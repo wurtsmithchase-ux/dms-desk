@@ -1278,8 +1278,18 @@ select.search:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 2px
 @media (max-width:640px){.day .moon{position:static;font-size:9px;order:3}.day .moon:not(.key){display:none}}
 .tm-body{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 @media (min-width:641px){
-  html.locked:has(#modal .sheet:not(.wide)) #diceFab{right:calc(min(520px,100vw) + 18px);bottom:calc(18px + env(safe-area-inset-bottom,0px))}
-  html.locked:has(#modal .sheet:not(.wide)) #dicetray,html.locked:has(#modal .sheet:not(.wide)) #rollstack{right:calc(min(520px,100vw) + 18px);bottom:calc(82px + env(safe-area-inset-bottom,0px))}
+  html.locked:has(#modal .sheet:not(.wide)) #diceFab{right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+  html.locked:has(#modal .sheet:not(.wide)) #dicetray,html.locked:has(#modal .sheet:not(.wide)) #rollstack{right:18px;bottom:calc(82px + env(safe-area-inset-bottom,0px))}
+}
+/* Centered pop-up on computers; phones stay full screen */
+@media (min-width:641px){
+  .scrim{justify-content:center;align-items:center;padding:24px}
+  .scrim>.sheet{width:min(760px,100%,calc(100vw - 170px));height:auto;max-height:100%;border:1px solid var(--line);border-top:4px solid var(--bar);border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.4)}
+  .scrim>.sheet.wide{width:min(1100px,100%)}
+}
+/* Keep the pop-up clear of the Keep open dock */
+@media (min-width:1101px){
+  body.docked .scrim{padding-left:424px}
 }
 </style>
 
@@ -3658,13 +3668,15 @@ function calSettings(){
 }
 
 /* ---------- events ---------- */
+let SCRIM_DOWN=false;
+document.addEventListener("pointerdown",e=>{SCRIM_DOWN=!!(e.target.classList&&e.target.classList.contains("scrim"))},true);
 document.addEventListener("click",async e=>{
   const mi=e.target.closest(".map-inner.editing");
   if(mi&&!e.target.closest(".pin")){const r=mi.getBoundingClientRect();pinForm(mi.dataset.map,null,+((e.clientX-r.left)/r.width*100).toFixed(2),+((e.clientY-r.top)/r.height*100).toFixed(2));return}
   const t=e.target.closest("[data-act]");if(!t)return;
   if(t.tagName==="A")e.preventDefault();
   const a=t.dataset.act,c=cal();
-  if(a==="scrim"){if(e.target===t)closeSheet();return}
+  if(a==="scrim"){if(e.target===t&&SCRIM_DOWN&&!document.querySelector("#modal>.scrim>form.sheet"))closeSheet();return}
   if(a!=="del"&&a!=="askDel"&&a!=="initClear")document.querySelectorAll(".armed").forEach(b=>{b.classList.remove("armed");b.textContent=b.dataset.label||b.textContent});
   e.stopPropagation();
   switch(a){
