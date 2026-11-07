@@ -32,19 +32,21 @@
   function multipart(meta,text){
     const b="desk"+Math.random().toString(36).slice(2);
     return{type:"multipart/related; boundary="+b,body:`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${text}\r\n--${b}--`}}
+  /* "version" here means a fingerprint of the contents. Drive's own version number also rises for changes that aren't to the contents, which looked like edits from another device. */
+  const tagged=f=>({id:f.id,version:f.md5Checksum});
   const googleDrive={
     hasToken:()=>!!(token=token||readToken()),
     signIn,
     async find(){
       const q=encodeURIComponent(`name='${FILE_NAME}' and trashed=false`);
-      const r=await(await call(`${API}/drive/v3/files?q=${q}&spaces=drive&orderBy=modifiedTime desc&fields=files(id,version)`)).json();
-      return r.files&&r.files[0]||null},
-    async version(id){return(await(await call(`${API}/drive/v3/files/${id}?fields=version`)).json()).version},
+      const r=await(await call(`${API}/drive/v3/files?q=${q}&spaces=drive&orderBy=modifiedTime desc&fields=files(id,md5Checksum)`)).json();
+      return r.files&&r.files[0]?tagged(r.files[0]):null},
+    async version(id){return(await(await call(`${API}/drive/v3/files/${id}?fields=md5Checksum`)).json()).md5Checksum},
     async read(id){return(await call(`${API}/drive/v3/files/${id}?alt=media`)).text()},
     async create(name,text){const m=multipart({name,mimeType:"application/json"},text);
-      return(await call(`${API}/upload/drive/v3/files?uploadType=multipart&fields=id,version`,{method:"POST",headers:{"Content-Type":m.type},body:m.body})).json()},
+      return tagged(await(await call(`${API}/upload/drive/v3/files?uploadType=multipart&fields=id,md5Checksum`,{method:"POST",headers:{"Content-Type":m.type},body:m.body})).json())},
     async update(id,text){
-      return(await call(`${API}/upload/drive/v3/files/${id}?uploadType=media&fields=id,version`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:text})).json()}
+      return tagged(await(await call(`${API}/upload/drive/v3/files/${id}?uploadType=media&fields=id,md5Checksum`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:text})).json())}
   };
   const drive=window.DESK_DRIVE||(CFG.googleClientId?googleDrive:null);
 
@@ -55,18 +57,18 @@
   async function localPut(v){try{const d=await idb();await new Promise(ok=>{const t=d.transaction("kv","readwrite");t.objectStore("kv").put(v,"campaign");t.oncomplete=ok;t.onerror=ok})}catch(_){}}
 
   /* ---------- state ---------- */
-  const st={docs:{},fileId:null,base:null,dirty:false,busy:false,again:false,timer:null,status:"",conflict:false};
+  const st={docs:{},fileId:null,base:null,sent:null,dirty:false,busy:false,again:false,timer:null,status:"",conflict:false};
   const subs=new Map();
   const deep=o=>JSON.parse(JSON.stringify(o));
   function freeze(o){if(o&&typeof o==="object"){Object.values(o).forEach(freeze);Object.freeze(o)}return o}
   const snap=path=>({docs:Object.entries(st.docs[path]||{}).map(([id,d])=>({id,data:()=>d}))});
   const fire=path=>(subs.get(path)||[]).forEach(cb=>cb(snap(path)));
   const fireAll=()=>subs.forEach((_,p)=>fire(p));
-  const serialize=()=>JSON.stringify({app:"dm-desk-store",version:1,saved:new Date().toISOString(),docs:st.docs});
+  const serialize=(saved=new Date().toISOString())=>JSON.stringify({app:"dm-desk-store",version:1,saved,docs:st.docs});
   function adopt(text){
     const d=JSON.parse(text);if(!d||!d.docs)throw new Error("bad file");
     Object.values(d.docs).forEach(c=>Object.values(c).forEach(freeze));st.docs=d.docs}
-  const remember=()=>localPut({docs:st.docs,fileId:st.fileId,base:st.base,dirty:st.dirty});
+  const remember=()=>localPut({docs:st.docs,fileId:st.fileId,base:st.base,sent:st.sent,dirty:st.dirty});
 
   /* ---------- status pill and sign-in screen ---------- */
   const STYLE=`#ds-pill{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:9000;font:600 12px/1.2 system-ui,sans-serif;padding:7px 10px;border-radius:999px;background:#2b2118;color:#f6ecd8;box-shadow:0 2px 8px #0005;border:0;opacity:.92}
@@ -103,6 +105,10 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
       st.conflict=false;ungate();await remember();
       if(st.dirty)await saveNow();else setStatus("saved")
     }catch(e){st.conflict=false;ungate();handle(e)}}
+  /* Drive differs from what this device last knew. It's only a real clash if someone else wrote it: a save whose reply never arrived (page closed or phone sleeping) leaves Drive holding this device's own work. */
+  async function driveIsMine(){
+    const d=JSON.parse(await drive.read(st.fileId));
+    return !!st.sent&&d.saved===st.sent||JSON.stringify(d.docs)===JSON.stringify(st.docs)}
   /* line this device up with Drive; used on opening and whenever the Desk comes back into view */
   async function sync(){
     if(!drive||st.busy||st.conflict)return;
@@ -115,8 +121,8 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
         const c=await drive.create(FILE_NAME,serialize());st.fileId=c.id;st.base=c.version;st.dirty=false;await remember();setStatus("saved");st.busy=false;return}
       const v=await drive.version(st.fileId);
       if(v!==st.base){
-        if(st.dirty){st.busy=false;askConflict();return}
-        adopt(await drive.read(st.fileId));st.base=v;await remember();fireAll()}
+        if(st.dirty){if(!await driveIsMine()){st.busy=false;askConflict();return}st.base=v}
+        else{adopt(await drive.read(st.fileId));st.base=v;await remember();fireAll()}}
       st.busy=false;
       if(st.dirty)await saveNow();else setStatus("saved")
     }catch(e){st.busy=false;if(e&&e.status===404){st.fileId=null;st.base=null;st.dirty=true;return sync()}handle(e)}}
@@ -130,8 +136,10 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
     st.busy=true;setStatus("saving");
     try{
       const v=await drive.version(st.fileId);
-      if(v!==st.base){st.busy=false;askConflict();return}
-      const text=serialize();st.dirty=false;
+      if(v!==st.base){if(!await driveIsMine()){st.busy=false;askConflict();return}st.base=v}
+      /* note the save before sending it, so a lost reply can be recognized after a reopen */
+      st.sent=new Date().toISOString();await remember();
+      const text=serialize(st.sent);st.dirty=false;
       const r=await drive.update(st.fileId,text);
       st.base=r.version;await remember();st.busy=false;
       if(st.dirty||st.again){st.again=false;st.dirty=true;return saveNow()}
@@ -172,7 +180,7 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
   async function open(){
     pill();
     const c=await localGet();
-    if(c&&c.docs){Object.values(c.docs).forEach(col=>Object.values(col).forEach(freeze));Object.assign(st,{docs:c.docs,fileId:c.fileId||null,base:c.base??null,dirty:!!c.dirty})}
+    if(c&&c.docs){Object.values(c.docs).forEach(col=>Object.values(col).forEach(freeze));Object.assign(st,{docs:c.docs,fileId:c.fileId||null,base:c.base??null,sent:c.sent||null,dirty:!!c.dirty})}
     if(!drive){setStatus("local");return db}
     if(!drive.hasToken()){
       if(c&&c.docs&&!navigator.onLine){setStatus("offline");return db}
