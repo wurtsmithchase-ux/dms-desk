@@ -42,6 +42,7 @@
       const r=await(await call(`${API}/drive/v3/files?q=${q}&spaces=drive&orderBy=modifiedTime desc&fields=files(id,md5Checksum)`)).json();
       return r.files&&r.files[0]?tagged(r.files[0]):null},
     async version(id){return(await(await call(`${API}/drive/v3/files/${id}?fields=md5Checksum`)).json()).md5Checksum},
+    async oldVersion(id){return(await(await call(`${API}/drive/v3/files/${id}?fields=version`)).json()).version},
     async read(id){return(await call(`${API}/drive/v3/files/${id}?alt=media`)).text()},
     async create(name,text){const m=multipart({name,mimeType:"application/json"},text);
       return tagged(await(await call(`${API}/upload/drive/v3/files?uploadType=multipart&fields=id,md5Checksum`,{method:"POST",headers:{"Content-Type":m.type},body:m.body})).json())},
@@ -106,9 +107,15 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
       if(st.dirty)await saveNow();else setStatus("saved")
     }catch(e){st.conflict=false;ungate();handle(e)}}
   /* Drive differs from what this device last knew. It's only a real clash if someone else wrote it: a save whose reply never arrived (page closed or phone sleeping) leaves Drive holding this device's own work. */
-  async function driveIsMine(){
-    const d=JSON.parse(await drive.read(st.fileId));
-    return !!st.sent&&d.saved===st.sent||JSON.stringify(d.docs)===JSON.stringify(st.docs)}
+  function driveIsMine(text){
+    /* a file that can't be read can't be this device's save, so it goes to the two-versions prompt, where keeping this device's version repairs it */
+    try{const d=JSON.parse(text);return !!st.sent&&d.saved===st.sent||JSON.stringify(d.docs)===JSON.stringify(st.docs)}
+    catch(_){return false}}
+  /* Drive's current fingerprint. Device copies from before fingerprints hold Drive's version number as their base: if that number hasn't moved, Drive hasn't changed. */
+  async function driveVersion(){
+    const v=await drive.version(st.fileId);
+    if(v!==st.base&&st.base!=null&&drive.oldVersion&&!/^[0-9a-f]{32}$/.test(st.base)&&await drive.oldVersion(st.fileId)===st.base)st.base=v;
+    return v}
   /* line this device up with Drive; used on opening and whenever the Desk comes back into view */
   async function sync(){
     if(!drive||st.busy||st.conflict)return;
@@ -116,13 +123,19 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
     try{
       if(!st.fileId){const f=await drive.find();
         if(f){st.fileId=f.id;
-          if(st.dirty&&Object.keys(st.docs).length){st.base=null;st.busy=false;askConflict();return}
-          adopt(await drive.read(f.id));st.base=f.version;st.dirty=false;await remember();fireAll();setStatus("saved");st.busy=false;return}
-        const c=await drive.create(FILE_NAME,serialize());st.fileId=c.id;st.base=c.version;st.dirty=false;await remember();setStatus("saved");st.busy=false;return}
-      const v=await drive.version(st.fileId);
+          const text=await drive.read(f.id);
+          if(st.dirty&&Object.keys(st.docs).length){
+            if(!driveIsMine(text)){st.base=null;st.busy=false;askConflict();return}
+            st.base=f.version;st.busy=false;return saveNow()}
+          adopt(text);st.base=f.version;st.dirty=false;await remember();fireAll();setStatus("saved");st.busy=false;return}
+        st.sent=new Date().toISOString();await remember();
+        const c=await drive.create(FILE_NAME,serialize(st.sent));st.fileId=c.id;st.base=c.version;st.dirty=false;await remember();setStatus("saved");st.busy=false;return}
+      const v=await driveVersion();
       if(v!==st.base){
-        if(st.dirty){if(!await driveIsMine()){st.busy=false;askConflict();return}st.base=v}
-        else{adopt(await drive.read(st.fileId));st.base=v;await remember();fireAll()}}
+        /* read before looking at dirty: an edit made during the download must not be replaced by it */
+        const text=await drive.read(st.fileId);
+        if(st.dirty){if(!driveIsMine(text)){st.busy=false;askConflict();return}st.base=v}
+        else{adopt(text);st.base=v;await remember();fireAll()}}
       st.busy=false;
       if(st.dirty)await saveNow();else setStatus("saved")
     }catch(e){st.busy=false;if(e&&e.status===404){st.fileId=null;st.base=null;st.dirty=true;return sync()}handle(e)}}
@@ -135,8 +148,8 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
     if(!st.fileId||st.base==null){return sync()}
     st.busy=true;setStatus("saving");
     try{
-      const v=await drive.version(st.fileId);
-      if(v!==st.base){if(!await driveIsMine()){st.busy=false;askConflict();return}st.base=v}
+      const v=await driveVersion();
+      if(v!==st.base){if(!driveIsMine(await drive.read(st.fileId))){st.busy=false;askConflict();return}st.base=v}
       /* note the save before sending it, so a lost reply can be recognized after a reopen */
       st.sent=new Date().toISOString();await remember();
       const text=serialize(st.sent);st.dirty=false;
