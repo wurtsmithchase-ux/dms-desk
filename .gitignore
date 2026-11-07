@@ -1,0 +1,4 @@
+# never commit campaign data
+*backup*.json
+dms-desk-*.json
+
