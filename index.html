@@ -3676,7 +3676,7 @@ document.addEventListener("click",async e=>{
   const t=e.target.closest("[data-act]");if(!t)return;
   if(t.tagName==="A")e.preventDefault();
   const a=t.dataset.act,c=cal();
-  if(a==="scrim"){if(e.target===t&&SCRIM_DOWN&&!document.querySelector("#modal>.scrim>form.sheet"))closeSheet();return}
+  if(a==="scrim"){if(e.target===t&&SCRIM_DOWN&&!document.querySelector("#modal>.scrim>form.sheet,#modal>.scrim>.sheet.enc"))closeSheet();return}
   if(a!=="del"&&a!=="askDel"&&a!=="initClear")document.querySelectorAll(".armed").forEach(b=>{b.classList.remove("armed");b.textContent=b.dataset.label||b.textContent});
   e.stopPropagation();
   switch(a){
