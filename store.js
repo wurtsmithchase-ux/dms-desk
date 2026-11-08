@@ -46,9 +46,16 @@
     if(r.status===401){dropToken();throw failure("signin")}
     if(!r.ok)throw failure("drive","drive "+r.status,{status:r.status});
     return r}
-  function multipart(meta,text){
+  function multipart(meta,text,type="application/json"){
     const b="desk"+Math.random().toString(36).slice(2);
-    return{type:"multipart/related; boundary="+b,body:`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${text}\r\n--${b}--`}}
+    return{type:"multipart/related; boundary="+b,body:`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: ${type}; charset=UTF-8\r\n\r\n${text}\r\n--${b}--`}}
+  const quote=s=>"'"+String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'")+"'";
+  const FOLDER="application/vnd.google-apps.folder";
+  async function query(q,fields="id,name,md5Checksum,parents"){
+    const out=[];let page="";
+    do{const r=await(await call(`${API}/drive/v3/files?q=${encodeURIComponent(q)}&spaces=drive&pageSize=1000&fields=nextPageToken,files(${fields})${page?"&pageToken="+encodeURIComponent(page):""}`)).json();
+      out.push(...(r.files||[]));page=r.nextPageToken||""}while(page);
+    return out}
   /* "version" here means a fingerprint of the contents. Drive's own version number also rises for changes that aren't to the contents, which looked like edits from another device. */
   const tagged=f=>({id:f.id,version:f.md5Checksum});
   const googleDrive={
@@ -61,10 +68,25 @@
     async version(id){return(await(await call(`${API}/drive/v3/files/${id}?fields=md5Checksum`)).json()).md5Checksum},
     async oldVersion(id){return(await(await call(`${API}/drive/v3/files/${id}?fields=version`)).json()).version},
     async read(id){return(await call(`${API}/drive/v3/files/${id}?alt=media`)).text()},
-    async create(name,text){const m=multipart({name,mimeType:"application/json"},text);
+    async create(name,text,parent){const m=multipart({name,mimeType:"application/json",...(parent?{parents:[parent]}:{})},text);
       return tagged(await(await call(`${API}/upload/drive/v3/files?uploadType=multipart&fields=id,md5Checksum`,{method:"POST",headers:{"Content-Type":m.type},body:m.body})).json())},
     async update(id,text){
-      return tagged(await(await call(`${API}/upload/drive/v3/files/${id}?uploadType=media&fields=id,md5Checksum`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:text})).json())}
+      return tagged(await(await call(`${API}/upload/drive/v3/files/${id}?uploadType=media&fields=id,md5Checksum`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:text})).json())},
+    /* folders and text files; the drive.file permission only shows files this app made */
+    async folder(name,parent){
+      const q=`name=${quote(name)} and mimeType='${FOLDER}' and trashed=false`+(parent?` and ${quote(parent)} in parents`:"");
+      const f=(await query(q,"id"))[0];if(f)return f.id;
+      return(await(await call(`${API}/drive/v3/files?fields=id`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,mimeType:FOLDER,...(parent?{parents:[parent]}:{})})})).json()).id},
+    async parents(id){return(await(await call(`${API}/drive/v3/files/${id}?fields=parents`)).json()).parents||[]},
+    async move(id,to,from){await call(`${API}/drive/v3/files/${id}?addParents=${encodeURIComponent(to)}${from&&from.length?"&removeParents="+encodeURIComponent(from.join(",")):""}&fields=id`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:"{}"})},
+    async named(prefix){return(await query(`name contains ${quote(prefix)} and trashed=false`)).filter(f=>f.name.startsWith(prefix)).map(f=>({id:f.id,parents:f.parents||[]}))},
+    /* props are Drive appProperties: hidden tags the Desk puts on its text files (which entry, and a fingerprint of what it wrote) */
+    async list(folder){return(await query(`${quote(folder)} in parents and trashed=false`,"id,name,md5Checksum,appProperties")).map(f=>({id:f.id,name:f.name,md5:f.md5Checksum,props:f.appProperties||{}}))},
+    async writeText(id,name,text,parent,props){
+      const meta=id?{name,appProperties:props}:{name,mimeType:"text/plain",parents:[parent],appProperties:props};const m=multipart(meta,text,"text/plain");
+      const r=await(await call(`${API}/upload/drive/v3/files${id?"/"+id:""}?uploadType=multipart&fields=id,md5Checksum`,{method:id?"PATCH":"POST",headers:{"Content-Type":m.type},body:m.body})).json();
+      return{id:r.id,md5:r.md5Checksum}},
+    async trash(id){await call(`${API}/drive/v3/files/${id}?fields=id`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({trashed:true})})}
   };
   const drive=window.DESK_DRIVE||(CFG.googleClientId?googleDrive:null);
 
@@ -121,6 +143,22 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
   const ungate=()=>document.getElementById("ds-gate")?.remove();
   const btn=(g,id,fn)=>{const b=g.querySelector("#"+id);if(b)b.onclick=fn};
 
+  /* ---------- the DM's Desk folder in Drive ---------- */
+  const HOME_NAME="DM's Desk",TEXT_NAME="Campaign text";
+  let homeP=null,textP=null,tidied=false;
+  const canFolders=()=>!!(drive&&drive.folder);
+  function home(){if(!homeP)homeP=drive.folder(HOME_NAME).catch(e=>{homeP=null;throw e});return homeP}
+  function textFolder(){if(!textP)textP=home().then(h=>drive.folder(TEXT_NAME,h)).catch(e=>{textP=null;throw e});return textP}
+  const homeOrRoot=()=>canFolders()?home().catch(()=>undefined):undefined;
+  /* moves the campaign file and old conflict copies into the folder; it never holds up saving */
+  async function tidy(){
+    if(tidied||!canFolders()||!st.fileId||!drive.hasToken())return;tidied=true;
+    try{
+      const h=await home(),p=await drive.parents(st.fileId);
+      if(!p.includes(h))await drive.move(st.fileId,h,p);
+      for(const f of await drive.named("dms-desk-conflict-"))if(!f.parents.includes(h))await drive.move(f.id,h,f.parents);
+    }catch(e){tidied=false;console.warn("Desk folder tidy failed",e)}}
+
   /* ---------- sync ---------- */
   function handle(e){
     if(e&&e.code==="signin")setStatus("signin");
@@ -135,8 +173,9 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
     const stamp=new Date().toISOString().slice(0,16).replace(/[:T]/g,"-");
     try{
       const remote=await drive.read(st.fileId);
-      if(pick==="drive"){await drive.create(`dms-desk-conflict-${stamp}-this-device.json`,serialize());adopt(remote);st.base=await drive.version(st.fileId);st.dirty=false;fireAll()}
-      else{await drive.create(`dms-desk-conflict-${stamp}-from-drive.json`,remote);st.base=await drive.version(st.fileId);st.dirty=true}
+      const where=await homeOrRoot();
+      if(pick==="drive"){await drive.create(`dms-desk-conflict-${stamp}-this-device.json`,serialize(),where);adopt(remote);st.base=await drive.version(st.fileId);st.dirty=false;fireAll()}
+      else{await drive.create(`dms-desk-conflict-${stamp}-from-drive.json`,remote,where);st.base=await drive.version(st.fileId);st.dirty=true}
       st.conflict=false;ungate();await remember();
       if(st.dirty)await saveNow();else setStatus("saved")
     }catch(e){st.conflict=false;ungate();handle(e)}}
@@ -164,7 +203,7 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
         adopt(text);st.base=f.version;st.dirty=false;await remember();fireAll();setStatus("saved");
         return}
       st.sent=new Date().toISOString();await remember();
-      const c=await drive.create(FILE_NAME,serialize(st.sent));
+      const c=await drive.create(FILE_NAME,serialize(st.sent),await homeOrRoot());
       st.fileId=c.id;st.base=c.version;st.dirty=false;await remember();setStatus("saved");
       return}
     const v=await driveVersion();
@@ -184,6 +223,7 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
       if(e&&e.status===404){st.fileId=null;st.base=null;st.dirty=true;next=sync}
       else handle(e)}
     finally{st.busy=false}
+    if(st.fileId&&!st.conflict)tidy();
     /* a save asked for while this sync was running still has to happen */
     const waiting=st.again;st.again=false;
     if(!next&&waiting&&st.dirty&&!st.conflict)next=saveNow;
@@ -259,5 +299,15 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
     await sync();
     return db}
 
-  window.DeskStore={open,assets,downloads,status:()=>st.status,saveNow};
+  /* ---------- campaign text files, used by textfiles.js ---------- */
+  const files={
+    available:()=>canFolders()&&!!drive.writeText,
+    signedIn:()=>!!(drive&&drive.hasToken()),
+    folder:textFolder,
+    list:async()=>drive.list(await textFolder()),
+    read:id=>drive.read(id),
+    write:async(id,name,text,props)=>drive.writeText(id,name,text,id?null:await textFolder(),props),
+    trash:id=>drive.trash(id)};
+
+  window.DeskStore={open,assets,downloads,files,status:()=>st.status,saveNow};
 })();

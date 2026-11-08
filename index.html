@@ -1761,6 +1761,11 @@ function campaignSheet(){
     <p class="tool-d">Download everything, DM secrets included, as one file. Restoring adds back anything in the file and updates entries with the same name; nothing else is deleted.</p>
     <div class="tool-acts"><button class="btn" data-act="exportGo">Download backup</button><button class="btn" data-act="copyAll">Copy whole campaign as text</button><label class="btn">Restore from backup<input type="file" id="imp-file" accept=".json,application/json" hidden></label></div>
     <div id="imp-box"></div>
+    <div class="taper"></div>
+    <h3 class="vh">Campaign text</h3>
+    <p class="tool-d">A text copy of every entry, kept in your Drive's DM's Desk folder for Claude to read. Changes made to those files wait here for you to accept.</p>
+    <div class="tool-acts"><button class="btn" data-tx="now">Update text files now</button><button class="btn" data-tx="review">Review text changes</button><button class="btn" data-tx="paste">Paste text to import</button></div>
+    <p class="tool-d" id="tx-st">${window.DeskText?esc(window.DeskText.status()):""}</p>
     <div class="taper"></div><div class="tool-acts"><button class="btn" data-act="calSettings">Calendar settings</button></div>`:`<p class="tool-d">You're viewing ${esc(S.settings.campaign?.name||"this campaign")} as a player.</p>`}
     <div class="foot"><span class="grow"></span><button type="button" class="btn" data-act="close">Close</button></div></div>`);
 }
@@ -3861,5 +3866,6 @@ if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceW
   BOOT.caps=true;bootCheck();
 })();
 </script>
+<script src="textfiles.js"></script>
 
 </body></html>
