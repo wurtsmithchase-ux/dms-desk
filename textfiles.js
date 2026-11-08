@@ -23,6 +23,12 @@ function md5(str){
     a0=(a0+A)>>>0;b0=(b0+B)>>>0;c0=(c0+C)>>>0;d0=(d0+D)>>>0}
   return [a0,b0,c0,d0].map(v=>[0,8,16,24].map(s=>((v>>>s)&255).toString(16).padStart(2,"0")).join("")).join("")}
 window.deskMd5=md5;
+/* overwrite protection depends on this hash matching Drive's, so check it against published test values */
+const MD5_OK=[["","d41d8cd98f00b204e9800998ecf8427e"],["abc","900150983cd24fb0d6963f7d28e17f72"],
+  ["The quick brown fox jumps over the lazy dog","9e107d9d372bb6826bd81d3542a419d6"],
+  ["12345678901234567890123456789012345678901234567890123456789012345678901234567890","57edf4a22be3c955ac49da2e2107b67a"]
+].every(([s,h])=>md5(s)===h);
+if(!MD5_OK)console.error("Desk text files: the MD5 self-test failed, so the text files are switched off.");
 
 /* ---------- what goes in a file ---------- */
 const HEAD="DM's Desk entry | keep this line | ";
@@ -35,7 +41,15 @@ const LINKED="Linked (the Desk fills this in; edits here are ignored)";
 const norm=s=>String(s||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
 const oneLine=s=>String(s||"").replace(/\s+/g," ").trim();
 const typeLabel=col=>col==="encounters"?"Encounter":FORMS[col].title;
-const find=(col,id)=>(ALL[col]||[]).find(x=>x.id===id);
+/* id lookups, rebuilt only when the data changes */
+const IX={ver:-1,m:new Map()};
+function find(col,id){
+  if(IX.ver!==dataVer){IX.ver=dataVer;IX.m.clear()}
+  const arr=ALL[col]||[];let e=IX.m.get(col);
+  if(!e||e.arr!==arr||e.n!==arr.length){e={arr,n:arr.length,m:new Map(arr.map(x=>[x.id,x]))};IX.m.set(col,e)}
+  return e.m.get(id)}
+/* one title for the file name and the "# heading", so they can't disagree. The first field comes first because the heading is read back into it */
+function entryTitle(col,x){const fs=fieldsOf(col),k=fs[0]&&fs[0].k;return oneLine(k&&x[k])||oneLine(titleOf(col,x))||"Untitled"}
 
 /* field lists depend on the data (some options are character names), so they're cached per data version */
 const FC={ver:-1,m:new Map()};
@@ -60,12 +74,12 @@ function valOut(f,v){
     default:return String(v)}}
 const isSection=(f,v)=>MULTI.has(f.t)||f.k==="secret"||v.includes("\n");
 
-function entryFile(col,x,linked){
-  const fs=fieldsOf(col),out=[HEAD+col+" | "+x.id,"# "+oneLine(x[fs[0].k]||titleOf(col,x)||"Untitled")],secs=[];
+function entryFile(col,x,linked,relOf){
+  const fs=fieldsOf(col),out=[HEAD+col+" | "+x.id,"# "+entryTitle(col,x)],secs=[];
   fs.slice(1).forEach(f=>{const v=valOut(f,rawVal(col,f,x));if(v==="")return;
     if(isSection(f,v))secs.push(`\n## ${f.l}\n${v.trim()}`);else out.push(`${f.l}: ${v}`)});
   if(col==="characters"){
-    const rel=S.links.filter(r=>r.a===x.id||r.b===x.id).map(r=>{const o=find("characters",r.a===x.id?r.b:r.a);return o?`- ${REL[r.kind]||"Linked"}: ${o.name}${r.label?" ("+oneLine(r.label)+")":""}`:""}).filter(Boolean);
+    const rel=(relOf?relOf(x.id):S.links.filter(r=>r.a===x.id||r.b===x.id)).map(r=>{const o=find("characters",r.a===x.id?r.b:r.a);return o?`- ${REL[r.kind]||"Linked"}: ${o.name}${r.label?" ("+oneLine(r.label)+")":""}`:""}).filter(Boolean);
     if(rel.length)secs.push("\n## Relationships (edit these in the Desk)\n"+rel.join("\n"))}
   if(linked.length)secs.push(`\n## ${LINKED}\n`+linked.map(n=>"- "+n).join("\n"));
   return out.concat(secs).join("\n")+"\n"}
@@ -78,31 +92,41 @@ const safeName=s=>oneLine(s).replace(/[\\/:*?"<>|]/g,"-").slice(0,80)||"Untitled
 
 /* every file the Desk wants in the folder, keyed col:id */
 function wanted(){
-  const W=new Map(),rows=[];
-  FILE_COLS.forEach(col=>ALL[col].slice().sort((a,b)=>a.id<b.id?-1:1).forEach(x=>rows.push({col,x})));
-  (ALL.encounters||[]).forEach(x=>rows.push({col:"encounters",x}));
-  const used=new Map();
-  rows.forEach(r=>{let base=`${typeLabel(r.col)} - ${safeName(titleOf(r.col,r.x)||r.x[fieldsOf(r.col)[0]?.k])}`,name=base+".txt",i=1;
-    while(used.has(name.toLowerCase()))name=`${base} (${++i}).txt`;used.set(name.toLowerCase(),1);r.name=name});
+  const rows=listRows();nameRows(rows);
   const nameOf=new Map(rows.map(r=>[r.col+":"+r.x.id,r.name.replace(/\.txt$/,"")]));
-  /* links: names this entry mentions, entries that mention it, picked characters or places, relationships */
-  const fwd=new Map(rows.map(r=>[r.col+":"+r.x.id,new Set()]));
-  const add=(a,b)=>{if(a!==b&&fwd.has(a)&&nameOf.has(b))fwd.get(a).add(b)};
-  rows.forEach(r=>{if(r.col==="encounters")return;const key=r.col+":"+r.x.id,fs=fieldsOf(r.col);
-    const text=fs.map(f=>{const v=rawVal(r.col,f,r.x);return typeof v==="string"?v:""}).join("\n");
-    try{backlinksFrom(text).forEach(t=>add(key,t.type+":"+t.id))}catch(_){}
-    fs.filter(f=>ID_SELECT.has(f.k)&&r.x[f.k]).forEach(f=>{["characters","notes"].forEach(c=>{if(find(c,r.x[f.k]))add(key,c+":"+r.x[f.k])})})});
-  S.links.forEach(l=>{add("characters:"+l.a,"characters:"+l.b);add("characters:"+l.b,"characters:"+l.a)});
-  const links=new Map([...fwd.keys()].map(k=>[k,new Set(fwd.get(k))]));
-  fwd.forEach((set,a)=>set.forEach(b=>{if(links.has(b))links.get(b).add(a)}));
-  const idx=[];
+  const links=buildLinks(rows,nameOf);
+  const relByChar=new Map();
+  S.links.forEach(r=>[r.a,r.b].forEach(id=>{if(!relByChar.has(id))relByChar.set(id,[]);relByChar.get(id).push(r)}));
+  const W=new Map(),idx=[];
   rows.forEach(r=>{const key=r.col+":"+r.x.id;
     const linked=[...links.get(key)].map(k=>nameOf.get(k)).filter(Boolean).sort();
-    W.set(key,{name:r.name,text:r.col==="encounters"?encounterFile(r.x):entryFile(r.col,r.x,linked)});
+    W.set(key,{name:r.name,text:r.col==="encounters"?encounterFile(r.x):entryFile(r.col,r.x,linked,id=>relByChar.get(id)||[])});
     const b=r.col==="encounters"?"":brief(r.col,r.x);idx.push({col:r.col,line:`- ${r.name.replace(/\.txt$/,"")}${b?" | "+b:""}`})});
   indexFiles(idx).forEach((v,k)=>W.set(k,{...v,always:true}));
   W.set("_new",{name:"_New entries.txt",text:NEW_TEMPLATE()});
   return W}
+function listRows(){
+  const rows=[];
+  FILE_COLS.forEach(col=>ALL[col].slice().sort((a,b)=>a.id<b.id?-1:1).forEach(x=>rows.push({col,x})));
+  (ALL.encounters||[]).forEach(x=>rows.push({col:"encounters",x}));
+  return rows}
+/* "Type - Name.txt"; a repeated name gets " (2)" */
+function nameRows(rows){
+  const used=new Set();
+  rows.forEach(r=>{const base=`${typeLabel(r.col)} - ${safeName(entryTitle(r.col,r.x))}`;let name=base+".txt",i=1;
+    while(used.has(name.toLowerCase()))name=`${base} (${++i}).txt`;used.add(name.toLowerCase());r.name=name})}
+/* links: names this entry mentions, entries that mention it, picked characters or places, relationships */
+function buildLinks(rows,nameOf){
+  const fwd=new Map(rows.map(r=>[r.col+":"+r.x.id,new Set()]));
+  const add=(a,b)=>{if(a!==b&&fwd.has(a)&&nameOf.has(b))fwd.get(a).add(b)};
+  rows.forEach(r=>{if(r.col==="encounters")return;const key=r.col+":"+r.x.id,fs=fieldsOf(r.col);
+    const text=fs.map(f=>{const v=rawVal(r.col,f,r.x);return typeof v==="string"?v:""}).join("\n");
+    try{backlinksFrom(text).forEach(t=>add(key,t.type+":"+t.id))}catch(e){console.warn("Desk text files: couldn't read links in",key,e)}
+    fs.filter(f=>ID_SELECT.has(f.k)&&r.x[f.k]).forEach(f=>{["characters","notes"].forEach(c=>{if(find(c,r.x[f.k]))add(key,c+":"+r.x[f.k])})})});
+  S.links.forEach(l=>{add("characters:"+l.a,"characters:"+l.b);add("characters:"+l.b,"characters:"+l.a)});
+  const links=new Map([...fwd.keys()].map(k=>[k,new Set(fwd.get(k))]));
+  fwd.forEach((set,a)=>set.forEach(b=>{if(links.has(b))links.get(b).add(a)}));
+  return links}
 
 function labelsLine(col){
   return fieldsOf(col).slice(1).map(f=>{
@@ -199,7 +223,13 @@ function newDefaults(col,vals){
 const ST={busy:false,ver:-1,dirty:false,dirtyAt:0,lastRun:0,started:false,force:new Set(),cards:[],status:"",again:false};
 const files=()=>window.DeskStore&&DeskStore.files;
 const outside=f=>!!(f.props.h&&f.md5&&f.md5!==f.props.h);
-async function pool(tasks,n){let i=0;const one=async()=>{while(i<tasks.length)await tasks[i++]()};await Promise.all(Array.from({length:Math.min(n,tasks.length)},one))}
+const WRITERS=4,QUIET_MS=60000,RECHECK_MS=120000,TICK_MS=5000,RERUN_MS=800,ARM_MS=4000;
+/* runs tasks n at a time. After the first failure no new task starts; in-flight ones finish, then the first error is thrown, so the next run never overlaps a leftover write */
+async function pool(tasks,n){
+  let i=0,err=null,failed=false;
+  const one=async()=>{while(!failed&&i<tasks.length){try{await tasks[i++]()}catch(e){if(!failed){failed=true;err=e}}}};
+  await Promise.all(Array.from({length:Math.min(n,tasks.length)},one));
+  if(failed)throw err}
 function setStatus(s){ST.status=s;const el=document.getElementById("tx-st");if(el)el.textContent=statusText()}
 function statusText(){
   const F=files();if(!F||!F.available())return "Text files need Google Drive.";
@@ -207,7 +237,7 @@ function statusText(){
   return {busy:"Updating the text files...",ok:"Text files are up to date.",error:"Couldn't update the text files. The Desk will try again.",offline:"Offline. The text files will update when you're back online."}[ST.status]||"Text files update about a minute after you stop editing."}
 async function run(){
   const F=files();
-  if(!F||!F.available()||!F.signedIn()||!BOOT.ready)return;
+  if(!F||!F.available()||!F.signedIn()||!BOOT.ready||!MD5_OK)return;
   if(ST.busy){ST.again=true;return}
   ST.busy=true;ST.lastRun=Date.now();setStatus("busy");
   try{
@@ -222,7 +252,7 @@ async function run(){
       jobs.push(async()=>{await F.write(f?f.id:null,w.name,w.text,{k,h,t:String(Date.now())});ST.force.delete(k)})});
     have.forEach((f,k)=>{if(W.has(k))return;if(outside(f)&&!ST.force.has(k)&&!k.startsWith("_index"))edited.push({k,f});else jobs.push(async()=>{await F.trash(f.id);ST.force.delete(k)})});
     extra.forEach(f=>{if(!outside(f))jobs.push(()=>F.trash(f.id))});
-    await pool(jobs,4);
+    await pool(jobs,WRITERS);
     await buildCards(edited);
     setStatus("ok")
   }catch(e){console.warn("Desk text files",e);setStatus(e&&e.code==="offline"?"offline":e&&e.code==="signin"?"":"error");ST.dirty=true;ST.dirtyAt=Date.now()}
@@ -232,21 +262,28 @@ function tick(){
   if(!BOOT.ready)return;
   if(dataVer!==ST.ver){ST.ver=dataVer;if(ST.started){ST.dirty=true;ST.dirtyAt=Date.now()}}
   if(!ST.started){ST.started=true;run();return}
-  if(ST.dirty&&Date.now()-ST.dirtyAt>=60000){ST.dirty=false;run()}}
-setInterval(tick,5000);
+  if(ST.dirty&&Date.now()-ST.dirtyAt>=QUIET_MS){ST.dirty=false;run()}}
+setInterval(tick,TICK_MS);
 document.addEventListener("visibilitychange",()=>{
   if(document.visibilityState==="hidden"){if(ST.dirty){ST.dirty=false;run()}}
-  else if(ST.started&&Date.now()-ST.lastRun>120000)run()});
-const soon=()=>setTimeout(run,800);
+  else if(ST.started&&Date.now()-ST.lastRun>RECHECK_MS)run()});
+const soon=()=>setTimeout(run,RERUN_MS);
 
 /* ---------- review page ---------- */
 async function buildCards(edited){
-  const F=files(),cards=[];
+  const F=files(),cards=[],texts=new Map(),failed=new Set();
+  /* cards already shown for this exact file stay as they are, so an accepted new entry can't come back */
+  const prevOf=k=>ST.cards.filter(c=>c.key===k&&c.src!=="paste");
+  const reads=edited.filter(({k,f})=>{const p=prevOf(k);return !(p.length&&p[0].md5===f.md5)});
+  await pool(reads.map(({k,f})=>async()=>{
+    try{texts.set(k,await F.read(f.id))}
+    catch(e){console.warn("Desk text files: couldn't read",f.name,e);failed.add(k)}}),WRITERS);
+  /* a file that couldn't be read keeps whatever cards it had and is tried again on the next cycle */
+  if(failed.size){ST.dirty=true;ST.dirtyAt=Date.now()}
   for(const {k,f} of edited){
-    /* cards already shown for this exact file stay as they are, so an accepted new entry can't come back */
-    const prev=ST.cards.filter(c=>c.key===k&&c.src!=="paste");
-    if(prev.length&&prev[0].md5===f.md5){cards.push(...prev);continue}
-    let text="";try{text=await F.read(f.id)}catch(_){continue}
+    const prev=prevOf(k);
+    if(failed.has(k)||(prev.length&&prev[0].md5===f.md5)){cards.push(...prev);continue}
+    const text=texts.get(k);
     const base={key:k,file:f.name,md5:f.md5};
     if(k==="_new"){parseNew(text).forEach(p=>cards.push({...p,...base,src:"new"}));continue}
     const p=parseEntry(text);
@@ -263,7 +300,8 @@ async function buildCards(edited){
 function notice(){
   const n=new Set(ST.cards.filter(c=>c.src!=="paste").map(c=>c.key)).size;let b=document.getElementById("tx-note");
   if(!n){if(b)b.remove();return}
-  if(!b){const s=document.createElement("style");s.textContent=CSS;document.head.appendChild(s);b=document.createElement("button");b.id="tx-note";b.type="button";b.dataset.tx="review";document.body.appendChild(b)}
+  if(!b){if(!document.getElementById("tx-css")){const s=document.createElement("style");s.id="tx-css";s.textContent=CSS;document.head.appendChild(s)}
+    b=document.createElement("button");b.id="tx-note";b.type="button";b.dataset.tx="review";document.body.appendChild(b)}
   b.textContent=`${n} text file${n===1?"":"s"} changed. Review`}
 const CSS=`#tx-note{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:8999;font:600 12px/1.2 system-ui,sans-serif;padding:7px 12px;border-radius:999px;background:var(--blood,#8a2c1d);color:#fff;border:0;box-shadow:0 2px 8px #0005;cursor:pointer}
 @media (max-width:640px){#tx-note{bottom:calc(78px + env(safe-area-inset-bottom))}}
@@ -309,7 +347,7 @@ function readPaste(text){
       const x=find(p.col,p.id),changes=diff(p.col,x,p.vals);cards.push({...p,src:"paste",gone:!x,changes})})}
   else parseNew(t).forEach(p=>cards.push({...p,src:"paste"}));
   return cards}
-function arm(t,label){if(t.classList.contains("armed"))return true;t.classList.add("armed");t.dataset.label=t.textContent;t.textContent=label;setTimeout(()=>{if(t.isConnected&&t.classList.contains("armed")){t.classList.remove("armed");t.textContent=t.dataset.label}},4000);return false}
+function arm(t,label){if(t.classList.contains("armed"))return true;t.classList.add("armed");t.dataset.label=t.textContent;t.textContent=label;setTimeout(()=>{if(t.isConnected&&t.classList.contains("armed")){t.classList.remove("armed");t.textContent=t.dataset.label}},ARM_MS);return false}
 function settle(c){
   ST.cards=ST.cards.filter(x=>x!==c);
   if(c.src!=="paste"&&!ST.cards.some(x=>x.key===c.key&&x.src!=="paste"))ST.force.add(c.key);
@@ -328,7 +366,10 @@ document.addEventListener("click",async e=>{
   else if(a==="paste")showPaste();
   else if(a==="check"){const cards=readPaste(document.getElementById("tx-paste-ta").value);if(!cards.length){toast("Nothing the Desk can import was found.");return}
     ST.cards=ST.cards.filter(x=>x.src!=="paste").concat(cards);showReview()}
-  else if(a==="accept"&&c){if(!arm(t,"Click again to accept"))return;t.disabled=true;await accept(c);settle(c)}
+  else if(a==="accept"&&c){if(!arm(t,"Click again to accept"))return;t.disabled=true;
+    try{await accept(c)}
+    catch(err){console.warn("Desk text files: accept failed",err);toast("Couldn't save that change. Try again.");t.disabled=false;t.classList.remove("armed");t.textContent=t.dataset.label||"Accept";return}
+    settle(c)}
   else if(a==="skip"&&c){if(c.src!=="paste"&&!arm(t,"Sure? Put the Desk's version back"))return;settle(c)}
 });
 
