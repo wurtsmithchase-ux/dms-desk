@@ -10,12 +10,26 @@
   /* ---------- Google Drive ---------- */
   const API="https://www.googleapis.com";
   let token=null;
-  function readToken(){try{const t=JSON.parse(localStorage.getItem(TOKEN_KEY)||"null");if(t&&t.exp>Date.now()+30000)return t.value}catch(_){}return null}
-  function keepToken(value,seconds){token=value;try{localStorage.setItem(TOKEN_KEY,JSON.stringify({value,exp:Date.now()+seconds*1000}))}catch(_){}}
-  function dropToken(){token=null;try{localStorage.removeItem(TOKEN_KEY)}catch(_){}}
+  const failure=(code,message,extra)=>Object.assign(new Error(message||code),{code,...extra});
+  function readToken(){
+    try{
+      const t=JSON.parse(localStorage.getItem(TOKEN_KEY)||"null");
+      if(t&&t.exp>Date.now()+30000)return t.value;
+    }catch(_){}
+    return null}
+  function keepToken(value,seconds){
+    token=value;
+    try{localStorage.setItem(TOKEN_KEY,JSON.stringify({value,exp:Date.now()+seconds*1000}))}catch(_){}}
+  function dropToken(){
+    token=null;
+    try{localStorage.removeItem(TOKEN_KEY)}catch(_){}}
   function gisReady(){return new Promise((ok,bad)=>{
     if(window.google&&google.accounts&&google.accounts.oauth2)return ok();
-    const s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.onload=()=>ok();s.onerror=()=>bad(new Error("offline"));document.head.appendChild(s)})}
+    const s=document.createElement("script");
+    s.src="https://accounts.google.com/gsi/client";
+    s.onload=()=>ok();
+    s.onerror=()=>bad(failure("offline"));
+    document.head.appendChild(s)})}
   async function signIn(){
     await gisReady();
     return new Promise((ok,bad)=>{
@@ -24,10 +38,13 @@
         error_callback:()=>bad(new Error("declined"))});
       c.requestAccessToken({prompt:""})})}
   async function call(url,opts){
-    if(!token)throw Object.assign(new Error("signin"),{code:"signin"});
-    const r=await fetch(url,{...opts,headers:{...(opts&&opts.headers),Authorization:"Bearer "+token}});
-    if(r.status===401){dropToken();throw Object.assign(new Error("signin"),{code:"signin"})}
-    if(!r.ok)throw Object.assign(new Error("drive "+r.status),{code:"drive",status:r.status});
+    if(!token)throw failure("signin");
+    let r;
+    /* only a failed network request counts as offline; any other TypeError is a bug and should surface as an error */
+    try{r=await fetch(url,{...opts,headers:{...(opts&&opts.headers),Authorization:"Bearer "+token}})}
+    catch(_){throw failure("offline")}
+    if(r.status===401){dropToken();throw failure("signin")}
+    if(!r.ok)throw failure("drive","drive "+r.status,{status:r.status});
     return r}
   function multipart(meta,text){
     const b="desk"+Math.random().toString(36).slice(2);
@@ -69,7 +86,12 @@
   function adopt(text){
     const d=JSON.parse(text);if(!d||!d.docs)throw new Error("bad file");
     Object.values(d.docs).forEach(c=>Object.values(c).forEach(freeze));st.docs=d.docs}
-  const remember=()=>localPut({docs:st.docs,fileId:st.fileId,base:st.base,sent:st.sent,dirty:st.dirty});
+  /* Writing the whole campaign to the device on every keystroke-sized change is wasteful, so edits are batched. remember() writes now and cancels any batched write. */
+  const REMEMBER_DELAY=300;
+  let rememberTimer=null;
+  const remember=()=>{clearTimeout(rememberTimer);rememberTimer=null;return localPut({docs:st.docs,fileId:st.fileId,base:st.base,sent:st.sent,dirty:st.dirty})};
+  const rememberSoon=()=>{if(!rememberTimer)rememberTimer=setTimeout(remember,REMEMBER_DELAY)};
+  const flushRemember=()=>{if(rememberTimer)remember()};
 
   /* ---------- status pill and sign-in screen ---------- */
   const STYLE=`#ds-pill{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:9000;font:600 12px/1.2 system-ui,sans-serif;padding:7px 10px;border-radius:999px;background:#2b2118;color:#f6ecd8;box-shadow:0 2px 8px #0005;border:0;opacity:.92}
@@ -82,7 +104,19 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
 #ds-gate button{display:block;width:100%;margin-top:10px;padding:12px;border-radius:8px;border:1px solid #8a6f4d;background:#3a2c20;color:#f6ecd8;font:600 15px system-ui,sans-serif;cursor:pointer}
 #ds-gate button.main{background:#c9a35c;color:#1f1812;border-color:#c9a35c}`;
   function pill(){let p=document.getElementById("ds-pill");if(!p){const s=document.createElement("style");s.textContent=STYLE;document.head.appendChild(s);p=document.createElement("button");p.id="ds-pill";p.type="button";p.onclick=()=>{if(st.status==="signin")reauth();else if(st.status==="offline"||st.status==="error")saveNow()};document.body.appendChild(p)}return p}
-  function setStatus(s){st.status=s;const p=pill();const m={saved:["Saved to Drive","ok"],saving:["Saving...",""],pending:["Not saved yet",""],offline:["Offline: saved on this device only. Tap to retry","warn"],signin:["Sign in to save to Drive","warn"],error:["Couldn't save to Drive. Tap to retry","warn"],local:["This device only","warn"],conflict:["Choose which version to keep","warn"]}[s]||["",""];p.textContent=m[0];p.className=m[1];p.hidden=!m[0]}
+  const STATUS_TEXT={
+    saved:["Saved to Drive","ok"],
+    saving:["Saving...",""],
+    pending:["Not saved yet",""],
+    offline:["Offline: saved on this device only. Tap to retry","warn"],
+    signin:["Sign in to save to Drive","warn"],
+    error:["Couldn't save to Drive. Tap to retry","warn"],
+    local:["This device only","warn"],
+    conflict:["Choose which version to keep","warn"]};
+  function setStatus(s){
+    st.status=s;
+    const p=pill(),m=STATUS_TEXT[s]||["",""];
+    p.textContent=m[0];p.className=m[1];p.hidden=!m[0]}
   function gate(html){let g=document.getElementById("ds-gate");if(!g){g=document.createElement("div");g.id="ds-gate";document.body.appendChild(g)}g.innerHTML=`<div>${html}</div>`;return g}
   const ungate=()=>document.getElementById("ds-gate")?.remove();
   const btn=(g,id,fn)=>{const b=g.querySelector("#"+id);if(b)b.onclick=fn};
@@ -90,8 +124,8 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
   /* ---------- sync ---------- */
   function handle(e){
     if(e&&e.code==="signin")setStatus("signin");
-    else if(!navigator.onLine||(e&&e.message==="offline")||e instanceof TypeError)setStatus("offline");
-    else setStatus("error")}
+    else if(!navigator.onLine||(e&&e.code==="offline"))setStatus("offline");
+    else{console.error("Desk sync error",e);setStatus("error")}}
   async function reauth(){try{await drive.signIn();await sync()}catch(e){handle(e)}}
   function askConflict(){
     st.conflict=true;setStatus("conflict");
@@ -117,28 +151,43 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
     if(v!==st.base&&st.base!=null&&drive.oldVersion&&!/^[0-9a-f]{32}$/.test(st.base)&&await drive.oldVersion(st.fileId)===st.base)st.base=v;
     return v}
   /* line this device up with Drive; used on opening and whenever the Desk comes back into view */
+  /* The work of one sync. Returns a function to run once the lock is released (or nothing). */
+  async function syncStep(){
+    if(!st.fileId){
+      const f=await drive.find();
+      if(f){
+        st.fileId=f.id;
+        const text=await drive.read(f.id);
+        if(st.dirty&&Object.keys(st.docs).length){
+          if(!driveIsMine(text)){st.base=null;return askConflict}
+          st.base=f.version;return saveNow}
+        adopt(text);st.base=f.version;st.dirty=false;await remember();fireAll();setStatus("saved");
+        return}
+      st.sent=new Date().toISOString();await remember();
+      const c=await drive.create(FILE_NAME,serialize(st.sent));
+      st.fileId=c.id;st.base=c.version;st.dirty=false;await remember();setStatus("saved");
+      return}
+    const v=await driveVersion();
+    if(v!==st.base){
+      /* read before looking at dirty: an edit made during the download must not be replaced by it */
+      const text=await drive.read(st.fileId);
+      if(st.dirty){if(!driveIsMine(text))return askConflict;st.base=v}
+      else{adopt(text);st.base=v;await remember();fireAll()}}
+    if(st.dirty)return saveNow;
+    setStatus("saved")}
   async function sync(){
     if(!drive||st.busy||st.conflict)return;
     st.busy=true;
-    try{
-      if(!st.fileId){const f=await drive.find();
-        if(f){st.fileId=f.id;
-          const text=await drive.read(f.id);
-          if(st.dirty&&Object.keys(st.docs).length){
-            if(!driveIsMine(text)){st.base=null;st.busy=false;askConflict();return}
-            st.base=f.version;st.busy=false;return saveNow()}
-          adopt(text);st.base=f.version;st.dirty=false;await remember();fireAll();setStatus("saved");st.busy=false;return}
-        st.sent=new Date().toISOString();await remember();
-        const c=await drive.create(FILE_NAME,serialize(st.sent));st.fileId=c.id;st.base=c.version;st.dirty=false;await remember();setStatus("saved");st.busy=false;return}
-      const v=await driveVersion();
-      if(v!==st.base){
-        /* read before looking at dirty: an edit made during the download must not be replaced by it */
-        const text=await drive.read(st.fileId);
-        if(st.dirty){if(!driveIsMine(text)){st.busy=false;askConflict();return}st.base=v}
-        else{adopt(text);st.base=v;await remember();fireAll()}}
-      st.busy=false;
-      if(st.dirty)await saveNow();else setStatus("saved")
-    }catch(e){st.busy=false;if(e&&e.status===404){st.fileId=null;st.base=null;st.dirty=true;return sync()}handle(e)}}
+    let next=null;
+    try{next=await syncStep()}
+    catch(e){
+      if(e&&e.status===404){st.fileId=null;st.base=null;st.dirty=true;next=sync}
+      else handle(e)}
+    finally{st.busy=false}
+    /* a save asked for while this sync was running still has to happen */
+    const waiting=st.again;st.again=false;
+    if(!next&&waiting&&st.dirty&&!st.conflict)next=saveNow;
+    if(next)return next()}
   async function saveNow(){
     clearTimeout(st.timer);st.timer=null;
     if(!drive){setStatus("local");return}
@@ -147,22 +196,31 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
     if(!drive.hasToken()){setStatus("signin");return}
     if(!st.fileId||st.base==null){return sync()}
     st.busy=true;setStatus("saving");
+    let next=null,sent=false;
     try{
       const v=await driveVersion();
-      if(v!==st.base){if(!driveIsMine(await drive.read(st.fileId))){st.busy=false;askConflict();return}st.base=v}
-      /* note the save before sending it, so a lost reply can be recognized after a reopen */
-      st.sent=new Date().toISOString();await remember();
-      const text=serialize(st.sent);st.dirty=false;
-      const r=await drive.update(st.fileId,text);
-      st.base=r.version;await remember();st.busy=false;
-      if(st.dirty||st.again){st.again=false;st.dirty=true;return saveNow()}
-      setStatus("saved")
-    }catch(e){st.busy=false;st.dirty=true;await remember();handle(e)}}
+      if(v!==st.base&&!driveIsMine(await drive.read(st.fileId)))next=askConflict;
+      else{
+        st.base=v;
+        /* note the save before sending it, so a lost reply can be recognized after a reopen */
+        st.sent=new Date().toISOString();await remember();
+        const text=serialize(st.sent);st.dirty=false;
+        const r=await drive.update(st.fileId,text);
+        st.base=r.version;await remember();sent=true}
+    }catch(e){st.dirty=true;await remember();handle(e)}
+    finally{st.busy=false}
+    if(next)return next();
+    if(!sent)return;
+    if(st.dirty||st.again){st.again=false;st.dirty=true;return saveNow()}
+    setStatus("saved")}
   function changed(path){
-    fire(path);st.dirty=true;remember();
+    fire(path);st.dirty=true;rememberSoon();
     if(!drive){setStatus("local");return}
     setStatus("pending");clearTimeout(st.timer);st.timer=setTimeout(saveNow,SAVE_DELAY)}
-  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){if(st.dirty)saveNow()}else if(drive&&drive.hasToken())sync()});
+  document.addEventListener("visibilitychange",()=>{
+    if(document.visibilityState==="hidden"){flushRemember();if(st.dirty)saveNow()}
+    else if(drive&&drive.hasToken())sync()});
+  window.addEventListener("pagehide",flushRemember);
   window.addEventListener("online",()=>{if(drive&&drive.hasToken())sync()});
   window.addEventListener("beforeunload",e=>{if(st.dirty&&drive){saveNow();e.preventDefault();e.returnValue=""}});
 
@@ -180,7 +238,7 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
     if(!/^image\/(png|jpeg|webp|gif)$/.test(f.type))return bad({code:"unsupported_type"});
     const url=URL.createObjectURL(f),img=new Image();
     img.onerror=()=>{URL.revokeObjectURL(url);bad({code:"bad_image"})};
-    img.onload=()=>{const max=2000,k=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement("canvas");
+    img.onload=()=>{const max=1600,k=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement("canvas");
       c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext("2d").drawImage(img,0,0,c.width,c.height);
       URL.revokeObjectURL(url);let d=c.toDataURL("image/webp",.82);if(!d.startsWith("data:image/webp"))d=c.toDataURL("image/jpeg",.82);ok({id:d,url:d})};
     img.src=url})};

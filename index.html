@@ -1336,6 +1336,7 @@ let db=null;
 
 /* ---------- helpers ---------- */
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const SAFE_ID=/^[\w.-]{1,80}$/;
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const num=v=>{const n=parseInt(v,10);return Number.isFinite(n)?n:null};
 const ord=n=>{const s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])};
@@ -1782,8 +1783,8 @@ function importPreview(file){
 }
 async function importGo(){
   const d=IMPORT;if(!d)return;const box=document.getElementById("imp-box");let n=0,total=COLS.reduce((a,c)=>a+(d.collections[c]||[]).length,0);
-  for(const c of COLS)for(const r of (d.collections[c]||[])){if(!r||!r.id)continue;const {id,...rest}=r;await save(c,id,rest,{keepDate:true});n++;if(box&&n%5===0)box.innerHTML=`<p class="tool-d">Restoring… ${n} of ${total}</p>`}
-  for(const k of Object.keys(d.settings||{}))if(d.settings[k])await save("settings",k,{...d.settings[k]});
+  for(const c of COLS)for(const r of (d.collections[c]||[])){if(!r||typeof r.id!=="string"||!SAFE_ID.test(r.id))continue;const {id,...rest}=r;await save(c,id,rest,{keepDate:true});n++;if(box&&n%5===0)box.innerHTML=`<p class="tool-d">Restoring… ${n} of ${total}</p>`}
+  for(const k of Object.keys(d.settings||{}))if(SAFE_ID.test(k)&&d.settings[k])await save("settings",k,{...d.settings[k]});
   IMPORT=null;if(box)box.innerHTML=`<p class="tool-d">Restored ${n} entries.</p>`;toast("Backup restored");
 }
 
@@ -2022,7 +2023,7 @@ function tmPopHtml(){const L=tmL();
     <button class="tm-kind" data-tmsticky="count"><b>Counter</b><small>Tallies with + and −: rounds, charges, legendary actions.</small></button></div>`;
   if(TMD.pop==="hidden"){const ks=Object.keys(L.hidden).filter(k=>L.hidden[k]);return `<h4>Hidden panels</h4>${ks.length?`<div class="tm-hid">${ks.map(k=>`<div class="tm-row"><span>${esc(tmKeyLabel(k))}</span><button class="btn sm" data-tmshow="${esc(k)}">Show</button></div>`).join("")}</div><button class="btn sm" data-tmarr="showall">Show all</button>`:`<p class="vempty">Nothing hidden. Use the – on a panel's top bar to hide it.</p>`}`}
   if(TMD.pop==="card"){const res=tmSearch(TMD.q);return `<h4>${TMD.popFor?"Link this sticky to a page":"Put a page on the board"}</h4><input id="tm-cardq" placeholder="Search characters, notes, quests, stat blocks…" value="${esc(TMD.q)}" autocomplete="off" aria-label="Search pages">
-    <div class="tm-res">${res.length?res.map(([t,x])=>`<button class="tm-ri" data-tmpick="${t}|${x.id}"><b>${esc(titleOf(t,x)||"Untitled")}</b><small>${esc(COL_LABEL[t]||t)}</small></button>`).join(""):`<p class="vempty">${TMD.q?"No matches.":"Start typing a name."}</p>`}</div>`}
+    <div class="tm-res">${res.length?res.map(([t,x])=>`<button class="tm-ri" data-tmpick="${esc(t)}|${esc(x.id)}"><b>${esc(titleOf(t,x)||"Untitled")}</b><small>${esc(COL_LABEL[t]||t)}</small></button>`).join(""):`<p class="vempty">${TMD.q?"No matches.":"Start typing a name."}</p>`}</div>`}
   return ""}
 /* put any page on Table mode from where you're reading it */
 function tmCardOn(type,eid){return tmL().cards.some(c=>c.type===type&&c.eid===eid)}
@@ -2141,7 +2142,7 @@ document.addEventListener("change",e=>{const el=e.target;if(el.matches&&el.match
 document.addEventListener("input",e=>{const el=e.target;const L=tmL();
   if(el.dataset&&el.dataset.stk){const st=L.stickies.find(s=>s.id===el.dataset.stk);if(st){st.text=el.value;tmSave()}}
   else if(el.dataset&&el.dataset.stct){const [sid,i]=el.dataset.stct.split("|");const st=L.stickies.find(s=>s.id===sid);const it=st&&st.items&&st.items[+i];if(it){it.t=el.value;tmSave()}}
-  else if(el.id==="tm-cardq"){TMD.q=el.value;const box=el.parentElement.querySelector(".tm-res");if(box){const res=tmSearch(TMD.q);box.innerHTML=res.length?res.map(([t,x])=>`<button class="tm-ri" data-tmpick="${t}|${x.id}"><b>${esc(titleOf(t,x)||"Untitled")}</b><small>${esc(COL_LABEL[t]||t)}</small></button>`).join(""):`<p class="vempty">${TMD.q?"No matches.":"Start typing a name."}</p>`}}
+  else if(el.id==="tm-cardq"){TMD.q=el.value;const box=el.parentElement.querySelector(".tm-res");if(box){const res=tmSearch(TMD.q);box.innerHTML=res.length?res.map(([t,x])=>`<button class="tm-ri" data-tmpick="${esc(t)}|${esc(x.id)}"><b>${esc(titleOf(t,x)||"Untitled")}</b><small>${esc(COL_LABEL[t]||t)}</small></button>`).join(""):`<p class="vempty">${TMD.q?"No matches.":"Start typing a name."}</p>`}}
   else if(el.id==="tm-newset")TMD.newName=el.value},true);
 document.addEventListener("keydown",e=>{const el=e.target;if(e.key!=="Enter"||!el.dataset)return;
   if(el.dataset.stcadd){e.preventDefault();const v=el.value.trim();if(!v)return;const st=tmL().stickies.find(s=>s.id===el.dataset.stcadd);if(st){st.items=st.items||[];st.items.push(st.kind==="count"?{t:v,n:0}:{t:v,done:false});el.value="";tmSave();const sid=st.id;el.blur();tmRender();setTimeout(()=>document.querySelector(`[data-stcadd="${sid}"]`)?.focus(),30)}}
@@ -2286,12 +2287,12 @@ async function recordHistory(col,id,prev){
   const key=col+"__"+id,last=HIST_SEEN.get(key)||0;if(Date.now()-last<5*60e3)return;HIST_SEEN.set(key,Date.now());
   const data=JSON.parse(JSON.stringify(prev));delete data.id;
   if(JSON.stringify(data).length>200000)return;
-  try{await db.collection(SECRET+"/history").doc(key+"__"+Date.now()).set({key,col,eid:id,at:Date.now(),title:titleOf(col,prev)||"",data})}catch(_){}
+  try{await db.collection(SECRET+"/history").doc(key+"__"+Date.now()).set({key,col,eid:id,at:Date.now(),title:titleOf(col,prev)||"",data})}catch(e){console.error("History write failed",e)}
 }
 async function recordTrash(col,id,prev){
   if(!prev||col==="chats"||col==="meta"||col==="logs")return;
   const data=JSON.parse(JSON.stringify(prev));delete data.id;
-  try{await db.collection(SECRET+"/trash").doc(col+"__"+id).set({col,eid:id,at:Date.now(),title:titleOf(col,prev)||"",data})}catch(_){}
+  try{await db.collection(SECRET+"/trash").doc(col+"__"+id).set({col,eid:id,at:Date.now(),title:titleOf(col,prev)||"",data})}catch(e){console.error("Trash write failed",e);toast("Couldn't move that to Trash, so it can't be restored later")}
 }
 async function purgeOld(){
   const now=Date.now();
@@ -2300,7 +2301,7 @@ async function purgeOld(){
 async function openTrash(){
   showSheet(`<div class="sheet" role="dialog" aria-label="Trash"><h2>Trash</h2><p class="tool-d">Deleted entries stay here for 30 days.</p><div id="trash-box"><p class="vempty">Loading…</p></div><div class="foot"><span class="grow"></span><button type="button" class="btn" data-act="close">Close</button></div></div>`,true);
   const docs=(await listDocs(SECRET+"/trash")).sort((a,b)=>(b.at||0)-(a.at||0));const box=document.getElementById("trash-box");if(!box)return;
-  box.innerHTML=docs.length?`<div class="bl">${docs.map(d=>`<div class="tr-i"><span><b>${esc(d.title||"Untitled")}</b><small>${esc(COL_LABEL[d.col]||d.col)} · deleted ${esc(new Date(d.at).toLocaleDateString("en-US",{month:"short",day:"numeric"}))}</small></span><button class="btn sm primary" data-act="trashRestore" data-id="${d.id}">Restore</button><button class="btn sm danger" data-act="trashPurge" data-id="${d.id}">Delete forever</button></div>`).join("")}</div>`:`<p class="vempty">The trash is empty.</p>`;
+  box.innerHTML=docs.length?`<div class="bl">${docs.map(d=>`<div class="tr-i"><span><b>${esc(d.title||"Untitled")}</b><small>${esc(COL_LABEL[d.col]||d.col)} · deleted ${esc(new Date(d.at).toLocaleDateString("en-US",{month:"short",day:"numeric"}))}</small></span><button class="btn sm primary" data-act="trashRestore" data-id="${esc(d.id)}">Restore</button><button class="btn sm danger" data-act="trashPurge" data-id="${esc(d.id)}">Delete forever</button></div>`).join("")}</div>`:`<p class="vempty">The trash is empty.</p>`;
   TRASH=docs;
 }
 let TRASH=[];
@@ -2309,12 +2310,12 @@ async function trashPurge(tid){await db.collection(SECRET+"/trash").doc(tid).del
 let HIST=[];
 async function openHistory(col,id){
   const x=rec(col,id);
-  showSheet(`<div class="sheet" role="dialog" aria-label="History"><h2>History · ${esc(titleOf(col,x||{})||"")}</h2><p class="tool-d">Earlier versions, saved when the entry changed (at most one every five minutes). Restoring keeps the current version in history too.</p><div id="hist-box"><p class="vempty">Loading…</p></div><div class="foot"><span class="grow"></span><button type="button" class="btn" data-act="open" data-type="${col}" data-id="${id}">Back</button></div></div>`,true);
+  showSheet(`<div class="sheet" role="dialog" aria-label="History"><h2>History · ${esc(titleOf(col,x||{})||"")}</h2><p class="tool-d">Earlier versions, saved when the entry changed (at most one every five minutes). Restoring keeps the current version in history too.</p><div id="hist-box"><p class="vempty">Loading…</p></div><div class="foot"><span class="grow"></span><button type="button" class="btn" data-act="open" data-type="${esc(col)}" data-id="${esc(id)}">Back</button></div></div>`,true);
   const docs=(await listDocs(SECRET+"/history","key",col+"__"+id)).sort((a,b)=>(b.at||0)-(a.at||0));
   for(const old of docs.slice(15)){try{await db.collection(SECRET+"/history").doc(old.id).delete()}catch(_){}}
   HIST=docs.slice(0,15);const box=document.getElementById("hist-box");if(!box)return;
   const preview=d=>esc(plain(textOf(col,d.data)||"").replace(/\s+/g," ").slice(0,160));
-  box.innerHTML=HIST.length?`<div class="bl">${HIST.map(d=>`<div class="tr-i"><span><b>${esc(new Date(d.at).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}))}</b><small>${preview(d)||"(no text)"}</small></span><button class="btn sm" data-act="histRestore" data-id="${d.id}">Restore</button></div>`).join("")}</div>`:`<p class="vempty">No earlier versions yet. They're kept from now on, whenever this entry changes.</p>`;
+  box.innerHTML=HIST.length?`<div class="bl">${HIST.map(d=>`<div class="tr-i"><span><b>${esc(new Date(d.at).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}))}</b><small>${preview(d)||"(no text)"}</small></span><button class="btn sm" data-act="histRestore" data-id="${esc(d.id)}">Restore</button></div>`).join("")}</div>`:`<p class="vempty">No earlier versions yet. They're kept from now on, whenever this entry changes.</p>`;
 }
 async function histRestore(hid){const d=HIST.find(x=>x.id===hid);if(!d)return;HIST_SEEN.delete(d.key);await save(d.col,d.eid,{...d.data});toast("Restored that version");openEntry(d.col,d.eid)}
 
