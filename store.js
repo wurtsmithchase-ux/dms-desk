@@ -9,28 +9,34 @@
   const ACCOUNT_KEY="desk.account";
   const RENEW_EARLY=5*60*1000;
   const RENEW_PAUSE=10*60*1000;
+  /* A stored sign-in this close to ending is treated as already over, so a request never starts with one about to lapse.
+     It is much smaller than RENEW_EARLY: renewal is offered from 5 minutes out, and this is the last-moment cutoff. */
+  const TOKEN_SLACK=30*1000;
 
   /* ---------- Google Drive ---------- */
   const API="https://www.googleapis.com";
   let token=null;
+  /* when the sign-in ends, also kept in memory in case the browser blocks storage (a private window, say) */
+  let tokenExp=0;
   const failure=(code,message,extra)=>Object.assign(new Error(message||code),{code,...extra});
   function readToken(){
     try{
       const t=JSON.parse(localStorage.getItem(TOKEN_KEY)||"null");
-      if(t&&t.exp>Date.now()+30000)return t.value;
+      if(t&&t.exp>Date.now()+TOKEN_SLACK){tokenExp=t.exp;return t.value}
     }catch(_){}
     return null}
   function keepToken(value,seconds){
-    token=value;
-    try{localStorage.setItem(TOKEN_KEY,JSON.stringify({value,exp:Date.now()+seconds*1000}))}catch(_){}}
+    token=value;tokenExp=Date.now()+seconds*1000;
+    try{localStorage.setItem(TOKEN_KEY,JSON.stringify({value,exp:tokenExp}))}catch(_){}}
   function dropToken(){
-    token=null;
+    token=null;tokenExp=0;
     try{localStorage.removeItem(TOKEN_KEY)}catch(_){}}
   /* Google's sign-in for browser-only apps lasts about an hour and can't renew itself.
      The Desk renews it on the user's next tap instead (see "renewing sign-in" below). */
   function tokenEndsSoon(){
-    try{const t=JSON.parse(localStorage.getItem(TOKEN_KEY)||"null");return!t||t.exp<Date.now()+RENEW_EARLY}
-    catch(_){return true}}
+    let exp=token?tokenExp:0;
+    try{const t=JSON.parse(localStorage.getItem(TOKEN_KEY)||"null");if(t&&t.exp>exp)exp=t.exp}catch(_){}
+    return exp<Date.now()+RENEW_EARLY}
   /* the account's email, kept on this device only, so renewing skips Google's account picker */
   function account(){try{return localStorage.getItem(ACCOUNT_KEY)||""}catch(_){return""}}
   async function rememberAccount(){
@@ -45,21 +51,32 @@
     s.onload=()=>ok();
     s.onerror=()=>{s.remove();gisLoading=null;bad(failure("offline"))};
     document.head.appendChild(s)}))}
-  async function signIn(){
+  /* only one sign-in attempt at a time, whoever asks (a tap, the pill or the sign-in screen) */
+  let signingIn=null;
+  function signIn(){
+    if(!signingIn)signingIn=doSignIn().finally(()=>{signingIn=null});
+    return signingIn}
+  async function doSignIn(){
     await gisReady();
     return new Promise((ok,bad)=>{
       const hint=account();
       const c=google.accounts.oauth2.initTokenClient({client_id:CFG.googleClientId,scope:SCOPE,...(hint?{login_hint:hint}:{}),
-        callback:r=>{if(r&&r.access_token){keepToken(r.access_token,Number(r.expires_in)||3600);if(!hint)rememberAccount();ok()}else bad(new Error("declined"))},
-        error_callback:()=>bad(new Error("declined"))});
+        callback:r=>{if(r&&r.access_token){keepToken(r.access_token,Number(r.expires_in)||3600);if(!hint)rememberAccount();ok()}else bad(failure("declined"))},
+        /* a blocked popup isn't the user saying no, so it gets its own code */
+        error_callback:e=>bad(failure(e&&e.type==="popup_failed_to_open"?"blocked":"declined"))});
       c.requestAccessToken({prompt:""})})}
-  async function call(url,opts){
+  async function call(url,opts,retried){
     if(!token)throw failure("signin");
+    const used=token;
     let r;
     /* only a failed network request counts as offline; any other TypeError is a bug and should surface as an error */
-    try{r=await fetch(url,{...opts,headers:{...(opts&&opts.headers),Authorization:"Bearer "+token}})}
+    try{r=await fetch(url,{...opts,headers:{...(opts&&opts.headers),Authorization:"Bearer "+used}})}
     catch(_){throw failure("offline")}
-    if(r.status===401){dropToken();throw failure("signin")}
+    if(r.status===401){
+      /* the sign-in was renewed while this request was in flight: try once with the new one, and never delete it */
+      if(token&&token!==used&&!retried)return call(url,opts,true);
+      if(token===used)dropToken();
+      throw failure("signin")}
     if(!r.ok)throw failure("drive","drive "+r.status,{status:r.status});
     return r}
   function multipart(meta,text,type="application/json"){
@@ -179,8 +196,13 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
     }catch(e){tidied=false;console.warn("Desk folder tidy failed",e)}}
 
   /* ---------- sync ---------- */
+  let rechecking=false;
   function handle(e){
-    if(e&&e.code==="signin")setStatus("signin");
+    if(e&&e.code==="signin"&&drive.hasToken()&&!rechecking){
+      /* a fresh sign-in arrived while the request was failing, so don't ask again: just try once more */
+      rechecking=true;setStatus("pending");
+      setTimeout(()=>{sync().finally(()=>{rechecking=false})},0)}
+    else if(e&&e.code==="signin")setStatus("signin");
     else if(!navigator.onLine||(e&&e.code==="offline"))setStatus("offline");
     else{console.error("Desk sync error",e);setStatus("error")}}
   async function reauth(){try{await drive.signIn();await sync()}catch(e){handle(e)}}
@@ -288,12 +310,15 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
      before trying again, and the "Sign in to save to Drive" notice still works. */
   let renewing=false,renewAfter=0;
   document.addEventListener("click",e=>{
-    if(!drive||!drive.renewDue||renewing||st.conflict||!navigator.onLine||Date.now()<renewAfter)return;
+    if(!drive||typeof drive.renewDue!=="function"||renewing||st.conflict||!navigator.onLine||Date.now()<renewAfter)return;
     if(document.getElementById("ds-gate")||(e.target.closest&&e.target.closest("#ds-pill")))return;
     if(!drive.renewDue())return;
     renewing=true;
     drive.signIn()
-      .then(()=>{if(st.status==="signin"||st.dirty)sync()},()=>{renewAfter=Date.now()+RENEW_PAUSE})
+      .then(()=>{if(st.status==="signin"||st.dirty)sync()},err=>{
+        console.warn("Desk couldn't renew the sign-in",err);
+        /* a blocked popup isn't a refusal, so the next tap may try again straight away */
+        if(!(err&&err.code==="blocked"))renewAfter=Date.now()+RENEW_PAUSE})
       .finally(()=>{renewing=false})},true);
   window.addEventListener("online",()=>{if(drive&&drive.hasToken())sync()});
   window.addEventListener("beforeunload",e=>{if(st.dirty&&drive){saveNow();e.preventDefault();e.returnValue=""}});
