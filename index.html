@@ -1766,6 +1766,7 @@ function campaignSheet(){
     <p class="tool-d">A text copy of every entry, kept in your Drive's DM's Desk folder for Claude to read. Changes made to those files wait here for you to accept.</p>
     <div class="tool-acts"><button class="btn" data-tx="now">Update text files now</button><button class="btn" data-tx="review">Review text changes</button><button class="btn" data-tx="paste">Paste text to import</button></div>
     <p class="tool-d" id="tx-st">${window.DeskText?esc(window.DeskText.status()):""}</p>
+    ${window.DeskSpotify?DeskSpotify.menu():""}
     <div class="taper"></div><div class="tool-acts"><button class="btn" data-act="calSettings">Calendar settings</button></div>`:`<p class="tool-d">You're viewing ${esc(S.settings.campaign?.name||"this campaign")} as a player.</p>`}
     <div class="foot"><span class="grow"></span><button type="button" class="btn" data-act="close">Close</button></div></div>`);
 }
@@ -2194,6 +2195,7 @@ function renderTable(){
       ${tmCardsStd()}
       ${npcCard()}
       ${timerSection()}
+      ${window.DeskSpotify?DeskSpotify.panel():""}
       ${lootSection()}
       <section class="tm-s"><h3>Treasury</h3><p class="mono tm-coins">${COINS.map(([k,l])=>`${fmtN(purse[k]||0)} ${l.toLowerCase()}`).join(" · ")}</p></section>
     </aside></div></div>`;
@@ -2760,7 +2762,7 @@ document.addEventListener("submit",async e=>{const f=e.target.closest("[data-qno
 document.addEventListener("click",e=>{if(e.target.closest("[data-qclose]")){e.stopPropagation();closeQuick()}if(e.target.closest("[data-act=quickNote]")){e.stopPropagation();quickNote()}},true);
 
 /* shortcuts */
-const KEYS=[["/","Search"],["D","Dice tray"],["N","Quick note"],["K","Keep the open entry open"],["P","Show or hide Kept open"],["T","Table mode"],["B","Saved ideas"],["1–6","Characters, Notes, Quests, Calendar, World, Prep"],["?","This list (or the keyboard button at the top)"],["Esc","Close"],["Alt + click","On a heading: collapse or expand that whole group"]];
+const KEYS=[["/","Search"],["D","Dice tray"],["N","Quick note"],["K","Keep the open entry open"],["P","Show or hide Kept open"],["T","Table mode"],["B","Saved ideas"],["1–6","Characters, Notes, Quests, Calendar, World, Prep"],["1–9 (table mode)","Play a Music button"],["?","This list (or the keyboard button at the top)"],["Esc","Close"],["Alt + click","On a heading: collapse or expand that whole group"]];
 function showKeys(){showSheet(`<div class="sheet" role="dialog" aria-label="Keyboard shortcuts"><h2>Keyboard shortcuts</h2><table class="keys">${KEYS.map(([k,l])=>`<tr><td><kbd>${k}</kbd></td><td>${l}</td></tr>`).join("")}</table><p class="vempty">Shortcuts work when you're not typing in a box. Forgot them? Click the keyboard button at the top of the page, or press <kbd>?</kbd>. Hover over a button to see its shortcut.</p><div class="foot"><span class="grow"></span><button type="button" class="btn primary" data-act="close">Done</button></div></div>`,true)}
 document.addEventListener("keydown",e=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;const a=document.activeElement;if(a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)))return;
@@ -3867,5 +3869,6 @@ if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceW
 })();
 </script>
 <script src="textfiles.js"></script>
+<script src="spotify.js"></script>
 
 </body></html>

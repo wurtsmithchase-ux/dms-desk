@@ -1,7 +1,7 @@
 /* Keeps the app itself available when the connection drops. Campaign data never passes through here. */
 /* Bump this number whenever the list of files below changes, so old caches are removed. */
-const CACHE="desk-app-3";
-const FILES=["./","index.html","store.js","textfiles.js","config.js","manifest.webmanifest","icon-192.png","icon-512.png"];
+const CACHE="desk-app-4";
+const FILES=["./","index.html","store.js","textfiles.js","spotify.js","config.js","manifest.webmanifest","icon-192.png","icon-512.png"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 self.addEventListener("fetch",e=>{

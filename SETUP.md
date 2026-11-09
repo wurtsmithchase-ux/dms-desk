@@ -81,3 +81,14 @@ After a change, commit and push it, and the site updates within a few minutes. B
 - If the Desk finds two versions, it asks which to keep. It saves the other to Drive as a dated copy.
 - Download a backup now and then from the campaign menu, and keep it outside this folder.
 - Google sign-in lasts about an hour. If it runs out, your work stays on the device. Tap the red notice to sign in and save.
+
+## Spotify music (optional)
+
+The Music panel in table mode starts your own playlists on any device running Spotify. It needs Spotify Premium.
+
+1. Sign in at developer.spotify.com and create an app called "DM's Desk".
+2. Add these redirect addresses: the Desk's web address, with the trailing slash (`https://wurtsmithchase-ux.github.io/dms-desk/`), and for local testing `http://127.0.0.1:8765/` (Spotify accepts `127.0.0.1`, not `localhost`).
+3. Add your own Spotify account under the app's users. Spotify's development-mode rules limit this to a handful of accounts and need the app owner to have Premium.
+4. Paste the app's Client ID into `config.js` as `spotifyClientId`. It is safe in a public repository because this sign-in has no secret.
+5. On each device, open the Campaign menu and choose **Connect Spotify**. The login stays on that device.
+6. Choose **Choose soundboard playlists** to pick buttons, labels, mood groups, order and the safe default. These save in your campaign file.
