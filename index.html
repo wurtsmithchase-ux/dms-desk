@@ -1992,7 +1992,7 @@ function closeTableMode(){TM=false;const el=document.getElementById("tablemode")
 function typingInTable(){const a=document.activeElement;return !!a&&document.getElementById("tablemode").contains(a)&&(a.tagName==="TEXTAREA"||a.tagName==="INPUT"&&a.type!=="checkbox")}
 
 /* ================= Table mode: free layout, panels as movable sticky notes ================= */
-const TMD={drag:null,sel:null,pop:null,popFor:null,q:"",nudgeT:null,nudged:false,newName:""};let TML=null;
+const TMD={edit:false,drag:null,sel:null,pop:null,popFor:null,q:"",nudgeT:null,nudged:false,newName:""};let TML=null;
 function tmRender(){const a=document.activeElement;if(a&&a.closest&&a.closest("#tablemode .tm-pop, #tablemode .tm-arrbar, #tablemode .st-list"))a.blur();renderTable()}
 const TM_FIELDS=["p","stickies","hidden","cards"];
 function tmL(){const st=S.settings.tmlayout;if(!TML||(st&&(st.updated||0)>(TML.updated||0)))TML=JSON.parse(JSON.stringify(st||{}));const L=TML;
@@ -2000,13 +2000,13 @@ function tmL(){const st=S.settings.tmlayout;if(!TML||(st&&(st.updated||0)>(TML.u
 function tmCur(L){const o={};TM_FIELDS.forEach(f=>o[f]=JSON.parse(JSON.stringify(L[f])));return o}
 let tmSaveT=null;function tmSave(){const L=tmL();L.sets[L.active]=tmCur(L);L.updated=Date.now();clearTimeout(tmSaveT);tmSaveT=setTimeout(()=>{const{id,...d}=JSON.parse(JSON.stringify(L));save("settings","tmlayout",d)},350)}
 const tmCanArrange=()=>window.innerWidth>=760;
-function tmArrangeBtns(){const L=tmL();if(!tmCanArrange())return "";return L.on?`<button class="btn sm on" data-tmarr="off" title="Go back to the standard two-column layout (your arrangement is kept)">Done arranging</button>`:`<button class="btn sm" data-tmarr="on" title="Drag panels anywhere, resize them, and add sticky notes">Arrange</button>`}
+function tmArrangeBtns(){const L=tmL();if(!tmCanArrange())return "";return L.on&&TMD.edit?`<button class="btn sm on" data-tmarr="done" title="Keep this arrangement and hide the arrange tools">Done arranging</button>`:`<button class="btn sm" data-tmarr="on" title="Drag panels anywhere, resize them, and add sticky notes">Arrange</button>`}
 /* layouts: several named arrangements, one active */
 function tmSwitch(name){const L=tmL();if(name===L.active)return;L.sets[L.active]=tmCur(L);const nx=L.sets[name]||{p:{},stickies:[],hidden:{},cards:[]};TM_FIELDS.forEach(f=>L[f]=JSON.parse(JSON.stringify(nx[f]||(f==="stickies"||f==="cards"?[]:{}))));L.active=name;TMU.length=0;tmSave();tmRender();toast(`Layout: ${name}`)}
 function tmSaveAs(name){name=String(name||"").trim().slice(0,30);if(!name)return;const L=tmL();L.sets[L.active]=tmCur(L);L.sets[name]=tmCur(L);L.active=name;tmSave();TMD.pop=null;tmRender();toast(`Saved as “${name}”`)}
 function tmDeleteSet(){const L=tmL();const names=Object.keys(L.sets);if(names.length<2){toast("Keep at least one layout");return}const gone=L.active;delete L.sets[gone];const nx=Object.keys(L.sets)[0];L.active="__";tmSwitch(nx);toast(`Deleted “${gone}”`)}
 /* the arrange tools float at the bottom, so turning Arrange on never pushes the panels down */
-function tmArrangeBar(){const L=tmL();if(!L.on||!tmCanArrange())return "";const names=Object.keys(L.sets);if(!names.includes(L.active))names.unshift(L.active);const nh=Object.keys(L.hidden).filter(k=>L.hidden[k]).length;
+function tmArrangeBar(){const L=tmL();if(!L.on||!TMD.edit||!tmCanArrange())return "";const names=Object.keys(L.sets);if(!names.includes(L.active))names.unshift(L.active);const nh=Object.keys(L.hidden).filter(k=>L.hidden[k]).length;
   const pop=TMD.pop?`<div class="tm-pop" role="dialog">${tmPopHtml()}</div>`:"";
   return `<div class="tm-arrwrap">${pop}<div class="tm-arrbar" role="toolbar" aria-label="Arrange tools">
     <select class="tm-set" data-tmset aria-label="Layout" title="Switch layout">${names.map(n=>`<option ${n===L.active?"selected":""}>${esc(n)}</option>`).join("")}</select>
@@ -2018,7 +2018,7 @@ function tmArrangeBar(){const L=tmL();if(!L.on||!tmCanArrange())return "";const 
     <button class="btn sm" data-tmarr="undo" title="Undo the last change (Ctrl+Z)">Undo</button>
     <button class="btn sm ${L.lock?"on":""}" data-tmarr="lock" title="Lock the layout so nothing moves by accident during play">${L.lock?"🔒 Locked":"Lock"}</button><span class="tm-sep"></span>
     <button class="btn sm icon" data-tmzoom="-" title="Zoom out" aria-label="Zoom out">−</button><button class="btn sm tm-z" data-tmzoom="1" title="Back to 100%">${Math.round(L.zoom*100)}%</button><button class="btn sm icon" data-tmzoom="+" title="Zoom in" aria-label="Zoom in">+</button><button class="btn sm" data-tmzoom="fit" title="Fit the whole board on screen">Fit</button><span class="tm-sep"></span>
-    <button class="btn sm" data-tmarr="reset" title="Put every panel back in its original spot">Reset</button></div></div>`}
+    <button class="btn sm" data-tmarr="off" title="Go back to the standard two-column layout (your arrangement is kept for next time you press Arrange)">Standard layout</button><button class="btn sm" data-tmarr="reset" title="Put every panel back in its original spot">Reset</button></div></div>`}
 function tmPopHtml(){const L=tmL();
   if(TMD.pop==="layouts")return `<h4>Layouts</h4><p class="tool-d">Keep different arrangements, for example one for combat and one for roleplay. Switch with the menu on the left of the bar.</p>
     <div class="tm-row"><input id="tm-newset" placeholder="Name, e.g. Combat" value="${esc(TMD.newName)}" aria-label="New layout name"><button class="btn sm primary" data-tmarr="saveas">Save current as new</button></div>
@@ -2054,7 +2054,7 @@ function tmLayoutApply(el){const L=tmL();if(!L.on||!tmCanArrange())return;
   const grid=el.querySelector(".tm-grid");if(!grid)return;const gr=grid.getBoundingClientRect();
   const panels=[...grid.querySelectorAll(":scope>.tm-main>*, :scope>.tm-side>*")];
   const seen={};const items=panels.map(p=>{let k=tmKey(p);seen[k]=(seen[k]||0)+1;if(seen[k]>1)k+="#"+seen[k];const r=p.getBoundingClientRect();return {p,k,dx:Math.round(r.left-gr.left),dy:Math.round(r.top-gr.top),dw:Math.round(r.width)}});
-  const board=document.createElement("div");board.className="tm-board"+(L.lock?" locked":"");board.style.width=Math.round(gr.width)+"px";if(L.zoom!==1)board.style.zoom=L.zoom;let maxZ=Math.max(1,...Object.values(L.p).map(v=>v.z||1));
+  const board=document.createElement("div");board.className="tm-board"+(L.lock||!TMD.edit?" locked":"");board.style.width=Math.round(gr.width)+"px";if(L.zoom!==1)board.style.zoom=L.zoom;let maxZ=Math.max(1,...Object.values(L.p).map(v=>v.z||1));
   const mk=(k,pos,cls)=>{const n=document.createElement("div");n.className="tm-note"+(cls?" "+cls:"")+(pos.h?" sized":"")+(TMD.sel===k?" sel":"");n.dataset.k=k;n.style.left=(pos.x??20)+"px";n.style.top=(pos.y??20)+"px";n.style.width=(pos.w??320)+"px";if(pos.h)n.style.height=pos.h+"px";n.style.zIndex=pos.z||1;return n};
   items.forEach(({p,k,dx,dy,dw})=>{if(L.hidden[k])return;const pos={x:dx,y:dy,w:dw,...(L.p[k]||{})};const n=mk(k,pos);
     n.innerHTML=`<div class="tm-grip" title="Drag to move (Shift: no snapping). Click, then arrow keys to nudge."><span>⠿</span><span class="grow"></span><button type="button" class="tm-hide" data-tmhide="${esc(k)}" title="Hide this panel" aria-label="Hide this panel">–</button></div><div class="tm-rs" title="Drag to resize"></div>`;n.insertBefore(p,n.lastChild);board.appendChild(n)});
@@ -2085,20 +2085,29 @@ function tmSelect(k){TMD.sel=k;document.querySelectorAll("#tablemode .tm-note").
 /* dragging by the grip, resizing by the corner */
 document.addEventListener("pointerdown",e=>{const g=e.target.closest("#tablemode .tm-grip, #tablemode .tm-rs");if(!g||e.target.closest("button"))return;const n=g.closest(".tm-note");if(!n||n.closest(".tm-board.locked"))return;e.preventDefault();tmSelect(n.dataset.k);
   const z=Math.max(1,...[...document.querySelectorAll("#tablemode .tm-note")].map(x=>+x.style.zIndex||1))+1;n.style.zIndex=z;const Z=tmL().zoom||1;
-  TMD.drag={n,Z,mode:g.classList.contains("tm-rs")?"size":"move",sx:e.clientX,sy:e.clientY,ox:n.offsetLeft,oy:n.offsetTop,ow:n.offsetWidth,oh:n.offsetHeight,id:e.pointerId,before:tmSnapshot()};n.classList.add("dragging");g.setPointerCapture(e.pointerId)});
-document.addEventListener("pointermove",e=>{const d=TMD.drag;if(!d||e.pointerId!==d.id)return;const dx=(e.clientX-d.sx)/d.Z,dy=(e.clientY-d.sy)/d.Z;const board=d.n.parentElement;
+  TMD.drag={n,Z,mode:g.classList.contains("tm-rs")?"size":"move",sx:e.clientX,sy:e.clientY,ox:n.offsetLeft,oy:n.offsetTop,ow:n.offsetWidth,oh:n.offsetHeight,id:e.pointerId,before:tmSnapshot()};
+  const b=n.closest(".tm-body");Object.assign(TMD.drag,{b,cx:e.clientX,cy:e.clientY,shift:e.shiftKey,st:b?b.scrollTop:0,sl:b?b.scrollLeft:0});
+  /* keep scrolling while the pointer rests near the top or bottom edge */
+  TMD.drag.timer=setInterval(()=>{const d=TMD.drag;if(!d||!d.b)return;const r=d.b.getBoundingClientRect();const v=d.cy>r.bottom-50?14:d.cy<r.top+50?-14:0;if(!v)return;const was=d.b.scrollTop;d.b.scrollTop+=v;if(d.b.scrollTop!==was)tmDragMove()},30);
+  n.classList.add("dragging");g.setPointerCapture(e.pointerId)});
+document.addEventListener("pointermove",e=>{const d=TMD.drag;if(!d||e.pointerId!==d.id)return;d.cx=e.clientX;d.cy=e.clientY;d.shift=e.shiftKey;tmDragMove()});
+/* the mouse wheel scrolls the board under a held panel, so the panel follows it */
+document.addEventListener("scroll",e=>{const d=TMD.drag;if(d&&e.target===d.b)tmDragMove()},true);
+/* place the held panel from the pointer position plus however far the board has scrolled since the grab */
+function tmDragMove(){const d=TMD.drag;if(!d)return;const e={shiftKey:d.shift};const dx=(d.cx-d.sx+(d.b?d.b.scrollLeft-d.sl:0))/d.Z,dy=(d.cy-d.sy+(d.b?d.b.scrollTop-d.st:0))/d.Z;const board=d.n.parentElement;
   if(d.mode==="move"){let x=Math.max(0,d.ox+dx),y=Math.max(0,d.oy+dy),gx=[],gy=[];if(!e.shiftKey){const s=tmSnapMove(d.n,x,y);x=Math.max(0,s.x);y=Math.max(0,s.y);gx=s.gx;gy=s.gy}d.n.style.left=x+"px";d.n.style.top=y+"px";tmGuides(board,gx,gy)}
   else{let w=Math.max(200,d.ow+dx),h=Math.max(60,d.oh+dy),gx=[],gy=[];if(!e.shiftKey){const s=tmSnapSize(d.n,w,h);w=s.w;h=s.h;gx=s.gx;gy=s.gy}d.n.style.width=w+"px";d.n.style.height=h+"px";d.n.classList.add("sized");tmGuides(board,gx,gy)}
-  const b=d.n.closest(".tm-body");if(b){const r=b.getBoundingClientRect();if(e.clientY>r.bottom-40)b.scrollTop+=12;else if(e.clientY<r.top+40)b.scrollTop-=12}});
-document.addEventListener("pointerup",e=>{const d=TMD.drag;if(!d||e.pointerId!==d.id)return;
-  d.n.classList.remove("dragging");TMD.drag=null;const bd=d.n.parentElement;tmGuides(bd,[],[]);
+  if(d.mode==="move"&&board&&d.n.offsetTop+d.n.offsetHeight+80>board.offsetHeight)board.style.height=(d.n.offsetTop+d.n.offsetHeight+80)+"px"}
+const tmDragEnd=e=>{const d=TMD.drag;if(!d||e.pointerId!==d.id)return;
+  clearInterval(d.timer);d.n.classList.remove("dragging");TMD.drag=null;const bd=d.n.parentElement;tmGuides(bd,[],[]);
   if(d.n.offsetLeft!==d.ox||d.n.offsetTop!==d.oy||d.n.offsetWidth!==d.ow||d.n.offsetHeight!==d.oh){TMU.push(d.before);if(TMU.length>30)TMU.shift();tmStore(d.n)}
-  tmBoardSize(bd);if(renderPending&&!typingInTable()){renderPending=false;renderTable()}});
+  tmBoardSize(bd);if(renderPending&&!typingInTable()){renderPending=false;renderTable()}};
+document.addEventListener("pointerup",tmDragEnd);document.addEventListener("pointercancel",tmDragEnd);
 /* undo for layout changes */
 const TMU=[];function tmSnapshot(){const L=tmL();return JSON.stringify(tmCur(L))}
 function tmUndo(){const b=TMU.pop();if(!b){toast("Nothing to undo");return}const L=tmL();const o=JSON.parse(b);TM_FIELDS.forEach(f=>L[f]=o[f]);tmSave();tmRender()}
 /* keyboard: Ctrl+Z, arrow-key nudging of the selected panel, Esc to deselect */
-document.addEventListener("keydown",e=>{if(!TM||!tmL().on||typingInTable())return;const L=tmL();
+document.addEventListener("keydown",e=>{if(!TM||!tmL().on||!TMD.edit||typingInTable())return;const L=tmL();
   if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&(e.key==="z"||e.key==="Z")){e.preventDefault();tmUndo();return}
   if(e.key==="Escape"&&(TMD.sel||TMD.pop)){e.preventDefault();e.stopPropagation();if(TMD.pop){TMD.pop=null;TMD.popFor=null;tmRender()}else tmSelect(null);return}
   const dir={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!dir||!TMD.sel||L.lock)return;
@@ -2118,8 +2127,9 @@ document.addEventListener("click",async e=>{const t=e.target.closest("[data-tmar
   const nz=()=>Math.max(1,...[...document.querySelectorAll("#tablemode .tm-note")].map(x=>+x.style.zIndex||1))+1;
   const spot=()=>{const b=document.querySelector("#tablemode .tm-body");const Z=L.zoom||1;let x=Math.round(((b?b.scrollLeft:0)/Z)+30),y=Math.round(((b?b.scrollTop:0)/Z)+30);
     const taken=[...document.querySelectorAll("#tablemode .tm-note.sticky, #tablemode .tm-note.card")].map(n=>[n.offsetLeft,n.offsetTop]);let guard=0;while(guard++<30&&taken.some(([a,c])=>Math.abs(a-x)<20&&Math.abs(c-y)<20)){x+=36;y+=36}return {x,y}};
-  if(d.tmarr==="on"){L.on=true;tmSave();tmRender();toast("Drag panels by their top bar. Drag a corner to resize.")}
-  else if(d.tmarr==="off"){L.on=false;TMD.pop=null;tmSave();tmRender()}
+  if(d.tmarr==="on"){L.on=true;TMD.edit=true;tmSave();tmRender();toast("Drag panels by their top bar. Drag a corner to resize.")}
+  else if(d.tmarr==="done"){TMD.edit=false;TMD.pop=null;tmSelect(null);tmSave();tmRender()}
+  else if(d.tmarr==="off"){L.on=false;TMD.edit=false;TMD.pop=null;tmSave();tmRender()}
   else if(d.tmarr==="tidy")tmTidy();
   else if(d.tmarr==="undo")tmUndo();
   else if(d.tmarr==="lock"){L.lock=!L.lock;tmSave();tmRender();toast(L.lock?"Layout locked":"Layout unlocked")}
