@@ -229,14 +229,28 @@ const files=()=>window.DeskStore&&DeskStore.files;
 const outside=f=>!!(f.props.h&&f.md5&&f.md5!==(f.doc&&f.props.e||f.props.h));
 /* Google Docs have no md5Checksum, and their exported text can differ from what was uploaded in small ways (a byte order mark, \r\n line ends,
    trailing spaces), so they're hashed after evening those out. A Doc whose modified time isn't after the Desk's last write is unchanged;
-   any other is exported once and hashed. SEEN keeps those results for this visit, keyed by modified time. */
-const SEEN=new Map();
-/* the Desk sends its write time as the Doc's modified time. If Drive keeps its own time instead, the Desk tags the file with that time,
-   which moves the time on by about a second, so a Doc counts as unchanged up to this long after its tag */
-const MOD_SLACK=5000;
-const fixTime=async(F,id,t,mod)=>{if(mod&&Date.parse(mod)!==+t)await F.tag(id,{t:String(Date.parse(mod))},mod)};
-const normText=s=>String(s||"").replace(/^﻿/,"").replace(/\r\n?/g,"\n").replace(/ /g," ").split("\n").map(l=>l.replace(/[ \t]+$/,"")).join("\n").replace(/\n+$/,"")+"\n";
+   any other is exported once and hashed. SEEN keeps those results, keyed by modified time. The hashes (not the text) are kept on this
+   device too, so a reload doesn't export every Doc still waiting on the review page again. */
+const SEEN_KEY="desk.textSeen";
+const SEEN=new Map((()=>{try{const o=JSON.parse(localStorage.getItem(SEEN_KEY))||{};
+  return Object.entries(o).filter(([,v])=>v&&typeof v.mod==="string"&&typeof v.md5==="string")}catch(_){return []}})());
+function keepSeen(){try{const o={};SEEN.forEach((v,id)=>{o[id]={mod:v.mod,md5:v.md5}});localStorage.setItem(SEEN_KEY,JSON.stringify(o))}catch(_){}}
+/* the Desk sends its write time as the Doc's modified time, and after a write t is set to the time Drive actually kept (fixTime).
+   If Drive moves the time on when the Desk tags the file, a Doc still counts as unchanged up to this long after its tag. An outside edit
+   inside this window would be missed, so it stays short */
+const MOD_SLACK=2000;
+/* makes t match the modified time Drive kept, and returns Drive's final time. Best effort: if tagging fails, the Doc is only exported once later */
+async function fixTime(F,id,t,mod){
+  if(!mod||Date.parse(mod)===+t)return mod;
+  try{const after=await F.tag(id,{t:String(Date.parse(mod))},mod);
+    if(after&&Date.parse(after)!==Date.parse(mod))console.info("Desk text files: tagging moved the modified time of",id);
+    return after||mod}
+  catch(e){console.warn("Desk text files: couldn't tag",e);return mod}}
+/* evens out what a Docs export changes: byte order mark, \r\n line ends, non-breaking spaces, spaces at line ends, final newlines */
+const normText=s=>String(s||"").replace(/^\uFEFF/,"").replace(/\r\n?/g,"\n").replace(/\u00A0/g," ").split("\n").map(l=>l.replace(/[ \t]+$/,"")).join("\n").replace(/\n+$/,"")+"\n";
 const docHash=s=>md5(normText(s));
+/* a connection or sign-in problem stops the run; any other export failure (a Doc deleted meanwhile, no access) only skips that file */
+const fatal=e=>!!(e&&(e.code==="offline"||e.code==="signin"));
 async function fingerprint(F,list){
   const need=[];
   list.forEach(f=>{if(!f.doc)return;const base=f.props.e||f.props.h,s=SEEN.get(f.id);
@@ -244,7 +258,11 @@ async function fingerprint(F,list){
     if(s&&s.mod===f.mod){f.md5=s.md5;if(s.text!=null)f.text=s.text;return}
     need.push(f)});
   const same=[];
-  await pool(need.map(f=>async()=>{const text=normText(await F.read(f.id,true)),m=md5(text);SEEN.set(f.id,{mod:f.mod,md5:m,text});f.md5=m;f.text=text;
+  await pool(need.map(f=>async()=>{
+    let text;
+    try{text=normText(await F.read(f.id,true))}
+    catch(e){if(fatal(e))throw e;console.warn("Desk text files: couldn't export",f.name,e);f.unreadable=true;return}
+    const m=md5(text);SEEN.set(f.id,{mod:f.mod,md5:m,text});f.md5=m;f.text=text;
     if(m===(f.props.e||f.props.h)&&f.mod)same.push(f)}),WRITERS);
   /* touched but the same text (Drive kept its own time, or an edit was undone): move the time tag up so the next visit needn't export it */
   if(same.length)await pool(same.map(f=>()=>F.tag(f.id,{t:String(Date.parse(f.mod))},f.mod)),WRITERS).catch(e=>console.warn("Desk text files: couldn't tag",e))}
@@ -266,29 +284,46 @@ async function run(){
   if(ST.busy){ST.again=true;return}
   ST.busy=true;ST.lastRun=Date.now();setStatus("busy");
   try{
-    /* Docs first, so if a switch from .txt was cut short the Doc is kept and the old file is the extra one */
-    const list=(await F.list()).sort((a,b)=>(b.doc?1:0)-(a.doc?1:0)),have=new Map(),extra=[];
+    /* Docs first, so if a switch from .txt was cut short the Doc is kept and the old file is the extra one. Then newest first, so when two
+       devices made the same Doc at once the same one is always kept */
+    const list=(await F.list()).sort((a,b)=>((b.doc?1:0)-(a.doc?1:0))||((Date.parse(b.mod)||0)-(Date.parse(a.mod)||0))),have=new Map(),extra=[];
+    const ids=new Set(list.map(f=>f.id));SEEN.forEach((_,id)=>{if(!ids.has(id))SEEN.delete(id)});
     await fingerprint(F,list);
     list.forEach(f=>{const k=f.props.k;if(!k)return;if(have.has(k))extra.push(f);else have.set(k,f)});
     /* links come from S, which catches up with ALL on the next frame; bring it up to date first so a file never misses its links */
     if(COLS.some(c=>S[c]!==ALL[c])){project();ST.ver=dataVer}
-    const W=wanted(),edited=[],jobs=[];
-    W.forEach((w,k)=>{const f=have.get(k);
+    const W=wanted(),edited=[],jobs=[];let skipped=0;
+    /* a file that couldn't be exported is left completely alone (never written over or trashed) and tried again next cycle */
+    const unread=f=>f&&f.unreadable&&++skipped;
+    W.forEach((w,k)=>{const f=have.get(k);if(unread(f))return;
       if(f&&!w.always&&outside(f)&&!ST.force.has(k)){edited.push({k,f});return}
       const h=docHash(w.text);if(f&&f.doc&&f.props.h===h&&f.name===w.name&&!outside(f)){ST.force.delete(k);return}
-      jobs.push(async()=>{const t=String(Date.now());
-        /* a Doc is rewritten in place (clearing e); a missing or old .txt file is replaced by a new Doc */
-        if(f&&f.doc){const r=await F.write(f.id,w.name,w.text,{k,h,t,e:null});SEEN.set(f.id,{mod:r.mod,md5:h});await fixTime(F,f.id,t,r.mod)}
-        else{const r=await F.write(null,w.name,w.text,{k,h,t},true);SEEN.set(r.id,{mod:r.mod,md5:h});await fixTime(F,r.id,t,r.mod);if(f)await F.trash(f.id)}
-        ST.force.delete(k)})});
-    have.forEach((f,k)=>{if(W.has(k))return;if(outside(f)&&!ST.force.has(k)&&!k.startsWith("_index"))edited.push({k,f});else jobs.push(async()=>{await F.trash(f.id);ST.force.delete(k)})});
-    extra.forEach(f=>{if(!outside(f))jobs.push(()=>F.trash(f.id))});
+      jobs.push(async()=>{await writeEntry(F,k,w,h,f);ST.force.delete(k)})});
+    have.forEach((f,k)=>{if(W.has(k)||unread(f))return;
+      if(outside(f)&&!ST.force.has(k)&&!k.startsWith("_index"))edited.push({k,f});else jobs.push(async()=>{await F.trash(f.id);ST.force.delete(k)})});
+    /* a leftover duplicate is trashed, unless it was changed outside the Desk: then it gets its own review card first */
+    extra.forEach(f=>{if(unread(f))return;const k=f.props.k,dk=k+DUP+f.id;
+      if(outside(f)&&!ST.force.has(dk)&&!k.startsWith("_index"))edited.push({k:dk,f});else jobs.push(async()=>{await F.trash(f.id);ST.force.delete(dk)})});
     await pool(jobs,WRITERS);
     await buildCards(edited);
-    setStatus("ok")
+    if(skipped){ST.dirty=true;ST.dirtyAt=Date.now();setStatus("error")}else setStatus("ok")
   }catch(e){console.warn("Desk text files",e);setStatus(e&&e.code==="offline"?"offline":e&&e.code==="signin"?"":"error");ST.dirty=true;ST.dirtyAt=Date.now()}
-  finally{ST.busy=false}
+  finally{ST.busy=false;keepSeen()}
   if(ST.again){ST.again=false;return run()}}
+/* card key for a leftover duplicate file: the entry's key, then this, then the file's id */
+const DUP="#dup:";
+const keyOf=k=>k.split(DUP)[0];
+/* writes one entry's file. A Doc is rewritten in place (clearing e). A missing file, or an old .txt, gets a new Doc, and the .txt is
+   trashed only once the Doc exists, so a swap that's cut short leaves an extra file (trashed next run), never a missing one.
+   Fixing the time tag comes last and is best effort */
+async function writeEntry(F,k,w,h,f){
+  const t=String(Date.now());
+  if(f&&f.doc){
+    const r=await F.write(f.id,w.name,w.text,{k,h,t,e:null});SEEN.set(f.id,{mod:r.mod,md5:h});
+    SEEN.set(f.id,{mod:await fixTime(F,f.id,t,r.mod),md5:h});return}
+  const r=await F.write(null,w.name,w.text,{k,h,t},true);SEEN.set(r.id,{mod:r.mod,md5:h});
+  if(f)await F.trash(f.id);
+  SEEN.set(r.id,{mod:await fixTime(F,r.id,t,r.mod),md5:h})}
 function tick(){
   if(!BOOT.ready)return;
   if(dataVer!==ST.ver){ST.ver=dataVer;if(ST.started){ST.dirty=true;ST.dirtyAt=Date.now()}}
@@ -316,12 +351,13 @@ async function buildCards(edited){
     if(failed.has(k)||(prev.length&&prev[0].md5===f.md5)){cards.push(...prev);continue}
     const text=texts.get(k);
     const base={key:k,file:f.name,md5:f.md5};
-    if(k==="_new"){parseNew(text).forEach(p=>cards.push({...p,...base,src:"new"}));continue}
+    if(keyOf(k)==="_new"){parseNew(text).forEach(p=>cards.push({...p,...base,src:"new"}));continue}
     const p=parseEntry(text);
     if(!p){cards.push({...base,col:null,src:"drive",warn:[k.startsWith("encounters:")?"Encounters are edited in the Desk's encounter builder. Skip this to put the file back.":"The first line was changed or removed, so the Desk can't tell which entry this is. Skip it to put the file back."]});continue}
     const x=find(p.col,p.id);
     const card={...p,...base,src:"drive",gone:!x,both:!!(x&&x.updated&&+f.props.t&&x.updated>+f.props.t)};
     card.changes=diff(p.col,x,p.vals);
+    if(k!==keyOf(k)&&card.changes.length)card.warn=[...(card.warn||[]),"This is an extra copy of the entry's file. Accept or skip it, and the copy goes to the Drive trash."];
     /* nothing really changed (spacing only, say): a .txt file gets the Desk's copy back without asking. A Doc is left as it is and
        tagged with this export's hash and time, so it isn't exported or rewritten again (a Doc's text may never match the upload exactly) */
     if(x&&!card.changes.length&&!card.warn.length){
@@ -405,7 +441,7 @@ document.addEventListener("click",async e=>{
     try{await accept(c)}
     catch(err){console.warn("Desk text files: accept failed",err);toast("Couldn't save that change. Try again.");t.disabled=false;t.classList.remove("armed");t.textContent=t.dataset.label||"Accept";return}
     settle(c)}
-  else if(a==="skip"&&c){if(c.src!=="paste"&&!arm(t,"Sure? Put the Desk's version back"))return;settle(c)}
+  else if(a==="skip"&&c){if(c.src!=="paste"&&!arm(t,c.key!==keyOf(c.key)?"Sure? Trash this copy":"Sure? Put the Desk's version back"))return;settle(c)}
 });
 
 window.DeskText={run,status:statusText,parseEntry,parseNew,diff,wanted,md5,state:ST};

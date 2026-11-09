@@ -122,14 +122,17 @@
     /* asDoc: a new file becomes a Google Doc (Drive converts the plain text), so Claude can edit it. An existing Doc stays one.
        modifiedTime is set to the Desk's write time, so a later edit by anyone else shows as a newer time */
     async writeText(id,name,text,parent,props,asDoc){
-      const t={...(props&&props.t?{modifiedTime:new Date(+props.t).toISOString()}:{})};
-      const meta=id?{name,appProperties:props,...t}:{name,mimeType:asDoc?GDOC:"text/plain",parents:[parent],appProperties:props,...t};const m=multipart(meta,text,"text/plain");
+      const t=props&&props.t?{modifiedTime:new Date(+props.t).toISOString()}:{};
+      const meta={name,appProperties:props,...t};
+      /* only a new file gets a type and a folder; Drive converts the plain text to a Doc when mimeType is GDOC */
+      if(!id)Object.assign(meta,{mimeType:asDoc?GDOC:"text/plain",parents:[parent]});
+      const m=multipart(meta,text,"text/plain");
       const r=await(await call(`${API}/upload/drive/v3/files${id?"/"+id:""}?uploadType=multipart&fields=id,md5Checksum,modifiedTime`,{method:id?"PATCH":"POST",headers:{"Content-Type":m.type},body:m.body})).json();
       if(t.modifiedTime&&r.modifiedTime&&Date.parse(r.modifiedTime)!==Date.parse(t.modifiedTime))console.info("Desk text files: Drive kept its own modified time for",name);
       return{id:r.id,md5:r.md5Checksum,mod:r.modifiedTime}},
     async readText(id,doc){return(await call(doc?`${API}/drive/v3/files/${id}/export?mimeType=text%2Fplain`:`${API}/drive/v3/files/${id}?alt=media`)).text()},
-    /* hidden tags only; modifiedTime is sent back unchanged so the file doesn't look edited */
-    async tag(id,props,mod){await call(`${API}/drive/v3/files/${id}?fields=id`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({appProperties:props,...(mod?{modifiedTime:mod}:{})})})},
+    /* hidden tags only; modifiedTime is sent back unchanged so the file doesn't look edited. Returns the modified time Drive ended up with */
+    async tag(id,props,mod){return(await(await call(`${API}/drive/v3/files/${id}?fields=id,modifiedTime`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({appProperties:props,...(mod?{modifiedTime:mod}:{})})})).json()).modifiedTime},
     async trash(id){await call(`${API}/drive/v3/files/${id}?fields=id`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({trashed:true})})}
   };
   const drive=window.DESK_DRIVE||(CFG.googleClientId?googleDrive:null);
