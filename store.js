@@ -6,6 +6,9 @@
   const SCOPE="https://www.googleapis.com/auth/drive.file";
   const SAVE_DELAY=1500;
   const TOKEN_KEY="desk.token";
+  const ACCOUNT_KEY="desk.account";
+  const RENEW_EARLY=5*60*1000;
+  const RENEW_PAUSE=10*60*1000;
 
   /* ---------- Google Drive ---------- */
   const API="https://www.googleapis.com";
@@ -23,18 +26,31 @@
   function dropToken(){
     token=null;
     try{localStorage.removeItem(TOKEN_KEY)}catch(_){}}
-  function gisReady(){return new Promise((ok,bad)=>{
+  /* Google's sign-in for browser-only apps lasts about an hour and can't renew itself.
+     The Desk renews it on the user's next tap instead (see "renewing sign-in" below). */
+  function tokenEndsSoon(){
+    try{const t=JSON.parse(localStorage.getItem(TOKEN_KEY)||"null");return!t||t.exp<Date.now()+RENEW_EARLY}
+    catch(_){return true}}
+  /* the account's email, kept on this device only, so renewing skips Google's account picker */
+  function account(){try{return localStorage.getItem(ACCOUNT_KEY)||""}catch(_){return""}}
+  async function rememberAccount(){
+    try{const r=await(await call(`${API}/drive/v3/about?fields=user(emailAddress)`)).json();
+      if(r.user&&r.user.emailAddress)localStorage.setItem(ACCOUNT_KEY,r.user.emailAddress)}
+    catch(e){console.warn("Desk couldn't note the Google account",e)}}
+  let gisLoading=null;
+  function gisReady(){return gisLoading||(gisLoading=new Promise((ok,bad)=>{
     if(window.google&&google.accounts&&google.accounts.oauth2)return ok();
     const s=document.createElement("script");
     s.src="https://accounts.google.com/gsi/client";
     s.onload=()=>ok();
-    s.onerror=()=>bad(failure("offline"));
-    document.head.appendChild(s)})}
+    s.onerror=()=>{s.remove();gisLoading=null;bad(failure("offline"))};
+    document.head.appendChild(s)}))}
   async function signIn(){
     await gisReady();
     return new Promise((ok,bad)=>{
-      const c=google.accounts.oauth2.initTokenClient({client_id:CFG.googleClientId,scope:SCOPE,
-        callback:r=>{if(r&&r.access_token){keepToken(r.access_token,Number(r.expires_in)||3600);ok()}else bad(new Error("declined"))},
+      const hint=account();
+      const c=google.accounts.oauth2.initTokenClient({client_id:CFG.googleClientId,scope:SCOPE,...(hint?{login_hint:hint}:{}),
+        callback:r=>{if(r&&r.access_token){keepToken(r.access_token,Number(r.expires_in)||3600);if(!hint)rememberAccount();ok()}else bad(new Error("declined"))},
         error_callback:()=>bad(new Error("declined"))});
       c.requestAccessToken({prompt:""})})}
   async function call(url,opts){
@@ -61,6 +77,9 @@
   const googleDrive={
     hasToken:()=>!!(token=token||readToken()),
     signIn,
+    /* true when this device has signed in before and the sign-in ends within five minutes or already has */
+    renewDue:()=>!!account()&&tokenEndsSoon(),
+    preload:()=>gisReady().catch(()=>{}),
     async find(){
       const q=encodeURIComponent(`name='${FILE_NAME}' and trashed=false`);
       const r=await(await call(`${API}/drive/v3/files?q=${q}&spaces=drive&orderBy=modifiedTime desc&fields=files(id,md5Checksum)`)).json();
@@ -261,6 +280,21 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
     if(document.visibilityState==="hidden"){flushRemember();if(st.dirty)saveNow()}
     else if(drive&&drive.hasToken())sync()});
   window.addEventListener("pagehide",flushRemember);
+
+  /* ---------- renewing sign-in ----------
+     Browsers only let a sign-in popup open straight after a tap, so renewal waits for the next one.
+     Google already knows the account, so the popup usually closes by itself. Taps on the sign-in
+     buttons are left alone because they sign in themselves. If renewal fails, it waits ten minutes
+     before trying again, and the "Sign in to save to Drive" notice still works. */
+  let renewing=false,renewAfter=0;
+  document.addEventListener("click",e=>{
+    if(!drive||!drive.renewDue||renewing||st.conflict||!navigator.onLine||Date.now()<renewAfter)return;
+    if(document.getElementById("ds-gate")||(e.target.closest&&e.target.closest("#ds-pill")))return;
+    if(!drive.renewDue())return;
+    renewing=true;
+    drive.signIn()
+      .then(()=>{if(st.status==="signin"||st.dirty)sync()},()=>{renewAfter=Date.now()+RENEW_PAUSE})
+      .finally(()=>{renewing=false})},true);
   window.addEventListener("online",()=>{if(drive&&drive.hasToken())sync()});
   window.addEventListener("beforeunload",e=>{if(st.dirty&&drive){saveNow();e.preventDefault();e.returnValue=""}});
 
@@ -293,6 +327,8 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
     const c=await localGet();
     if(c&&c.docs){Object.values(c.docs).forEach(col=>Object.values(col).forEach(freeze));Object.assign(st,{docs:c.docs,fileId:c.fileId||null,base:c.base??null,sent:c.sent||null,dirty:!!c.dirty})}
     if(!drive){setStatus("local");return db}
+    /* load Google's sign-in code now, so a later renewal opens its popup during the tap */
+    if(drive.preload)drive.preload();
     if(!drive.hasToken()){
       if(c&&c.docs&&!navigator.onLine){setStatus("offline");return db}
       await waitForSignIn()}
