@@ -2057,7 +2057,7 @@ function tmLayoutApply(el){const L=tmL();if(!L.on||!tmCanArrange())return;
   const board=document.createElement("div");board.className="tm-board"+(L.lock||!TMD.edit?" locked":"");board.style.width=Math.round(gr.width)+"px";if(L.zoom!==1)board.style.zoom=L.zoom;let maxZ=Math.max(1,...Object.values(L.p).map(v=>v.z||1));
   const mk=(k,pos,cls)=>{const n=document.createElement("div");n.className="tm-note"+(cls?" "+cls:"")+(pos.h?" sized":"")+(TMD.sel===k?" sel":"");n.dataset.k=k;n.style.left=(pos.x??20)+"px";n.style.top=(pos.y??20)+"px";n.style.width=(pos.w??320)+"px";if(pos.h)n.style.height=pos.h+"px";n.style.zIndex=pos.z||1;return n};
   items.forEach(({p,k,dx,dy,dw})=>{if(L.hidden[k])return;const pos={x:dx,y:dy,w:dw,...(L.p[k]||{})};const n=mk(k,pos);
-    n.innerHTML=`<div class="tm-grip" title="Drag to move (Shift: no snapping). Click, then arrow keys to nudge."><span>⠿</span><span class="grow"></span><button type="button" class="tm-hide" data-tmhide="${esc(k)}" title="Hide this panel" aria-label="Hide this panel">–</button></div><div class="tm-rs" title="Drag to resize"></div>`;n.insertBefore(p,n.lastChild);board.appendChild(n)});
+    n.innerHTML=`<div class="tm-grip" title="Drag to move. Panels in the way step aside (hold Shift to place freely). Click, then arrow keys to nudge."><span>⠿</span><span class="grow"></span><button type="button" class="tm-hide" data-tmhide="${esc(k)}" title="Hide this panel" aria-label="Hide this panel">–</button></div><div class="tm-rs" title="Drag to resize"></div>`;n.insertBefore(p,n.lastChild);board.appendChild(n)});
   L.cards.forEach(c=>{const r=rec(c.type,c.eid);if(!r)return;const k="cd:"+c.id;if(L.hidden[k])return;const n=mk(k,{w:380,z:maxZ+1,...c},"card");
     n.innerHTML=`<div class="tm-grip st-bar" title="Drag to move"><span>⠿</span><b class="cd-t">${esc(titleOf(c.type,r)||"Untitled")}</b><span class="grow"></span><button type="button" data-act="view" data-type="${c.type}" data-id="${c.eid}" title="Open the full page" aria-label="Open">↗</button><button type="button" class="st-del" data-cddel="${c.id}" title="Take this card off the board" aria-label="Remove card">✕</button></div><div class="cd-body pin-body" data-pintype="${c.type}">${captureView(c.type,c.eid)||""}</div><div class="tm-rs" title="Drag to resize"></div>`;board.appendChild(n)});
   L.stickies.forEach(st=>{const k="st:"+st.id;const n=mk(k,{w:240,z:maxZ+1,...st},"sticky c-"+(st.color||"yellow"));
@@ -2086,7 +2086,7 @@ function tmSelect(k){TMD.sel=k;document.querySelectorAll("#tablemode .tm-note").
 document.addEventListener("pointerdown",e=>{const g=e.target.closest("#tablemode .tm-grip, #tablemode .tm-rs");if(!g||e.target.closest("button"))return;const n=g.closest(".tm-note");if(!n||n.closest(".tm-board.locked"))return;e.preventDefault();tmSelect(n.dataset.k);
   const z=Math.max(1,...[...document.querySelectorAll("#tablemode .tm-note")].map(x=>+x.style.zIndex||1))+1;n.style.zIndex=z;const Z=tmL().zoom||1;
   TMD.drag={n,Z,mode:g.classList.contains("tm-rs")?"size":"move",sx:e.clientX,sy:e.clientY,ox:n.offsetLeft,oy:n.offsetTop,ow:n.offsetWidth,oh:n.offsetHeight,id:e.pointerId,before:tmSnapshot()};
-  const b=n.closest(".tm-body");Object.assign(TMD.drag,{b,cx:e.clientX,cy:e.clientY,shift:e.shiftKey,st:b?b.scrollTop:0,sl:b?b.scrollLeft:0});
+  const b=n.closest(".tm-body");Object.assign(TMD.drag,{b,cx:e.clientX,cy:e.clientY,shift:e.shiftKey,st:b?b.scrollTop:0,sl:b?b.scrollLeft:0,home:tmHome(n)});
   /* keep scrolling while the pointer rests near the top or bottom edge */
   TMD.drag.timer=setInterval(()=>{const d=TMD.drag;if(!d||!d.b)return;const r=d.b.getBoundingClientRect();const v=d.cy>r.bottom-50?14:d.cy<r.top+50?-14:0;if(!v)return;const was=d.b.scrollTop;d.b.scrollTop+=v;if(d.b.scrollTop!==was)tmDragMove()},30);
   n.classList.add("dragging");g.setPointerCapture(e.pointerId)});
@@ -2094,13 +2094,27 @@ document.addEventListener("pointermove",e=>{const d=TMD.drag;if(!d||e.pointerId!
 /* the mouse wheel scrolls the board under a held panel, so the panel follows it */
 document.addEventListener("scroll",e=>{const d=TMD.drag;if(d&&e.target===d.b)tmDragMove()},true);
 /* place the held panel from the pointer position plus however far the board has scrolled since the grab */
-function tmDragMove(){const d=TMD.drag;if(!d)return;const e={shiftKey:d.shift};const dx=(d.cx-d.sx+(d.b?d.b.scrollLeft-d.sl:0))/d.Z,dy=(d.cy-d.sy+(d.b?d.b.scrollTop-d.st:0))/d.Z;const board=d.n.parentElement;
+function tmDragMove(){const d=TMD.drag;if(!d)return;const e={shiftKey:d.shift};const dx=(d.cx-d.sx+(d.b?d.b.scrollLeft-d.sl:0))/d.Z,dy=(d.cy-d.sy+(d.b?d.b.scrollTop-d.st:0))/d.Z;const board=d.n.parentElement;tmRoomReset(d);
   if(d.mode==="move"){let x=Math.max(0,d.ox+dx),y=Math.max(0,d.oy+dy),gx=[],gy=[];if(!e.shiftKey){const s=tmSnapMove(d.n,x,y);x=Math.max(0,s.x);y=Math.max(0,s.y);gx=s.gx;gy=s.gy}d.n.style.left=x+"px";d.n.style.top=y+"px";tmGuides(board,gx,gy)}
   else{let w=Math.max(200,d.ow+dx),h=Math.max(60,d.oh+dy),gx=[],gy=[];if(!e.shiftKey){const s=tmSnapSize(d.n,w,h);w=s.w;h=s.h;gx=s.gx;gy=s.gy}d.n.style.width=w+"px";d.n.style.height=h+"px";d.n.classList.add("sized");tmGuides(board,gx,gy)}
-  if(d.mode==="move"&&board&&d.n.offsetTop+d.n.offsetHeight+80>board.offsetHeight)board.style.height=(d.n.offsetTop+d.n.offsetHeight+80)+"px"}
+  if(!e.shiftKey)tmMakeRoom(d);
+  if(board){let H=0;board.querySelectorAll(".tm-note").forEach(o=>{H=Math.max(H,o.offsetTop+o.offsetHeight)});if(H+80>board.offsetHeight)board.style.height=(H+80)+"px"}}
+/* panels in the way of the held one step aside: narrower if there is room beside it, otherwise down below it */
+function tmHome(n){return [...n.parentElement.querySelectorAll(".tm-note")].filter(o=>o!==n).map(o=>({o,l:o.style.left,t:o.style.top,w:o.style.width,h:o.style.height,sz:o.classList.contains("sized")}))}
+function tmRoomReset(d){(d.home||[]).forEach(h=>{h.o.style.left=h.l;h.o.style.top=h.t;h.o.style.width=h.w;h.o.style.height=h.h;h.o.classList.toggle("sized",h.sz)})}
+function tmMakeRoom(d){const R=o=>({l:o.offsetLeft,t:o.offsetTop,r:o.offsetLeft+o.offsetWidth,b:o.offsetTop+o.offsetHeight});const hit=(a,b)=>a.l<b.r&&b.l<a.r&&a.t<b.b&&b.t<a.b;
+  const placed=[R(d.n)];const list=(d.home||[]).map(h=>h.o).sort((a,b)=>a.offsetTop-b.offsetTop||a.offsetLeft-b.offsetLeft);
+  list.forEach(o=>{const minW=Math.max(200,Math.round(o.offsetWidth*.6));for(let i=0;i<60;i++){const a=R(o);const B=placed.find(p=>hit(a,p));if(!B)break;
+    const rightW=B.l-TM_GAP-a.l,leftW=a.r-(B.r+TM_GAP);
+    if(B.l>a.l&&rightW>=minW&&rightW>=leftW)o.style.width=rightW+"px";
+    else if(B.r<a.r&&leftW>=minW){o.style.left=(B.r+TM_GAP)+"px";o.style.width=leftW+"px"}
+    else o.style.top=(B.b+TM_GAP)+"px"}
+    placed.push(R(o))})}
 const tmDragEnd=e=>{const d=TMD.drag;if(!d||e.pointerId!==d.id)return;
   clearInterval(d.timer);d.n.classList.remove("dragging");TMD.drag=null;const bd=d.n.parentElement;tmGuides(bd,[],[]);
-  if(d.n.offsetLeft!==d.ox||d.n.offsetTop!==d.oy||d.n.offsetWidth!==d.ow||d.n.offsetHeight!==d.oh){TMU.push(d.before);if(TMU.length>30)TMU.shift();tmStore(d.n)}
+  if(d.n.offsetLeft!==d.ox||d.n.offsetTop!==d.oy||d.n.offsetWidth!==d.ow||d.n.offsetHeight!==d.oh){TMU.push(d.before);if(TMU.length>30)TMU.shift();
+    (d.home||[]).forEach(h=>{if(h.o.style.left!==h.l||h.o.style.top!==h.t||h.o.style.width!==h.w)tmSetVals(h.o)});tmStore(d.n)}
+  else tmRoomReset(d);
   tmBoardSize(bd);if(renderPending&&!typingInTable()){renderPending=false;renderTable()}};
 document.addEventListener("pointerup",tmDragEnd);document.addEventListener("pointercancel",tmDragEnd);
 /* undo for layout changes */
