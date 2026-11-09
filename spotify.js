@@ -8,7 +8,7 @@ const AUTH="spotify.auth",PEND="spotify.pending",DEVK="spotify.device",EXP="spot
 const SCOPES="playlist-read-private playlist-read-collaborative user-read-playback-state user-modify-playback-state";
 const GROUPS=["Combat","Explore","Town","Rest","Mood"];
 const cid=()=>(window.DESK_CONFIG&&window.DESK_CONFIG.spotifyClientId)||"";
-const redirect=()=>location.origin+location.pathname.replace(/index\.html$/,"");
+const redirect=()=>location.origin+location.pathname.replace(/index\.html$/,"").replace(/\/?$/,"/");
 const ls={get(k){try{return localStorage.getItem(k)}catch(_){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(_){}},del(k){try{localStorage.removeItem(k)}catch(_){}}};
 const say=m=>{if(typeof toast==="function")toast(m)};
 const E=s=>typeof esc==="function"?esc(s):String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -21,7 +21,7 @@ const fail=(code,extra)=>new SpErr(code,MSG[code]||extra||"Spotify error");
 const b64=buf=>btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 const rand=n=>b64(crypto.getRandomValues(new Uint8Array(n)));
 function saved(){try{return JSON.parse(ls.get(AUTH)||"null")}catch(_){return null}}
-const connected=()=>!!(saved()&&saved().refresh);
+const connected=()=>{const a=saved();return !!(a&&a.refresh)};
 
 async function connect(){
   if(!cid()){say(MSG.setup+". See SETUP.md");return}
@@ -38,7 +38,9 @@ async function tokenCall(params){
   try{r=await fetch("https://accounts.spotify.com/api/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({client_id:cid(),...params})})}
   catch(_){throw fail("offline")}
   const j=await r.json().catch(()=>({}));
-  if(!r.ok){const e=fail(r.status===400||r.status===401?"signin":"other",j.error_description||"Spotify sign-in failed");e.status=r.status;throw e}
+  if(!r.ok){
+    /* only a revoked or used-up login means "sign in again"; a setup mistake shows Spotify's own words */
+    const e=fail(j.error==="invalid_grant"?"signin":"other",j.error_description||j.error||"Spotify sign-in failed");e.status=r.status;throw e}
   return j;
 }
 function keep(j,old){
@@ -68,6 +70,7 @@ async function handleReturn(){
 }
 
 /* ---------- Spotify calls ---------- */
+let hold=0;   /* when Spotify says slow down, no polling until this time (ms) */
 async function api(method,path,o,again){
   o=o||{};const t=await token();
   let url="https://api.spotify.com/v1"+path;
@@ -78,7 +81,7 @@ async function api(method,path,o,again){
   if(r.status===401&&!again){await token(true);return api(method,path,o,true)}
   if(r.status===401){ls.del(AUTH);ls.set(EXP,"1");throw fail("signin")}
   if(r.status===204||r.status===202)return null;
-  if(r.status===429)throw fail("limit");
+  if(r.status===429){hold=Date.now()+(+r.headers.get("Retry-After")||5)*1000;throw fail("limit")}
   const j=await r.json().catch(()=>null);
   if(!r.ok){
     const er=(j&&j.error)||{};
@@ -116,11 +119,11 @@ const music=()=>{const m=(typeof S!=="undefined"&&S.settings&&S.settings.music)|
 const label=uri=>{const it=music().items.find(x=>x.uri===uri);return it?it.label:""};
 
 async function poll(force){
-  if(!connected()||ST.busy)return;
+  if(!connected()||ST.busy||(!force&&Date.now()<hold))return;
   ST.busy=true;
   try{
     ST.state=await api("GET","/me/player");
-    if(force||ST.n++%2===0)ST.devices=await devices();
+    if(force||ST.n++%5===0)ST.devices=await devices();
     ST.err=null;
   }catch(e){ST.err=e.message||"Spotify error"}
   ST.busy=false;ST.last=Date.now();refresh();
@@ -145,18 +148,27 @@ function body(){
     <div class="sp-bar"><select data-sp-dev aria-label="Play on">${cur?"":`<option value="">Choose a device…</option>`}${ds.map(d=>`<option value="${E(d.id)}" ${d.id===cur?"selected":""}>${E(d.name)}</option>`).join("")}</select><button class="btn sm" data-sp="setup">Choose playlists</button></div>
     ${ST.err?`<p class="sp-err">${E(ST.err)}</p>`:""}`;
 }
-function panel(){return `<section class="tm-s sp" id="sp-panel"><h3>Music</h3><div id="sp-body">${body()}</div></section>`}
-/* updates only the panel, never the whole page, so typing in Session notes is not interrupted */
-function refresh(){
+let last="";   /* the panel HTML as last drawn, to skip redraws that change nothing */
+function panel(){last=body();return `<section class="tm-s sp" id="sp-panel"><h3>Music</h3><div id="sp-body">${last}</div></section>`}
+/* updates only the panel, never the whole page, so typing in Session notes is not interrupted.
+   Background updates wait while a slider or menu in the panel has focus; force=true (after a tap) redraws anyway. */
+function refresh(force){
   const el=document.getElementById("sp-body");if(!el)return;
-  const a=document.activeElement;if(a&&el.contains(a)&&/^(INPUT|SELECT)$/.test(a.tagName))return;
-  const h=body();if(el.dataset.h===h)return;el.innerHTML=h;el.dataset.h=h;
+  const a=document.activeElement,busy=a&&el.contains(a)&&/^(INPUT|SELECT)$/.test(a.tagName);
+  if(busy){if(!force)return;a.blur()}   /* after a tap, let go of focus so later updates are not blocked */
+  const h=body();if(h===last&&el.innerHTML)return;el.innerHTML=last=h;
 }
 function onScreen(){
   const p=document.getElementById("sp-panel");if(!p||document.hidden||!p.offsetParent)return false;
   const r=p.getBoundingClientRect();return r.bottom>0&&r.top<innerHeight&&r.right>0&&r.left<innerWidth;
 }
-setInterval(()=>{if(onScreen())poll()},5000);
+/* every 5 seconds while music plays, every 15 when idle, to save battery and data */
+setInterval(()=>{
+  if(!onScreen())return;
+  const playing=ST.state&&ST.state.is_playing;
+  if(!playing&&ST.last&&Date.now()-ST.last<15000)return;
+  poll();
+},5000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&onScreen())poll(true)});
 function watch(){
   const tm=document.getElementById("tablemode");if(!tm)return setTimeout(watch,500);
@@ -165,7 +177,7 @@ function watch(){
 
 async function act(f,okPoll){
   try{await f();ST.err=null}catch(e){ST.err=e.message||"Spotify error";say(ST.err)}
-  refresh();setTimeout(()=>poll(),okPoll||700);
+  refresh(true);setTimeout(()=>poll(),okPoll||700);
 }
 document.addEventListener("click",e=>{
   const t=e.target.closest("[data-sp]");if(!t)return;
@@ -199,7 +211,7 @@ document.addEventListener("keydown",e=>{
 function menu(){
   const on=connected();
   return `<div class="taper"></div><h3 class="vh">Music (Spotify)</h3>
-  <p class="tool-d">${on?"Spotify is connected on this device. The login stays here and is never saved in your campaign.":"Connect Spotify once on each device. It uses your Premium account to start playlists on any device running Spotify."}${ls.get(EXP)&&!on?" The last sign-in expired.":""}</p>
+  <p class="tool-d">${on?"Spotify is connected on this device. The login stays here and is never saved in your campaign. To cut off access completely, also remove the app at spotify.com/account/apps.":"Connect Spotify once on each device. It uses your Premium account to start playlists on any device running Spotify."}${ls.get(EXP)&&!on?" The last sign-in expired.":""}</p>
   <div class="tool-acts">${on?`<button class="btn" data-sp="setup">Choose soundboard playlists</button><button class="btn" data-sp="disconnect">Disconnect Spotify</button>`:`<button class="btn" data-sp="connect">Connect Spotify</button>`}</div>`;
 }
 
@@ -207,10 +219,10 @@ function menu(){
 let ED=null;
 async function openSetup(){
   if(!connected()){connect();return}
-  showSheet(`<div class="sheet"><h2>Music soundboard</h2><p class="vempty">Loading your playlists…</p><div class="foot"><span class="grow"></span><button type="button" class="btn" data-act="close">Close</button></div></div>`,true);
+  const note=inner=>showSheet(`<div class="sheet"><h2>Music soundboard</h2>${inner}<div class="foot"><span class="grow"></span><button type="button" class="btn" data-act="close">Close</button></div></div>`,true);
+  note(`<p class="vempty">Loading your playlists…</p>`);
   let pls;
-  try{pls=await playlists()}catch(e){
-    showSheet(`<div class="sheet"><h2>Music soundboard</h2><p class="sp-err">${E(e.message)}</p><div class="foot"><span class="grow"></span><button type="button" class="btn" data-act="close">Close</button></div></div>`,true);return}
+  try{pls=await playlists()}catch(e){note(`<p class="sp-err">${E(e.message)}</p>`);return}
   const m=JSON.parse(JSON.stringify(music())),rows=[],seen=new Set();
   m.items.forEach(x=>{const p=pls.find(q=>q.id===x.id);seen.add(x.id);rows.push({id:x.id,uri:x.uri,name:p?p.name:"(no longer in your library)",on:true,label:x.label||"",group:x.group||"Mood"})});
   pls.forEach(p=>{if(!seen.has(p.id))rows.push({id:p.id,uri:p.uri,name:p.name,on:false,label:"",group:"Mood"})});
@@ -243,9 +255,11 @@ document.addEventListener("input",e=>{const el=e.target;if(!ED||!el.dataset||!el
 document.addEventListener("submit",async e=>{
   const f=e.target.closest("[data-spform]");if(!f)return;
   e.preventDefault();e.stopPropagation();
+  if(!ED)return;
   const items=ED.rows.filter(r=>r.on).map(r=>({id:r.id,uri:r.uri,label:(r.label||r.name).trim().slice(0,24),group:r.group}));
   const def=items.some(x=>x.id===ED.def)?ED.def:"";
-  await save("settings","music",{items,def,updated:Date.now()});
+  try{await save("settings","music",{items,def,updated:Date.now()})}
+  catch(_){say("Could not save the soundboard. Your choices are still on screen");return}
   ED=null;closeSheet();say("Soundboard saved");
   if(typeof TM!=="undefined"&&TM&&typeof renderTable==="function")renderTable();
 },true);
@@ -255,19 +269,21 @@ const css=document.createElement("style");css.textContent=`
 .sp-np{font-size:18px;margin-bottom:8px;line-height:1.3}.sp-np small{color:var(--muted)}
 .sp-g{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
 .sp-gl{font:700 12px var(--ui);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);flex:0 0 100%}
-.sp-b{min-height:40px;padding:4px 14px;font-size:15px}
+.sp-b{min-height:48px;padding:4px 14px;font-size:15px}
+.sp-bar .btn,.sp-mv .btn{min-height:48px}.sp-mv .btn{min-width:48px}
+.sp-bar select{min-height:44px}
 .sp-b i{font:700 11px var(--ui);opacity:.65;margin-right:6px;font-style:normal}
 .sp-b.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .sp-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
 .sp-bar select{flex:1 1 140px;min-width:0;max-width:100%}
-.sp-bar input[type=range]{flex:1 1 120px;min-width:80px}
-.sp-err{color:#a33;font-size:14px;margin:8px 0 0}
+.sp-bar input[type=range]{flex:1 1 120px;min-width:80px;height:32px}
+.sp-err{color:var(--blood);font-size:14px;margin:8px 0 0}
 .sp-rows{display:flex;flex-direction:column;gap:6px;margin:10px 0}
 .sp-row{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;padding:6px 8px;border:1px solid var(--line);opacity:.75}
 .sp-row.on{opacity:1;background:var(--paper)}
 .sp-tick{display:flex;gap:8px;align-items:center;flex:1 1 100%;min-width:0}.sp-nm{overflow-wrap:anywhere}
 .sp-row input[data-spr=label]{flex:1 1 130px;min-width:0}
-.sp-mv{display:flex;gap:4px}.sp-def{font-size:13px;display:flex;gap:4px;align-items:center}
+.sp-mv{display:flex;gap:4px}.sp-def{font-size:14px;display:flex;gap:6px;align-items:center;min-height:48px}
 `;
 document.head.appendChild(css);
 

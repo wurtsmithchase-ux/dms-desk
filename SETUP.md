@@ -87,7 +87,7 @@ After a change, commit and push it, and the site updates within a few minutes. B
 The Music panel in table mode starts your own playlists on any device running Spotify. It needs Spotify Premium.
 
 1. Sign in at developer.spotify.com and create an app called "DM's Desk".
-2. Add these redirect addresses: the Desk's web address, with the trailing slash (`https://wurtsmithchase-ux.github.io/dms-desk/`), and for local testing `http://127.0.0.1:8765/` (Spotify accepts `127.0.0.1`, not `localhost`).
+2. Add these redirect addresses: the Desk's web address, with the trailing slash (`https://<your-github-username>.github.io/dms-desk/`), and for local testing `http://127.0.0.1:8765/` (Spotify accepts `127.0.0.1`, not `localhost`).
 3. Add your own Spotify account under the app's users. Spotify's development-mode rules limit this to a handful of accounts and need the app owner to have Premium.
 4. Paste the app's Client ID into `config.js` as `spotifyClientId`. It is safe in a public repository because this sign-in has no secret.
 5. On each device, open the Campaign menu and choose **Connect Spotify**. The login stays on that device.
