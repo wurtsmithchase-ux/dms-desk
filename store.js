@@ -83,7 +83,7 @@
     const b="desk"+Math.random().toString(36).slice(2);
     return{type:"multipart/related; boundary="+b,body:`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: ${type}; charset=UTF-8\r\n\r\n${text}\r\n--${b}--`}}
   const quote=s=>"'"+String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'")+"'";
-  const FOLDER="application/vnd.google-apps.folder";
+  const FOLDER="application/vnd.google-apps.folder",GDOC="application/vnd.google-apps.document";
   async function query(q,fields="id,name,md5Checksum,parents"){
     const out=[];let page="";
     do{const r=await(await call(`${API}/drive/v3/files?q=${encodeURIComponent(q)}&spaces=drive&pageSize=1000&fields=nextPageToken,files(${fields})${page?"&pageToken="+encodeURIComponent(page):""}`)).json();
@@ -117,11 +117,19 @@
     async move(id,to,from){await call(`${API}/drive/v3/files/${id}?addParents=${encodeURIComponent(to)}${from&&from.length?"&removeParents="+encodeURIComponent(from.join(",")):""}&fields=id`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:"{}"})},
     async named(prefix){return(await query(`name contains ${quote(prefix)} and trashed=false`)).filter(f=>f.name.startsWith(prefix)).map(f=>({id:f.id,parents:f.parents||[]}))},
     /* props are Drive appProperties: hidden tags the Desk puts on its text files (which entry, and a fingerprint of what it wrote) */
-    async list(folder){return(await query(`${quote(folder)} in parents and trashed=false`,"id,name,md5Checksum,appProperties")).map(f=>({id:f.id,name:f.name,md5:f.md5Checksum,props:f.appProperties||{}}))},
-    async writeText(id,name,text,parent,props){
-      const meta=id?{name,appProperties:props}:{name,mimeType:"text/plain",parents:[parent],appProperties:props};const m=multipart(meta,text,"text/plain");
-      const r=await(await call(`${API}/upload/drive/v3/files${id?"/"+id:""}?uploadType=multipart&fields=id,md5Checksum`,{method:id?"PATCH":"POST",headers:{"Content-Type":m.type},body:m.body})).json();
-      return{id:r.id,md5:r.md5Checksum}},
+    /* doc: a Google Doc, which has no md5Checksum, so textfiles.js compares its exported text instead; mod is Drive's modifiedTime */
+    async list(folder){return(await query(`${quote(folder)} in parents and trashed=false`,"id,name,md5Checksum,mimeType,modifiedTime,appProperties")).map(f=>({id:f.id,name:f.name,md5:f.md5Checksum,doc:f.mimeType===GDOC,mod:f.modifiedTime,props:f.appProperties||{}}))},
+    /* asDoc: a new file becomes a Google Doc (Drive converts the plain text), so Claude can edit it. An existing Doc stays one.
+       modifiedTime is set to the Desk's write time, so a later edit by anyone else shows as a newer time */
+    async writeText(id,name,text,parent,props,asDoc){
+      const t={...(props&&props.t?{modifiedTime:new Date(+props.t).toISOString()}:{})};
+      const meta=id?{name,appProperties:props,...t}:{name,mimeType:asDoc?GDOC:"text/plain",parents:[parent],appProperties:props,...t};const m=multipart(meta,text,"text/plain");
+      const r=await(await call(`${API}/upload/drive/v3/files${id?"/"+id:""}?uploadType=multipart&fields=id,md5Checksum,modifiedTime`,{method:id?"PATCH":"POST",headers:{"Content-Type":m.type},body:m.body})).json();
+      if(t.modifiedTime&&r.modifiedTime&&Date.parse(r.modifiedTime)!==Date.parse(t.modifiedTime))console.info("Desk text files: Drive kept its own modified time for",name);
+      return{id:r.id,md5:r.md5Checksum,mod:r.modifiedTime}},
+    async readText(id,doc){return(await call(doc?`${API}/drive/v3/files/${id}/export?mimeType=text%2Fplain`:`${API}/drive/v3/files/${id}?alt=media`)).text()},
+    /* hidden tags only; modifiedTime is sent back unchanged so the file doesn't look edited */
+    async tag(id,props,mod){await call(`${API}/drive/v3/files/${id}?fields=id`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({appProperties:props,...(mod?{modifiedTime:mod}:{})})})},
     async trash(id){await call(`${API}/drive/v3/files/${id}?fields=id`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({trashed:true})})}
   };
   const drive=window.DESK_DRIVE||(CFG.googleClientId?googleDrive:null);
@@ -366,8 +374,9 @@ body:has(#tablemode:not([hidden])) #ds-pill.ok{display:none}
     signedIn:()=>!!(drive&&drive.hasToken()),
     folder:textFolder,
     list:async()=>drive.list(await textFolder()),
-    read:id=>drive.read(id),
-    write:async(id,name,text,props)=>drive.writeText(id,name,text,id?null:await textFolder(),props),
+    read:(id,doc)=>drive.readText?drive.readText(id,doc):drive.read(id),
+    write:async(id,name,text,props,asDoc)=>drive.writeText(id,name,text,id?null:await textFolder(),props,asDoc),
+    tag:(id,props,mod)=>drive.tag?drive.tag(id,props,mod):Promise.resolve(),
     trash:id=>drive.trash(id)};
 
   window.DeskStore={open,assets,downloads,files,status:()=>st.status,saveNow};

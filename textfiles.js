@@ -1,6 +1,7 @@
 /* DM's Desk campaign text files.
-   Keeps a readable copy of every entry in Drive, in "DM's Desk/Campaign text", one file per entry plus _Index.txt,
-   so Claude can read only what a request needs. Files changed outside the Desk are never overwritten: they wait on
+   Keeps a readable copy of every entry in Drive, in "DM's Desk/Campaign text", one Google Doc per entry plus _Index,
+   so Claude can read and edit only what a request needs. Older plain .txt files are swapped for Docs as they're rewritten.
+   Files changed outside the Desk are never overwritten: they wait on
    the review page, where each change is accepted or skipped. Uses the Desk's globals (S, ALL, FORMS, save, BOOT,
    dataVer...) and DeskStore.files from store.js. */
 (function(){
@@ -93,7 +94,7 @@ const safeName=s=>oneLine(s).replace(/[\\/:*?"<>|]/g,"-").slice(0,80)||"Untitled
 /* every file the Desk wants in the folder, keyed col:id */
 function wanted(){
   const rows=listRows();nameRows(rows);
-  const nameOf=new Map(rows.map(r=>[r.col+":"+r.x.id,r.name.replace(/\.txt$/,"")]));
+  const nameOf=new Map(rows.map(r=>[r.col+":"+r.x.id,r.name]));
   const links=buildLinks(rows,nameOf);
   const relByChar=new Map();
   S.links.forEach(r=>[r.a,r.b].forEach(id=>{if(!relByChar.has(id))relByChar.set(id,[]);relByChar.get(id).push(r)}));
@@ -101,20 +102,20 @@ function wanted(){
   rows.forEach(r=>{const key=r.col+":"+r.x.id;
     const linked=[...links.get(key)].map(k=>nameOf.get(k)).filter(Boolean).sort();
     W.set(key,{name:r.name,text:r.col==="encounters"?encounterFile(r.x):entryFile(r.col,r.x,linked,id=>relByChar.get(id)||[])});
-    const b=r.col==="encounters"?"":brief(r.col,r.x);idx.push({col:r.col,line:`- ${r.name.replace(/\.txt$/,"")}${b?" | "+b:""}`})});
+    const b=r.col==="encounters"?"":brief(r.col,r.x);idx.push({col:r.col,line:`- ${r.name}${b?" | "+b:""}`})});
   indexFiles(idx).forEach((v,k)=>W.set(k,{...v,always:true}));
-  W.set("_new",{name:"_New entries.txt",text:NEW_TEMPLATE()});
+  W.set("_new",{name:"_New entries",text:NEW_TEMPLATE()});
   return W}
 function listRows(){
   const rows=[];
   FILE_COLS.forEach(col=>ALL[col].slice().sort((a,b)=>a.id<b.id?-1:1).forEach(x=>rows.push({col,x})));
   (ALL.encounters||[]).forEach(x=>rows.push({col:"encounters",x}));
   return rows}
-/* "Type - Name.txt"; a repeated name gets " (2)" */
+/* "Type - Name"; a repeated name gets " (2)" */
 function nameRows(rows){
   const used=new Set();
-  rows.forEach(r=>{const base=`${typeLabel(r.col)} - ${safeName(entryTitle(r.col,r.x))}`;let name=base+".txt",i=1;
-    while(used.has(name.toLowerCase()))name=`${base} (${++i}).txt`;used.add(name.toLowerCase());r.name=name})}
+  rows.forEach(r=>{const base=`${typeLabel(r.col)} - ${safeName(entryTitle(r.col,r.x))}`;let name=base,i=1;
+    while(used.has(name.toLowerCase()))name=`${base} (${++i})`;used.add(name.toLowerCase());r.name=name})}
 /* links: names this entry mentions, entries that mention it, picked characters or places, relationships */
 function buildLinks(rows,nameOf){
   const fwd=new Map(rows.map(r=>[r.col+":"+r.x.id,new Set()]));
@@ -142,12 +143,12 @@ function indexFiles(idx){
   const out=new Map(),groups=new Map();
   idx.forEach(i=>{if(!groups.has(i.col))groups.set(i.col,[]);groups.get(i.col).push(i.line)});
   const main=[`DM's Desk campaign index: ${S.settings.campaign?.name||"Campaign"}`,
-    "Entry files are named \"Type - Name.txt\". Find one by name first; open a type's index only to browse or when the name is unknown. Then open only the entries needed, plus their Linked entries.",
-    "Editing: keep each file's first line. Short fields are \"Label: value\" lines; long ones are \"## Label\" sections. A field left out stays as it is; \"Label:\" with nothing after it clears it. The DM accepts each change in the Desk.",
-    "New entries go in \"_New entries.txt\". Each type's index lists its field labels.","","Type indexes:"];
-  groups.forEach((lines,col)=>{const name=`_Index - ${typeLabel(col)}.txt`;main.push(`- ${name} (${lines.length})`);
+    "Entry files are Google Docs named \"Type - Name\". Find one by name first; open a type's index only to browse or when the name is unknown. Then open only the entries needed, plus their Linked entries.",
+    "Editing: edit the Doc's text in place and keep its first line. Short fields are \"Label: value\" lines; long ones are \"## Label\" sections. A field left out stays as it is; \"Label:\" with nothing after it clears it. Formatting is ignored. The DM accepts each change in the Desk.",
+    "New entries go in \"_New entries\". Each type's index lists its field labels.","","Type indexes:"];
+  groups.forEach((lines,col)=>{const name=`_Index - ${typeLabel(col)}`;main.push(`- ${name} (${lines.length})`);
     out.set("_index:"+col,{name,text:[`${typeLabel(col)} entries`,col==="encounters"?"Read only: edit encounters in the Desk.":`Fields: ${labelsLine(col)}`,"",...lines].join("\n")+"\n"})});
-  out.set("_index",{name:"_Index.txt",text:main.join("\n")+"\n"});
+  out.set("_index",{name:"_Index",text:main.join("\n")+"\n"});
   return out}
 const NEW_TEMPLATE=()=>[NEW_HEAD,
   "Add new entries below this line. Start each with \"Type: <type>\" and \"# Name\", then fields as in the other files.",
@@ -210,7 +211,9 @@ function parseNew(text){
 /* ---------- comparing with the Desk ---------- */
 function diff(col,x,vals){
   return fieldsOf(col).filter(f=>f.k in vals).map(f=>{const nv=vals[f.k],ov=x?rawVal(col,f,x):undefined;
-    const before=x?valOut(f,ov):"",after=valOut(f,nv);return before===after?null:{k:f.k,l:f.l,before,after}}).filter(Boolean)}
+    const before=x?valOut(f,ov):"",after=valOut(f,nv);return sameText(before,after)?null:{k:f.k,l:f.l,before,after}}).filter(Boolean)}
+/* spaces at line ends don't count: Google Docs and copy-paste can drop them */
+const sameText=(a,b)=>a===b||a.replace(/[ \t]+$/gm,"").replace(/\s+$/,"")===b.replace(/[ \t]+$/gm,"").replace(/\s+$/,"");
 function toRecord(col,base,vals){
   const d=JSON.parse(JSON.stringify(base||{}));delete d.id;Object.assign(d,JSON.parse(JSON.stringify(vals)));
   if(col==="events"&&"date" in d){if(d.date)Object.assign(d,d.date);delete d.date}
@@ -222,7 +225,29 @@ function newDefaults(col,vals){
 /* ---------- keeping Drive in step ---------- */
 const ST={busy:false,ver:-1,dirty:false,dirtyAt:0,lastRun:0,started:false,force:new Set(),cards:[],status:"",again:false};
 const files=()=>window.DeskStore&&DeskStore.files;
-const outside=f=>!!(f.props.h&&f.md5&&f.md5!==f.props.h);
+/* Docs: h is the hash of what the Desk wrote, e (when set) the hash of a later export that matched the Desk anyway */
+const outside=f=>!!(f.props.h&&f.md5&&f.md5!==(f.doc&&f.props.e||f.props.h));
+/* Google Docs have no md5Checksum, and their exported text can differ from what was uploaded in small ways (a byte order mark, \r\n line ends,
+   trailing spaces), so they're hashed after evening those out. A Doc whose modified time isn't after the Desk's last write is unchanged;
+   any other is exported once and hashed. SEEN keeps those results for this visit, keyed by modified time. */
+const SEEN=new Map();
+/* the Desk sends its write time as the Doc's modified time. If Drive keeps its own time instead, the Desk tags the file with that time,
+   which moves the time on by about a second, so a Doc counts as unchanged up to this long after its tag */
+const MOD_SLACK=5000;
+const fixTime=async(F,id,t,mod)=>{if(mod&&Date.parse(mod)!==+t)await F.tag(id,{t:String(Date.parse(mod))},mod)};
+const normText=s=>String(s||"").replace(/^﻿/,"").replace(/\r\n?/g,"\n").replace(/ /g," ").split("\n").map(l=>l.replace(/[ \t]+$/,"")).join("\n").replace(/\n+$/,"")+"\n";
+const docHash=s=>md5(normText(s));
+async function fingerprint(F,list){
+  const need=[];
+  list.forEach(f=>{if(!f.doc)return;const base=f.props.e||f.props.h,s=SEEN.get(f.id);
+    if(!f.props.h||(f.mod&&f.props.t&&Date.parse(f.mod)<=+f.props.t+MOD_SLACK)){f.md5=base;return}
+    if(s&&s.mod===f.mod){f.md5=s.md5;if(s.text!=null)f.text=s.text;return}
+    need.push(f)});
+  const same=[];
+  await pool(need.map(f=>async()=>{const text=normText(await F.read(f.id,true)),m=md5(text);SEEN.set(f.id,{mod:f.mod,md5:m,text});f.md5=m;f.text=text;
+    if(m===(f.props.e||f.props.h)&&f.mod)same.push(f)}),WRITERS);
+  /* touched but the same text (Drive kept its own time, or an edit was undone): move the time tag up so the next visit needn't export it */
+  if(same.length)await pool(same.map(f=>()=>F.tag(f.id,{t:String(Date.parse(f.mod))},f.mod)),WRITERS).catch(e=>console.warn("Desk text files: couldn't tag",e))}
 const WRITERS=4,QUIET_MS=60000,RECHECK_MS=120000,TICK_MS=5000,RERUN_MS=800,ARM_MS=4000;
 /* runs tasks n at a time. After the first failure no new task starts; in-flight ones finish, then the first error is thrown, so the next run never overlaps a leftover write */
 async function pool(tasks,n){
@@ -241,15 +266,21 @@ async function run(){
   if(ST.busy){ST.again=true;return}
   ST.busy=true;ST.lastRun=Date.now();setStatus("busy");
   try{
-    const list=await F.list(),have=new Map(),extra=[];
+    /* Docs first, so if a switch from .txt was cut short the Doc is kept and the old file is the extra one */
+    const list=(await F.list()).sort((a,b)=>(b.doc?1:0)-(a.doc?1:0)),have=new Map(),extra=[];
+    await fingerprint(F,list);
     list.forEach(f=>{const k=f.props.k;if(!k)return;if(have.has(k))extra.push(f);else have.set(k,f)});
     /* links come from S, which catches up with ALL on the next frame; bring it up to date first so a file never misses its links */
     if(COLS.some(c=>S[c]!==ALL[c])){project();ST.ver=dataVer}
     const W=wanted(),edited=[],jobs=[];
     W.forEach((w,k)=>{const f=have.get(k);
       if(f&&!w.always&&outside(f)&&!ST.force.has(k)){edited.push({k,f});return}
-      const h=md5(w.text);if(f&&f.props.h===h&&f.name===w.name&&!outside(f)){ST.force.delete(k);return}
-      jobs.push(async()=>{await F.write(f?f.id:null,w.name,w.text,{k,h,t:String(Date.now())});ST.force.delete(k)})});
+      const h=docHash(w.text);if(f&&f.doc&&f.props.h===h&&f.name===w.name&&!outside(f)){ST.force.delete(k);return}
+      jobs.push(async()=>{const t=String(Date.now());
+        /* a Doc is rewritten in place (clearing e); a missing or old .txt file is replaced by a new Doc */
+        if(f&&f.doc){const r=await F.write(f.id,w.name,w.text,{k,h,t,e:null});SEEN.set(f.id,{mod:r.mod,md5:h});await fixTime(F,f.id,t,r.mod)}
+        else{const r=await F.write(null,w.name,w.text,{k,h,t},true);SEEN.set(r.id,{mod:r.mod,md5:h});await fixTime(F,r.id,t,r.mod);if(f)await F.trash(f.id)}
+        ST.force.delete(k)})});
     have.forEach((f,k)=>{if(W.has(k))return;if(outside(f)&&!ST.force.has(k)&&!k.startsWith("_index"))edited.push({k,f});else jobs.push(async()=>{await F.trash(f.id);ST.force.delete(k)})});
     extra.forEach(f=>{if(!outside(f))jobs.push(()=>F.trash(f.id))});
     await pool(jobs,WRITERS);
@@ -271,12 +302,12 @@ const soon=()=>setTimeout(run,RERUN_MS);
 
 /* ---------- review page ---------- */
 async function buildCards(edited){
-  const F=files(),cards=[],texts=new Map(),failed=new Set();
+  const F=files(),cards=[],texts=new Map(),failed=new Set(),retag=[];
   /* cards already shown for this exact file stay as they are, so an accepted new entry can't come back */
   const prevOf=k=>ST.cards.filter(c=>c.key===k&&c.src!=="paste");
   const reads=edited.filter(({k,f})=>{const p=prevOf(k);return !(p.length&&p[0].md5===f.md5)});
   await pool(reads.map(({k,f})=>async()=>{
-    try{texts.set(k,await F.read(f.id))}
+    try{texts.set(k,f.text!=null?f.text:f.doc?normText(await F.read(f.id,true)):await F.read(f.id,false))}
     catch(e){console.warn("Desk text files: couldn't read",f.name,e);failed.add(k)}}),WRITERS);
   /* a file that couldn't be read keeps whatever cards it had and is tried again on the next cycle */
   if(failed.size){ST.dirty=true;ST.dirtyAt=Date.now()}
@@ -291,9 +322,13 @@ async function buildCards(edited){
     const x=find(p.col,p.id);
     const card={...p,...base,src:"drive",gone:!x,both:!!(x&&x.updated&&+f.props.t&&x.updated>+f.props.t)};
     card.changes=diff(p.col,x,p.vals);
-    /* nothing really changed (spacing only, say): put the Desk's copy back without asking */
-    if(x&&!card.changes.length&&!card.warn.length){ST.force.add(k);continue}
+    /* nothing really changed (spacing only, say): a .txt file gets the Desk's copy back without asking. A Doc is left as it is and
+       tagged with this export's hash and time, so it isn't exported or rewritten again (a Doc's text may never match the upload exactly) */
+    if(x&&!card.changes.length&&!card.warn.length){
+      if(f.doc){const props={e:f.md5,...(f.mod?{t:String(Date.parse(f.mod))}:{})};retag.push(async()=>{await F.tag(f.id,props,f.mod);SEEN.set(f.id,{mod:f.mod,md5:f.md5})})}
+      else ST.force.add(k);continue}
     cards.push(card)}
+  if(retag.length)await pool(retag,WRITERS).catch(e=>console.warn("Desk text files: couldn't tag",e));
   ST.cards=ST.cards.filter(c=>c.src==="paste").concat(cards);
   if(edited.some(e=>ST.force.has(e.k)))soon();
   notice();if(document.getElementById("tx-review"))showReview()}
