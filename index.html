@@ -1988,7 +1988,7 @@ function vTimeline(c){
 /* ---------- table mode ---------- */
 let TM=false;
 function openTableMode(){TM=true;document.documentElement.classList.add("locked");renderTable();}
-function closeTableMode(){TM=false;const el=document.getElementById("tablemode");el.hidden=true;el.innerHTML="";if(document.getElementById("modal").hidden)document.documentElement.classList.remove("locked")}
+function closeTableMode(){TM=false;if(TMD.drag){clearInterval(TMD.drag.timer);TMD.drag=null}const el=document.getElementById("tablemode");el.hidden=true;el.innerHTML="";if(document.getElementById("modal").hidden)document.documentElement.classList.remove("locked")}
 function typingInTable(){const a=document.activeElement;return !!a&&document.getElementById("tablemode").contains(a)&&(a.tagName==="TEXTAREA"||a.tagName==="INPUT"&&a.type!=="checkbox")}
 
 /* ================= Table mode: free layout, panels as movable sticky notes ================= */
@@ -2083,12 +2083,12 @@ function tmSnapSize(n,w,h){const x=n.offsetLeft,y=n.offsetTop,O=tmOthers(n);
   return {w:Math.max(200,bx?bx.pos-x:Math.round(w/10)*10),h:Math.max(60,by?by.pos-y:Math.round(h/10)*10),gx:bx?[bx.line]:[],gy:by?[by.line]:[]}}
 function tmSelect(k){TMD.sel=k;document.querySelectorAll("#tablemode .tm-note").forEach(n=>n.classList.toggle("sel",n.dataset.k===k))}
 /* dragging by the grip, resizing by the corner */
-document.addEventListener("pointerdown",e=>{const g=e.target.closest("#tablemode .tm-grip, #tablemode .tm-rs");if(!g||e.target.closest("button"))return;const n=g.closest(".tm-note");if(!n||n.closest(".tm-board.locked"))return;e.preventDefault();tmSelect(n.dataset.k);
+document.addEventListener("pointerdown",e=>{if(TMD.drag||e.button>0)return;const g=e.target.closest("#tablemode .tm-grip, #tablemode .tm-rs");if(!g||e.target.closest("button"))return;const n=g.closest(".tm-note");if(!n||n.closest(".tm-board.locked"))return;e.preventDefault();tmSelect(n.dataset.k);
   const z=Math.max(1,...[...document.querySelectorAll("#tablemode .tm-note")].map(x=>+x.style.zIndex||1))+1;n.style.zIndex=z;const Z=tmL().zoom||1;
   TMD.drag={n,Z,mode:g.classList.contains("tm-rs")?"size":"move",sx:e.clientX,sy:e.clientY,ox:n.offsetLeft,oy:n.offsetTop,ow:n.offsetWidth,oh:n.offsetHeight,id:e.pointerId,before:tmSnapshot()};
-  const b=n.closest(".tm-body");Object.assign(TMD.drag,{b,cx:e.clientX,cy:e.clientY,shift:e.shiftKey,st:b?b.scrollTop:0,sl:b?b.scrollLeft:0,home:tmHome(n)});
-  /* keep scrolling while the pointer rests near the top or bottom edge */
-  TMD.drag.timer=setInterval(()=>{const d=TMD.drag;if(!d||!d.b)return;const r=d.b.getBoundingClientRect();const v=d.cy>r.bottom-50?14:d.cy<r.top+50?-14:0;if(!v)return;const was=d.b.scrollTop;d.b.scrollTop+=v;if(d.b.scrollTop!==was)tmDragMove()},30);
+  const b=n.closest(".tm-body");Object.assign(TMD.drag,{b,cx:e.clientX,cy:e.clientY,shift:e.shiftKey,st:b?b.scrollTop:0,sl:b?b.scrollLeft:0,home:tmHome(n),orig:{left:n.style.left,top:n.style.top,width:n.style.width,height:n.style.height},origSized:n.classList.contains("sized")});
+  /* keep scrolling while the pointer rests near the top or bottom edge; the scroll listener below moves the held panel */
+  TMD.drag.timer=setInterval(()=>{const d=TMD.drag;if(!d||!d.b)return;const r=d.b.getBoundingClientRect();const v=d.cy>r.bottom-50?14:d.cy<r.top+50?-14:0;if(!v)return;d.b.scrollTop+=v},30);
   n.classList.add("dragging");g.setPointerCapture(e.pointerId)});
 document.addEventListener("pointermove",e=>{const d=TMD.drag;if(!d||e.pointerId!==d.id)return;d.cx=e.clientX;d.cy=e.clientY;d.shift=e.shiftKey;tmDragMove()});
 /* the mouse wheel scrolls the board under a held panel, so the panel follows it */
@@ -2110,13 +2110,14 @@ function tmMakeRoom(d){const R=o=>({l:o.offsetLeft,t:o.offsetTop,r:o.offsetLeft+
     else if(B.r<a.r&&leftW>=minW){o.style.left=(B.r+TM_GAP)+"px";o.style.width=leftW+"px"}
     else o.style.top=(B.b+TM_GAP)+"px"}
     placed.push(R(o))})}
-const tmDragEnd=e=>{const d=TMD.drag;if(!d||e.pointerId!==d.id)return;
+const tmDragEnd=(e,cancelled)=>{const d=TMD.drag;if(!d||e.pointerId!==d.id)return;
   clearInterval(d.timer);d.n.classList.remove("dragging");TMD.drag=null;const bd=d.n.parentElement;tmGuides(bd,[],[]);
-  if(d.n.offsetLeft!==d.ox||d.n.offsetTop!==d.oy||d.n.offsetWidth!==d.ow||d.n.offsetHeight!==d.oh){TMU.push(d.before);if(TMU.length>30)TMU.shift();
+  if(cancelled){/* the system cancelled the gesture: put everything back where it was */tmRoomReset(d);Object.assign(d.n.style,d.orig);d.n.classList.toggle("sized",d.origSized)}
+  else if(d.n.offsetLeft!==d.ox||d.n.offsetTop!==d.oy||d.n.offsetWidth!==d.ow||d.n.offsetHeight!==d.oh){TMU.push(d.before);if(TMU.length>30)TMU.shift();
     (d.home||[]).forEach(h=>{if(h.o.style.left!==h.l||h.o.style.top!==h.t||h.o.style.width!==h.w)tmSetVals(h.o)});tmStore(d.n)}
   else tmRoomReset(d);
   tmBoardSize(bd);if(renderPending&&!typingInTable()){renderPending=false;renderTable()}};
-document.addEventListener("pointerup",tmDragEnd);document.addEventListener("pointercancel",tmDragEnd);
+document.addEventListener("pointerup",e=>tmDragEnd(e,false));document.addEventListener("pointercancel",e=>tmDragEnd(e,true));
 /* undo for layout changes */
 const TMU=[];function tmSnapshot(){const L=tmL();return JSON.stringify(tmCur(L))}
 function tmUndo(){const b=TMU.pop();if(!b){toast("Nothing to undo");return}const L=tmL();const o=JSON.parse(b);TM_FIELDS.forEach(f=>L[f]=o[f]);tmSave();tmRender()}
