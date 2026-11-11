@@ -238,6 +238,17 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 .scn-sec > .btn{align-self:flex-start}
 .scn-whos{display:flex;flex-wrap:wrap;gap:8px}
 .scn-who{display:inline-flex;align-items:center;gap:8px;padding:2px 2px 2px 12px;border:1px solid var(--gold);border-radius:999px;background:var(--surface)}
+/* NPCs & Enemies */
+.ppl-tools{display:flex;flex-direction:column;gap:8px;padding:10px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:1;background:inherit}
+.ppl-tools .search{width:100%;max-width:none}
+.ppl-tools .tq select{min-height:36px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.ppl-tools .tq input{flex:1 1 auto;min-width:0}
+.ppl-tabs{margin:14px 0 12px}
+.ppl-att{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:12px}
+.ppl-wants{margin:0;font-size:18px}
+.ppl-acts{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.ppl-gen{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:8px 0}
+.ppl .statblock{max-width:640px}
 @media (max-width:640px){.lib-groups{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.lib-groups::-webkit-scrollbar{display:none}.lib-g{flex:0 0 auto;min-height:40px}.lib-q{max-width:none;flex-basis:100%}}
 .reader .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font:500 14px var(--sc);letter-spacing:.04em;margin-bottom:6px}
 .prose{max-width:68ch;overflow-wrap:anywhere;margin-top:14px}
@@ -2646,6 +2657,104 @@ function statBlock(m){
     ${line("Saving Throws",m.saves)}${line("Skills",m.skills)}${line("Resistances & Immunities",m.resist)}${line("Senses",m.senses)}${line("Languages",m.languages)}${line("Challenge",m.cr?`${m.cr} (${fmtN(CR_XP[m.cr]||0)} XP)`:"")}
     ${m.traits?`<div class="taper"></div>${blockLines(m.traits)}`:""}${sec("Actions",m.actions)}${sec("Bonus Actions",m.bonus)}${sec("Reactions",m.reactions)}${sec("Legendary Actions",m.legendary)}${sec("Phases & notes",m.notes)}</div>`;
 }
+/* Quick stat block maker: built-in rules of thumb by CR, nudged by role. No outside service. */
+const GEN_ROLES={brute:"Brute",skirmisher:"Skirmisher",caster:"Spellcaster",defender:"Defender"};
+const GEN_TYPES=["humanoid","beast","undead","fiend","monstrosity","construct","elemental","fey","dragon","aberration","giant","celestial","plant","ooze"];
+const GEN_DMG=["slashing","piercing","bludgeoning","fire","cold","lightning","thunder","acid","poison","necrotic","radiant","psychic","force"];
+const crNum=cr=>cr==="1/8"?.125:cr==="1/4"?.25:cr==="1/2"?.5:(num(cr)||0);
+function genMon(name,o){
+  const cr=CRS.includes(o.cr)?o.cr:"1",n=crNum(cr),half=Math.floor(n/2),R=GEN_ROLES[o.role]?o.role:"brute",type=GEN_TYPES.includes(o.type)?o.type:"humanoid",dmg=GEN_DMG.includes(o.dmg)?o.dmg:"slashing";
+  const low=["0","1/8","1/4","1/2"].indexOf(cr);
+  let ac=12+half,hp=low>=0?[3,7,13,22][low]:Math.round(20*n),dpr=low>=0?[1,3,5,7][low]:Math.round(7*n);
+  const adj={brute:[-1,1.25,1.15],skirmisher:[1,.85,1],caster:[-1,.8,1.1],defender:[2,1.2,.8]}[R];
+  ac=Math.min(22,Math.max(10,ac+adj[0]));hp=Math.max(2,Math.round(hp*adj[1]));dpr=Math.max(1,Math.round(dpr*adj[2]));
+  const atk=3+half,dc=12+half,prof=n<1?2:2+Math.floor((n-1)/4),pm=Math.min(7,2+Math.floor(n/4));
+  const mindless=["beast","ooze","plant"].includes(type);
+  const prim=R==="brute"||R==="defender"?"str":R==="skirmisher"?"dex":["fiend","fey","celestial","dragon"].includes(type)?"cha":["undead","aberration","construct"].includes(type)?"int":"wis";
+  const ab={str:10,dex:12,con:10+2*Math.max(1,pm-1),int:mindless?3:10,wis:10,cha:mindless?5:10};ab[prim]=10+2*pm;
+  const conM=Math.floor((ab.con-10)/2),large=["giant","dragon"].includes(type)||(R==="brute"&&n>=5),die=large?5.5:4.5;
+  const hd=Math.max(1,Math.round(hp/(die+conM)));hp=Math.max(1,Math.floor(hd*die)+hd*conM);
+  const who="the "+String(name||"creature").toLowerCase(),Who="The "+String(name||"creature").toLowerCase();
+  const count=n>=11?3:n>=3?2:1,per=dpr/count,dd=R==="skirmisher"?3.5:R==="caster"?5.5:4.5,dn=R==="skirmisher"?"d6":R==="caster"?"d10":"d8";
+  const nd=Math.max(1,Math.round((per-pm)/dd)),avg=Math.max(1,Math.floor(nd*dd)+pm);
+  const phys={slashing:"Slash",piercing:"Stab",bludgeoning:"Slam"}[dmg],aName=phys||`${CAP(dmg)} Lash`;
+  const actions=[];
+  if(count>1)actions.push(`Multiattack. ${Who} makes ${count===2?"two":"three"} ${R==="caster"?"Spell Bolt":aName} attacks.`);
+  if(R==="caster"){
+    actions.push(`Spell Bolt. Ranged Attack Roll: +${atk}, range 120 ft. Hit: ${avg} (${nd}${dn} + ${pm}) ${dmg} damage.`);
+    const bn=Math.max(1,Math.round(dpr*.75/3.5));actions.push(`${phys?"Shard":CAP(dmg)} Burst (Recharge 5–6). Dexterity Saving Throw: DC ${dc}, each creature in a 15-foot cube within 60 feet. Failure: ${Math.floor(bn*3.5)} (${bn}d6) ${dmg} damage. Success: Half damage.`)}
+  else actions.push(`${aName}. Melee Attack Roll: +${atk}, reach ${large?10:5} ft. Hit: ${avg} (${nd}${dn} + ${pm}) ${dmg} damage.`);
+  const traits=[],bonus=[],reactions=[];
+  if(R==="brute")traits.push(`Brutal Charge. If ${who} moves at least 20 feet straight toward a target right before hitting it, the target takes an extra ${Math.max(2,Math.round(per/2))} ${dmg} damage.`);
+  if(R==="skirmisher")bonus.push(`Nimble Escape. ${Who} takes the Disengage or Hide action.`);
+  if(R==="defender")reactions.push(`Parry. ${Who} adds 2 to its AC against one melee attack that would hit it. It must see the attacker.`);
+  if(R==="caster")bonus.push(`Misty Step. ${Who} teleports up to 30 feet to a space it can see.`);
+  if(type==="undead")traits.push(`Undead Nature. ${Who} doesn't need air, food, drink or sleep.`);
+  const wisM=Math.floor((ab.wis-10)/2),dark=["undead","fiend","dragon","aberration","monstrosity","giant","elemental"].includes(type);
+  const P=prim.toUpperCase().replace(/^(.)(.*)$/,(m,a,b)=>a+b.toLowerCase());
+  return {name:name||"Creature",cr,meta:`${large?"Large":"Medium"} ${type}, ${["beast","ooze","plant","construct"].includes(type)?"unaligned":"neutral"}`,
+    ac:String(ac),hp:String(hp),hpNote:`${hd}d${large?10:8}${hd*conM?` ${hd*conM>0?"+":"−"} ${Math.abs(hd*conM)}`:""}`,speed:R==="skirmisher"?"40 ft.":type==="dragon"?"30 ft., fly 60 ft.":"30 ft.",
+    ...ab,saves:n>=5?`${P} +${pm+prof}`:"",skills:`Perception +${wisM+prof}`,senses:`${dark?"darkvision 60 ft., ":""}passive Perception ${10+wisM+prof}`,languages:mindless?"—":"Common",
+    traits:traits.join("\n"),actions:actions.join("\n"),bonus:bonus.join("\n"),reactions:reactions.join("\n")}}
+const GEN={cr:"1",role:"brute",type:"humanoid",dmg:"slashing"};
+
+/* NPCs & Enemies: NPCs (characters, kind npc) and stat blocks (monsters) in one list */
+function pplItems(){const q=String(U.pplQ||"").trim().toLowerCase(),k=U.pplKind||"all",out=[];
+  if(k!=="foe")S.characters.filter(x=>x.kind!=="pc").forEach(x=>out.push({col:"characters",x}));
+  if(k!=="npc")S.monsters.forEach(x=>out.push({col:"monsters",x}));
+  return out.filter(({col,x})=>!q||((x.name||"")+" "+textOf(col,x)).toLowerCase().includes(q)).sort((a,b)=>(a.x.name||"").localeCompare(b.x.name||""))}
+function vPeople(){
+  const list=pplItems();let sel=U.pplSel&&rec(U.pplSel.col,U.pplSel.id)?U.pplSel:null;
+  if(!sel||!list.some(i=>i.col===sel.col&&i.x.id===sel.id))sel=list[0]?{col:list[0].col,id:list[0].x.id}:null;U.pplSel=sel;
+  const x=sel&&rec(sel.col,sel.id),npc=sel&&sel.col==="characters",tab=U.pplTab||"notes";
+  const kinds=`<div class="seg">${[["all","All"],["npc","NPCs"],["foe","Foes"]].map(([k,l])=>`<button type="button" data-act="pplKind" data-v="${k}" aria-pressed="${(U.pplKind||"all")===k}">${l}</button>`).join("")}</div>`;
+  const row=({col,x:r})=>`<button class="nitem" data-act="pplSel" data-col="${col}" data-id="${r.id}" aria-current="${!!sel&&sel.col===col&&sel.id===r.id}"><b>${esc(r.name||"Unnamed")}</b><small>${col==="characters"?["NPC",r.cls,r.location].filter(Boolean).map(esc).join(" · "):`Foe${r.cr?" · CR "+esc(r.cr):""}${r.meta?" · "+esc(r.meta):""}`}</small></button>`;
+  const left=`<div class="nlist"><div class="ppl-tools"><input class="search" id="pplq" data-in="pplQ" type="search" placeholder="Search NPCs and foes" aria-label="Search NPCs and foes" value="${esc(U.pplQ||"")}">${kinds}
+    <form data-ppladd class="tq dm-only"><input id="ppl-add" placeholder="Add by name" aria-label="Name of a new NPC or foe"><select id="ppl-addk" aria-label="Add as"><option value="npc" ${U.pplKind==="foe"?"":"selected"}>NPC</option><option value="foe" ${U.pplKind==="foe"?"selected":""}>Foe</option></select><button class="btn sm primary" type="submit">Add</button></form></div>
+    <div class="lib-lh"><h3>${{all:"NPCs & Enemies",npc:"NPCs",foe:"Foes"}[U.pplKind||"all"]}</h3><span>${list.length}</span></div>${list.length?list.map(row).join(""):`<div class="empty">${U.pplQ?"Nothing matches that search.":"No one here yet. Add someone by name."}</div>`}</div>`;
+  if(!x)return `<div class="notes lib ppl ${U.noteReading?"reading":""}">${left}<div class="empty lib-pick">Pick someone to see their notes and stat block.</div></div>`;
+  const m=npc?(x.mon&&rec("monsters",x.mon)):x;
+  const tabs=`<div class="seg ppl-tabs">${[["notes","Notes"],["block","Stat block"],["gen","Quick stat block"]].map(([k,l])=>`<button type="button" data-act="pplTab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join("")}</div>`;
+  let body="";
+  if(tab==="notes"&&npc){
+    const fl=[["Role",x.cls],["Where",x.location],["Faction",x.faction],["Voice",x.voice],["Status",x.status&&x.status!=="alive"?CAP(x.status):""]].filter(f=>f[1]);
+    body=`${fl.length?`<dl class="le-fields">${fl.map(([l,v])=>`<div><dt>${l}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`:""}
+      <div class="ppl-att"><span class="label">Starting attitude</span><div class="seg dm-only">${[["friendly","Friendly"],["neutral","Neutral"],["hostile","Hostile"]].map(([k,l])=>`<button type="button" data-act="pplAtt" data-v="${k}" aria-pressed="${x.attitude===k}">${l}</button>`).join("")}</div></div>
+      <div class="le-cols"><div class="le-main">${x.wants?`<section><h4 class="le-h">What they want</h4><p class="ppl-wants">${linkify(esc(x.wants),"characters:"+x.id)}</p></section>`:""}<section><h4 class="le-h">Notes</h4>${x.notes?`<div class="prose vprose">${rich(x.notes,"characters:"+x.id)}</div>`:`<p class="vempty">No notes yet. Use Edit to add them.</p>`}</section></div>
+      <div class="le-side">${secretBox(x)}${backlinkBlock("characters",x.id)}</div></div>`}
+  else if(tab==="notes"){
+    body=`<div class="le-cols"><div class="le-main"><section><h4 class="le-h">Phases & notes</h4>${x.notes?blockLines(x.notes):`<p class="vempty">Nothing yet. Edit the stat block to add phases or tactics.</p>`}</section></div><div class="le-side">${backlinkBlock("monsters",x.id)}</div></div>`}
+  else if(tab==="block"){
+    body=m?`${statBlock(m)}<div class="ppl-acts dm-only"><button type="button" class="btn sm" data-act="edit" data-type="monsters" data-id="${m.id}">Edit stat block</button>${npc?`<button type="button" class="btn sm" data-act="pplUnlink">Unlink from ${esc(x.name||"this NPC")}</button>`:""}</div>`
+      :`<p class="vempty">${esc(x.name||"This NPC")} has no stat block yet.</p><label class="scn-f dm-only"><span class="label">Use one from the Bestiary</span><select class="scn-in" id="ppl-link"><option value="">— Pick a stat block —</option>${S.monsters.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(k=>`<option value="${k.id}">${esc(k.name||"Monster")}${k.cr?` (CR ${esc(k.cr)})`:""}</option>`).join("")}</select></label><p class="vempty">Or make one in Quick stat block.</p>`}
+  else{
+    const g=genMon(x.name,GEN),opt=(k,vals,lab)=>`<label class="scn-f"><span class="label">${lab}</span><select class="scn-in" data-gen="${k}">${vals.map(([v,l])=>`<option value="${v}" ${GEN[k]===v?"selected":""}>${esc(l)}</option>`).join("")}</select></label>`;
+    body=`<p class="pb-sub">Numbers come from simple rules of thumb for the CR. Adjust anything after saving.</p>
+      <div class="ppl-gen">${opt("cr",CRS.map(c=>[c,"CR "+c]),"Challenge")}${opt("role",Object.entries(GEN_ROLES),"Role")}${opt("type",GEN_TYPES.map(t=>[t,CAP(t)]),"Type")}${opt("dmg",GEN_DMG.map(t=>[t,CAP(t)]),"Damage")}</div>
+      <div class="ppl-acts dm-only">${npc?`<button type="button" class="btn primary" data-act="genSave">${m?"Save as a new stat block and link it":"Save and link to "+esc(x.name||"this NPC")}</button>`:`<button type="button" class="btn danger ${U.genArm===x.id?"armed":""}" data-act="genApply">${U.genArm===x.id?"Yes, replace the numbers":"Replace this stat block's numbers"}</button><button type="button" class="btn" data-act="genSave">Save as a new stat block</button>`}</div>
+      ${statBlock(g)}`}
+  const crumb=npc?["NPC",x.attitude?CAP(x.attitude):""].filter(Boolean).join(" · "):`Foe${x.cr?" · CR "+esc(x.cr):""}`;
+  return `<div class="notes lib ppl ${U.noteReading?"reading":""}">${left}<article class="reader lib-entry"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ Back to the list</button></div>
+    <div class="le-head"><div class="le-t"><span class="le-crumb">${crumb}</span><h3 class="t">${esc(x.name||"Unnamed")}</h3></div><span class="dm-only acts-r"><button type="button" class="btn sm" data-act="${npc?"view":"open"}" data-type="${sel.col}" data-id="${x.id}">Full page</button><button type="button" class="btn sm" data-act="edit" data-type="${sel.col}" data-id="${x.id}">Edit</button></span></div>
+    ${tabs}${body}</article></div>`;
+}
+async function pplPatch(col,id,patch){const r=rec(col,id);if(!r)return;const{id:_,...keep}=r;await save(col,id,{...JSON.parse(JSON.stringify(keep)),...patch})}
+async function pplAct(a,t){const sel=U.pplSel,x=sel&&rec(sel.col,sel.id);
+  if(a==="pplSel"){U.pplSel={col:t.dataset.col,id:t.dataset.id};U.genArm=null;U.noteReading=true;render();if(isPhone())window.scrollTo({top:0});return}
+  if(a==="pplKind"){U.pplKind=t.dataset.v;U.noteReading=false;render();return}
+  if(a==="pplTab"){U.pplTab=t.dataset.v;U.genArm=null;render();return}
+  if(!x)return;
+  if(a==="pplAtt"){await pplPatch("characters",x.id,{attitude:x.attitude===t.dataset.v?"":t.dataset.v});return}
+  if(a==="pplUnlink"){await pplPatch("characters",x.id,{mon:""});return}
+  if(a==="genSave"){const id=uid(),g=genMon(x.name,GEN);await save("monsters",id,g);if(sel.col==="characters")await pplPatch("characters",x.id,{mon:id});else U.pplSel={col:"monsters",id};U.pplTab="block";toast(`Saved a CR ${g.cr} stat block for ${g.name}`);project();render();return}
+  if(a==="genApply"){if(U.genArm!==x.id){U.genArm=x.id;render();return}U.genArm=null;const{name:_,...g}=genMon(x.name,GEN);await pplPatch("monsters",x.id,g);U.pplTab="block";toast("Stat block numbers replaced");render()}}
+document.addEventListener("change",e=>{const t=e.target;
+  if(t.dataset&&t.dataset.gen){GEN[t.dataset.gen]=t.value;U.genArm=null;render();return}
+  if(t.id==="ppl-link"&&t.value&&U.pplSel&&U.pplSel.col==="characters")pplPatch("characters",U.pplSel.id,{mon:t.value})});
+document.addEventListener("submit",async e=>{const f=e.target.closest("[data-ppladd]");if(!f)return;e.preventDefault();e.stopPropagation();const i=document.getElementById("ppl-add"),v=i.value.trim();if(!v)return;
+  const foe=document.getElementById("ppl-addk").value==="foe",id=uid();
+  if(foe)await save("monsters",id,{name:v,cr:"1"});else await save("characters",id,{name:v,kind:"npc",status:"alive"});
+  U.pplSel={col:foe?"monsters":"characters",id};U.pplTab=foe?"gen":"notes";U.pplQ="";U.noteReading=true;project();render()});
 function vBestiary(){
   const list=S.monsters.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||""));
   return `<div class="sub-bar"><p class="tool-d">Your own stat blocks. Names link everywhere, encounters can pull them in, and table mode shows them when a plan mentions them.</p><button class="btn primary" data-act="new" data-type="monsters">New stat block</button></div>
@@ -3583,9 +3692,10 @@ function vParty(){
   const npcs=S.characters.filter(x=>x.kind!=="pc"&&match(x)).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
   const f=U.charFilter;
   let h=`<div class="bar"><h2>Characters</h2>
-    <div class="seg">${[["all","All"],["pc","Party"],["npc","NPCs"]].map(([k,l])=>`<button data-act="charFilter" data-v="${k}" aria-pressed="${f===k}">${l}</button>`).join("")}</div>
+    <div class="seg">${[["all","All"],["pc","Party"],["npc","NPCs & Enemies"]].map(([k,l])=>`<button data-act="charFilter" data-v="${k}" aria-pressed="${f===k}">${l}</button>`).join("")}</div>
     <button class="btn primary dm-only" data-act="new" data-type="characters">Add character</button></div>`;
   h+=whatsNew();
+  if(f==="npc")return h+vPeople();
   if(f!=="npc"){
     h+=`<h3 class="section-h">The Adventuring Party · ${pcs.length}</h3>`;
     h+=pcs.length?`<div class="pcs">${pcs.map(pcCard).join("")}</div>`:`<div class="empty" style="margin-bottom:28px">No player characters yet.${isDM()?" Use <b>Add character</b> and set the type to Player character.":""}</div>`;
@@ -3730,7 +3840,7 @@ const charOpts=()=>Object.fromEntries([["","— Choose —"],...S.characters.sli
 const FAC={fac:true};
 const FORMS={
   characters:{title:"Character",fields:c=>[
-    ["name","Name","text",6],["pronounce","Pronunciation","text",3,null,"e.g. Ah-LAR-ick"],["voice","Voice & mannerisms","text",3,null,"e.g. hissing, slow, never blinks"],["kind","Type","select",3,{pc:"Player character",npc:"NPC"}],["status","Status","select",3,{alive:"Alive",missing:"Missing",dead:"Dead",unknown:"Unknown"}],
+    ["name","Name","text",6],["pronounce","Pronunciation","text",3,null,"e.g. Ah-LAR-ick"],["voice","Voice & mannerisms","text",3,null,"e.g. hissing, slow, never blinks"],["wants","What they want","text",6,null,"e.g. to buy back the family farm"],["mon","Stat block","select",6,Object.fromEntries([["","— None —"],...S.monsters.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(m=>[m.id,m.name||"Monster"])])],["kind","Type","select",3,{pc:"Player character",npc:"NPC"}],["status","Status","select",3,{alive:"Alive",missing:"Missing",dead:"Dead",unknown:"Unknown"}],
     ["img","Portrait","image",6],
     ["player","Player","text",3],["race","Species","text",3],["cls","Class / role","text",4,null,"e.g. Tempest Cleric, or Blacksmith"],["level","Level","number",2],
     ["ac","AC","number",2],["hpMax","Max HP","number",2],["hp","Current HP","number",2],["pp","Passive Perception","number",2],
@@ -4106,6 +4216,7 @@ document.addEventListener("click",async e=>{
     case"planPlayed":{const pl=rec("plans",t.dataset.id);if(pl){const{id,...r}=pl;save("plans",id,{...r,status:pl.status==="played"?"planned":"played"})}break}
     case"pbPlan":U.planSel=t.dataset.id;U.prepTab="plan";render();window.scrollTo({top:0});break;
     case"scnSel":case"scnMove":case"scnDel":case"scnReserve":case"scnClueDel":case"scnIfAdd":case"scnIfDel":case"scnWhoAdd":case"scnWhoDel":scnAct(a,t);break;
+    case"pplSel":case"pplKind":case"pplTab":case"pplAtt":case"pplUnlink":case"genSave":case"genApply":pplAct(a,t);break;
     case"scnOpen":U.planSel=t.dataset.id;U.prepTab="scenes";render();window.scrollTo({top:0});break;
     case"pbWorld":U.worldTab=t.dataset.v;if(location.hash!=="#world")location.hash="world";else render();break;
     case"planPick":U.planSel=t.dataset.id;render();window.scrollTo({top:0});break;
