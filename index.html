@@ -115,7 +115,7 @@ input.search{width:230px;max-width:100%}
 .pc h3{margin:0;font:700 22px/1.15 var(--display);color:var(--accent);cursor:pointer;min-width:0;overflow-wrap:anywhere}
 .pc h3:hover{text-decoration:underline;text-decoration-thickness:1px}
 .pc .sub{font-style:italic;color:var(--ink);font-size:15px;line-height:1.3}
-.taper{height:5px;background:var(--accent);clip-path:polygon(0 50%,0 0,100% 50%,0 100%);margin:2px 0;clear:both}
+.taper{height:5px;background:var(--accent);clip-path:polygon(0 50%,0 0,100% 50%,0 100%);margin:2px 0;clear:both} /* clear:both keeps a divider below a floated drop cap instead of beside it */
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;text-align:center}
 .stat b{display:block;font:500 21px/1.15 var(--ui);font-variant-numeric:lining-nums tabular-nums;color:var(--ink)}
 .stat span{font:800 12px var(--sc);letter-spacing:.08em;color:var(--accent)}
@@ -940,7 +940,7 @@ header.top .clock{display:none!important}
 :root[data-skin="frost"]{--bg:#e4ebf1;--paper:#f3f7fa;--surface:#fbfdff;--surface2:#e1e9f0;--block:#eef4f9;--ink:#17222c;--muted:#4f6070;--line:#c2cfdb;--stripe:#dde8f1;--side:#e7eef5;--accent:#1f5a8a;--accent-ink:#eef6fc;--accent-soft:#d5e4f1;--gold:#7f9bb5;--bar:#5aa0d0;--blood:#a3262c;--blood-soft:#f4d7d8;--ok:#2f6b4f;--ok-soft:#d6eadf;--warn:#7a5908;--warn-soft:#efe3c2;--hdr:#142333;--hdr2:#243b53;--hdr-ink:#e3eef8;color-scheme:light}
 :root[data-skin="forge"]{--bg:#e3ded6;--paper:#f1eee8;--surface:#f8f6f2;--surface2:#e2ddd3;--block:#efebe3;--ink:#22201c;--muted:#5d574d;--line:#c9c1b2;--stripe:#e5e0d4;--side:#eae6dc;--accent:#2f4f5f;--accent-ink:#f1ece0;--accent-soft:#d7e0e2;--gold:#a07a32;--bar:#b5852f;--blood:#9b2a1c;--blood-soft:#f1d6cf;--ok:#3d6630;--ok-soft:#dde8d0;--warn:#7d5508;--warn-soft:#f0e2bd;--hdr:#23272b;--hdr2:#3b4148;--hdr-ink:#e8d29d;color-scheme:light}
 /* Wood & Wax skin: parchment pages on dark wood, wax red actions, gilt edges. At 1101px and wider the tabs become a side menu. */
-:root[data-skin="wood"]{--bg:#efe0be;--paper:#f6ebd0;--surface:#f6ebd0;--surface2:#e4cfa3;--block:#f3e5c4;--ink:#2a1b10;--muted:#5e4630;--line:#cdb383;--stripe:#e8d6ae;--side:#eddcb8;--accent:#8e1f12;--accent-ink:#f6e8c6;--accent-soft:#eed3c2;--gold:#c9a24e;--bar:#c9a24e;--blood:#8e1f12;--blood-soft:#f0d2c6;--hdr:#17100b;--hdr2:#2e2015;--hdr-ink:#ead9b5;--wood:#17100b;--wood2:#241811}
+:root[data-skin="wood"]{--bg:#efe0be;--paper:#f6ebd0;--surface:#f6ebd0;--surface2:#e4cfa3;--block:#f3e5c4;--ink:#2a1b10;--muted:#5e4630;--line:#cdb383;--stripe:#e8d6ae;--side:#eddcb8;--accent:#8e1f12;--accent-ink:#f6e8c6;--accent-soft:#eed3c2;--gold:#c9a24e;--bar:#c9a24e;--blood:#8e1f12;--blood-soft:#f0d2c6;--ok:#3d6630;--ok-soft:#dfe4c4;--warn:#7d5508;--warn-soft:#f0deb0;--hdr:#17100b;--hdr2:#2e2015;--hdr-ink:#ead9b5;--wood:#17100b;--wood2:#241811}
 :root[data-skin="wood"]:not([data-fonts]){--title:"Cinzel Decorative","Cinzel",Georgia,serif;--drop:"Cinzel Decorative","Cinzel",Georgia,serif;--display:"IM Fell English SC",Georgia,serif;--sc:"IM Fell English SC",Georgia,serif;--body:"EB Garamond",Georgia,serif;--ui:"EB Garamond",Georgia,serif}
 :root[data-skin="wood"] body{background:var(--wood);background-image:none}
 :root[data-skin="wood"] #app{background:var(--bg);border:1px solid #8a6a2c;border-radius:4px;margin-block:18px 28px;box-shadow:0 2px 14px rgba(0,0,0,.45)}
@@ -957,21 +957,21 @@ header.top .clock{display:none!important}
 @media (max-width:640px){:root[data-skin="wood"] .lib-entry h3.t{font-size:28px}}
 @media (max-width:640px){:root[data-skin="wood"] body{background:var(--bg)}:root[data-skin="wood"] #app{margin:0;border:0;border-radius:0;box-shadow:none}}
 @media (min-width:1101px){
-  :root[data-skin="wood"] body{padding-left:232px}
-  :root[data-skin="wood"] nav.tabs{position:fixed;left:0;top:0;bottom:0;width:232px;z-index:6;flex-direction:column;gap:3px;overflow-y:auto;background:var(--wood2);border-right:2px solid var(--gold);padding:max(24px,env(safe-area-inset-top,0px)) 14px 24px}
-  :root[data-skin="wood"] nav.tabs a,:root[data-skin="wood"] .nav-sess{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:0 12px;margin:0;border:0;border-radius:3px;background:none;color:var(--hdr-ink);opacity:1;font:400 18px var(--sc);letter-spacing:.02em;text-align:left;cursor:pointer;order:5}
+  /* --navw is the side menu width; 400px and 424px match the normal #pindock width and scrim padding */
+  :root[data-skin="wood"]{--navw:232px}
+  :root[data-skin="wood"] body{padding-left:var(--navw)}
+  :root[data-skin="wood"] nav.tabs{position:fixed;left:0;top:0;bottom:0;width:var(--navw);z-index:6;flex-direction:column;gap:3px;overflow-y:auto;background:var(--wood2);border-right:2px solid var(--gold);padding:max(24px,env(safe-area-inset-top,0px)) 14px 24px}
+  :root[data-skin="wood"] nav.tabs a,:root[data-skin="wood"] .nav-sess{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:0 12px;margin:0;border:0;border-radius:3px;background:none;color:var(--hdr-ink);opacity:1;font:400 18px var(--sc);letter-spacing:.02em;text-align:left;cursor:pointer}
   :root[data-skin="wood"] nav.tabs a:hover,:root[data-skin="wood"] .nav-sess:hover{background:rgba(201,162,78,.14)}
   :root[data-skin="wood"] nav.tabs a[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
   :root[data-skin="wood"] nav.tabs a .n{font:400 14px var(--body);opacity:.75;margin:0}
-  :root[data-skin="wood"] .nav-brand{display:block;order:0;font:700 24px/1.2 var(--drop);color:var(--gold);padding:0 10px 18px}
-  :root[data-skin="wood"] .nav-sess{order:1}
-  :root[data-skin="wood"] nav.tabs a[href="#prep"]{order:2}
-  :root[data-skin="wood"] nav.tabs a[href="#party"],:root[data-skin="wood"] nav.tabs a[href="#home"]{order:3}
-  :root[data-skin="wood"] .nav-h{display:block;order:4;font:400 16px var(--sc);color:var(--gold);padding:18px 12px 6px}
+  /* render() writes the side menu in the order shown, so keyboard and screen reader order match */
+  :root[data-skin="wood"] .nav-brand{display:block;font:700 24px/1.2 var(--drop);color:var(--gold);padding:0 10px 18px}
+  :root[data-skin="wood"] .nav-h{display:block;font:400 16px var(--sc);color:var(--gold);padding:18px 12px 6px}
   :root[data-skin="wood"] .brand small{display:none}
-  :root[data-skin="wood"] #pindock{left:232px}
-  :root[data-skin="wood"] body.docked{padding-left:632px}
-  :root[data-skin="wood"] body.docked .scrim{padding-left:656px}
+  :root[data-skin="wood"] #pindock{left:var(--navw)}
+  :root[data-skin="wood"] body.docked{padding-left:calc(var(--navw) + 400px)}
+  :root[data-skin="wood"] body.docked .scrim{padding-left:calc(var(--navw) + 424px)}
 }
 :root[data-fonts="storybook"]{--title:"IM Fell English SC",Georgia,serif;--display:"IM Fell English SC",Georgia,serif;--drop:"IM Fell English SC",Georgia,serif;--body:"IM Fell English",Georgia,serif}
 :root[data-fonts="elvish"]{--title:"Uncial Antiqua",Georgia,serif;--display:"Alegreya SC",Georgia,serif;--drop:"Uncial Antiqua",Georgia,serif;--body:"Alegreya",Georgia,serif}
@@ -1393,6 +1393,10 @@ const TABS=[["home","Party page","Party"],["party","Characters","Cast"],["notes"
 const S={characters:[],notes:[],quests:[],events:[],threads:[],plans:[],links:[],loot:[],maps:[],logs:[],encounters:[],tables:[],clocks:[],chats:[],meta:[],monsters:[],todos:[],settings:{},loaded:false,live:false};
 const U={tab:"party",charFilter:"all",charQ:"",noteSel:null,noteQ:"",libGrp:"all",calY:null,calM:null,noteReading:false,calSel:null,questTab:"active",preview:false,prepTab:"plan",calView:"month",tableSel:null,worldTab:"maps",planSel:null};
 const isPhone=()=>window.matchMedia("(max-width:640px)").matches;
+// Wood & Wax turns the tabs into a side menu at 1101px and wider (matches the CSS media query)
+const SIDE_MQ=window.matchMedia("(min-width:1101px)");
+const sideMenu=()=>STYLE.skin==="wood"&&SIDE_MQ.matches;
+try{SIDE_MQ.addEventListener("change",()=>{if(STYLE.skin==="wood")render()})}catch(e){}
 let db=null;
 
 /* ---------- helpers ---------- */
@@ -2536,18 +2540,19 @@ function applyTexture(){let el=document.getElementById("texture");if(!el){el=doc
 try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>applyStyle())}catch(e){}
 let STYLE={skin:"auto",fonts:"classic",size:"1",texture:"theme",texStrength:"0.8"};
 try{const s=JSON.parse(localStorage.getItem("dmdesk-style")||"null");if(s&&typeof s==="object")STYLE={...STYLE,...s}}catch(e){}
-function loadFontSet(id){const f=FONTSETS.find(x=>x.id===id);if(!f||!f.css||document.getElementById("font-"+id))return;const l=document.createElement("link");l.id="font-"+id;l.rel="stylesheet";l.href="https://fonts.googleapis.com/css2?family="+f.css+"&display=swap";document.body.appendChild(l)}
+function loadFontLink(id,family){if(!family||document.getElementById(id))return;const l=document.createElement("link");l.id=id;l.rel="stylesheet";l.href="https://fonts.googleapis.com/css2?family="+family+"&display=swap";document.body.appendChild(l)}
+function loadFontSet(id){const f=FONTSETS.find(x=>x.id===id);if(f)loadFontLink("font-"+id,f.css)}
 function applyStyle(){const r=document.documentElement;
   if(STYLE.skin==="auto"){r.removeAttribute("data-theme");r.removeAttribute("data-skin")}
   else{r.setAttribute("data-theme",SKIN_MODE[STYLE.skin]||"light");if(["parchment","candlelit"].includes(STYLE.skin))r.removeAttribute("data-skin");else r.setAttribute("data-skin",STYLE.skin)}
-  if(SKIN_FONTS[STYLE.skin]&&!document.getElementById("font-skin-"+STYLE.skin)){const l=document.createElement("link");l.id="font-skin-"+STYLE.skin;l.rel="stylesheet";l.href="https://fonts.googleapis.com/css2?family="+SKIN_FONTS[STYLE.skin]+"&display=swap";document.body.appendChild(l)}
+  loadFontLink("font-skin-"+STYLE.skin,SKIN_FONTS[STYLE.skin]);
   if(STYLE.fonts&&STYLE.fonts!=="classic"){loadFontSet(STYLE.fonts);r.setAttribute("data-fonts",STYLE.fonts)}else r.removeAttribute("data-fonts");
   r.style.setProperty("--zoom",STYLE.size||"1");
   if(STYLE.plain&&!STYLE.texture)STYLE.texture="none";
   applyTexture();
   const mc=document.querySelector('meta[name="theme-color"]');if(mc)mc.content=getComputedStyle(r).getPropertyValue("--hdr").trim();
 }
-function setStyle(k,v){STYLE[k]=v;try{localStorage.setItem("dmdesk-style",JSON.stringify(STYLE))}catch(e){}applyStyle();styleSheet(true)}
+function setStyle(k,v){STYLE[k]=v;try{localStorage.setItem("dmdesk-style",JSON.stringify(STYLE))}catch(e){}applyStyle();if(k==="skin")render();styleSheet(true)}
 function styleSheet(re){
   FONTSETS.forEach(f=>loadFontSet(f.id));
   const skin=s=>`<button type="button" class="st-card" data-act="setStyle" data-k="skin" data-v="${s.id}" aria-pressed="${STYLE.skin===s.id}"><span class="sw-top" style="background:${s.top};color:${s.ink}">Desk</span><span class="sw-body" style="background:${s.bg}"><span class="sw-h" style="color:${s.h}">Session 19</span><span class="sw-line" style="background:${s.line};width:85%"></span><span class="sw-line" style="background:${s.line};width:60%"></span><span class="sw-dots">${s.dots.map(c=>`<i style="background:${c}"></i>`).join("")}</span></span><span class="sw-name">${esc(s.name)}<small>${esc(s.note)}</small></span></button>`;
@@ -3346,8 +3351,15 @@ function render(){
   if(document.getElementById("modal").hidden&&!TM)document.documentElement.classList.remove("locked");
   if(U.tab==="prep"&&!isDM())U.tab="home";if(U.tab==="home"&&isDM())U.tab="party";
   const counts={party:S.characters.length,notes:S.notes.length,calendar:S.events.length,quests:S.quests.filter(q=>q.status==="active").length,world:S.maps.length,prep:S.threads.filter(t=>t.status!=="resolved").length};
-  document.getElementById("tabs").innerHTML=TABS.filter(([k])=>((k!=="prep")||isDM())&&(k!=="home"||!isDM())).map(([k,l,sh])=>`<a href="#${k}" ${U.tab===k?'aria-current="page"':""}><span class="full">${l}</span><span class="short">${sh}</span><span class="n">${counts[k]||""}</span></a>`).join("")
-    +`<span class="nav-brand" aria-hidden="true">DM's Desk</span>${isDM()?`<button type="button" class="nav-sess" data-act="tmOpen" title="A big-text screen for running the session (T)">Session</button>`:""}<span class="nav-h">The Library</span>`;
+  const tabLinks=TABS.filter(([k])=>((k!=="prep")||isDM())&&(k!=="home"||!isDM())).map(([k,l,sh])=>[k,`<a href="#${k}" ${U.tab===k?'aria-current="page"':""}><span class="full">${l}</span><span class="short">${sh}</span><span class="n">${counts[k]||""}</span></a>`]);
+  // Side menu (Wood & Wax, wide screens): brand, Session, Prep, Party/Characters, then the rest under a label
+  const sideTop=["prep","home","party"],linkHtml=list=>list.map(([,h])=>h).join("");
+  document.getElementById("tabs").innerHTML=sideMenu()
+    ?`<span class="nav-brand" aria-hidden="true">DM's Desk</span>${isDM()?`<button type="button" class="nav-sess" data-act="tmOpen" title="A big-text screen for running the session (T)">Session</button>`:""}`
+      +linkHtml(sideTop.map(k=>tabLinks.find(([t])=>t===k)).filter(Boolean))
+      +`<span class="nav-h" aria-hidden="true">The Library</span>`
+      +linkHtml(tabLinks.filter(([k])=>!sideTop.includes(k)))
+    :linkHtml(tabLinks);
   const banner=(S.live?"":`<div class="banner">Saving isn't available in this view, so changes last only until you close the page.</div>`)+(U.preview?`<div class="preview-bar"><span>Previewing what your players see.</span><button class="btn sm" data-act="previewToggle">Stop previewing</button></div>`:"");
   const views={home:vHome,party:vParty,notes:vNotes,calendar:vCalendar,quests:vQuests,world:vWorld,prep:vPrep};
   const y=window.scrollY,ta=aid&&ae.tagName==="TEXTAREA"?ae.scrollTop:0;
