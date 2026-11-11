@@ -1942,7 +1942,7 @@ function vPrepBoard(c){
   // clocks closest to filling first; full ones have already happened, so leave them off the board
   const clkR=k=>(num(k.filled)||0)/Math.max(1,num(k.segments)||0);
   const clocks=S.clocks.filter(k=>clkR(k)<1).sort((a,b)=>clkR(b)-clkR(a));
-  const kC=card("Clocks",clocks.length,goTab("clocks","All clocks"),clocks.length?`<div class="clks pb-clks">${clocks.slice(0,6).map(k=>clockCard(k,true)).join("")}</div>`:`<p class="vempty">No clocks yet.</p>`);
+  const kC=card("Clocks",clocks.length,goTab("clocks","All clocks"),clocks.length?`<div class="clks pb-clks">${clocks.slice(0,6).map(k=>clockCard(k,true)).join("")}</div>`:`<p class="vempty">${S.clocks.length?"Every clock has filled.":"No clocks yet."}</p>`);
   const facs=S.notes.filter(x=>x.category==="faction").sort((a,b)=>(a.title||"").localeCompare(b.title||""));
   const fC=card("Factions",facs.length,`<button class="btn sm" data-act="pbWorld" data-v="rel">Relationships</button>`,facs.length?facs.map(f=>`<button class="pb-row" data-act="open" data-type="notes" data-id="${f.id}"><b>${esc(f.title||"Untitled")}</b>${f.leader||f.base?`<small>${esc([f.leader&&"Led by "+f.leader,f.base&&"Based in "+f.base].filter(Boolean).join(" · "))}</small>`:""}</button>`).join(""):`<p class="vempty">No faction notes yet. Add a note with the Faction category.</p>`);
   const todos=S.todos.filter(t=>t.kind!=="goal"&&!t.done).sort((a,b)=>(a.due||"9999").localeCompare(b.due||"9999")||(a.updated||0)-(b.updated||0));
@@ -1952,7 +1952,7 @@ function vPrepBoard(c){
 }
 /* Scene Editor: scenes live in the plan record as plan.scenes [{id,title,note,read,clues:[{t,found}],ifs:[{if,then}],who:[{col,id}],reserve,when}].
    Edits go to a draft (SCN.d) and save on their own about a second after typing stops. Plans without scenes start from their opener and reveals. */
-const SCN={pid:null,d:null,sel:null,dirty:false,state:"",q:"",arm:null,timer:null,legacy:false};
+const SCN={pid:null,d:null,sel:null,dirty:false,state:"",q:"",arm:null,timer:null,legacy:false,pending:{},tries:{}};
 const scnNew=o=>({id:uid(),title:"",note:"",read:"",clues:[],ifs:[],who:[],reserve:false,when:"",...o});
 function scnLegacy(p){
   const clues=revealItems(p).map(r=>({t:r.text,found:r.done}));
@@ -1962,31 +1962,43 @@ function scnPlan(){const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.ses
 function scnLoad(p){
   if(SCN.pid&&SCN.pid!==p.id&&SCN.dirty)scnFlush();
   // reload the draft only when the plan changed or a newer copy arrived, and never over unsaved edits
-  if(SCN.pid!==p.id||(!SCN.dirty&&(SCN.ver!==p.updated||!SCN.d))){const has=Array.isArray(p.scenes);SCN.d=(has?JSON.parse(JSON.stringify(p.scenes)):scnLegacy(p)).map(s=>scnNew({...s,clues:s.clues||[],ifs:s.ifs||[],who:s.who||[]}));SCN.legacy=!has;SCN.ver=p.updated;
-    if(SCN.pid!==p.id){SCN.sel=null;SCN.arm=null;SCN.state="";SCN.dirty=false}SCN.pid=p.id}
+  if(SCN.pid!==p.id||(!SCN.dirty&&(SCN.ver!==p.updated||!SCN.d))){const has=Array.isArray(p.scenes),held=SCN.pending[p.id];
+    // edits that failed to save after you left this plan come back as the draft instead of the older saved copy
+    SCN.d=(held?JSON.parse(held):has?JSON.parse(JSON.stringify(p.scenes)):scnLegacy(p)).map(s=>scnNew({...s,clues:s.clues||[],ifs:s.ifs||[],who:s.who||[]}));SCN.legacy=!has&&!held;SCN.ver=p.updated;
+    if(SCN.pid!==p.id){SCN.sel=null;SCN.arm=null;SCN.state="";SCN.dirty=false}SCN.pid=p.id;
+    if(held){delete SCN.pending[p.id];SCN.dirty=true;SCN.state="Not saved yet";clearTimeout(SCN.timer);SCN.timer=setTimeout(scnFlush,1200)}}
   if(!SCN.d.find(s=>s.id===SCN.sel))SCN.sel=SCN.d[0]?.id||null}
 const scnCur=()=>SCN.d&&SCN.d.find(s=>s.id===SCN.sel);
 function scnStatus(){const el=document.getElementById("scn-state");if(el)el.textContent=SCN.state}
 function scnTouch(redraw){SCN.dirty=true;SCN.state="Not saved yet";clearTimeout(SCN.timer);SCN.timer=setTimeout(scnFlush,1200);if(redraw)render();else scnStatus()}
 /* Saves run one at a time. The draft is copied when the save is asked for, so switching plans mid-save keeps the old plan's edits.
-   save() returns false when the write failed: the draft then stays unsaved and tries again. */
+   save() returns false when the write failed: the draft stays unsaved and tries again a few times, waiting longer each time.
+   A plan you left with unsaved edits keeps them in SCN.pending until they save or you open that plan again. */
+const SCN_TRIES=6;
 let scnQ=Promise.resolve(),scnSent=null;
+function scnQueue(fn){return scnQ=scnQ.then(fn).catch(e=>{console.error(e);scnSent=null;if(SCN.dirty){SCN.state="Couldn't save. Your changes are still here; edit again to retry.";scnStatus()}})}
 function scnFlush(){
   clearTimeout(SCN.timer);if(!SCN.dirty||!SCN.pid||!SCN.d)return scnQ;
   const pid=SCN.pid,snap=JSON.stringify(SCN.d);if(scnSent===pid+"|"+snap)return scnQ;scnSent=pid+"|"+snap;
   SCN.state="Saving…";scnStatus();
-  return scnQ=scnQ.then(()=>scnWrite(pid,snap))}
+  return scnQueue(()=>scnWrite(pid,snap))}
 async function scnWrite(pid,snap){
   const p=rec("plans",pid);scnSent=null;
-  if(!p){if(SCN.pid===pid){SCN.dirty=false;SCN.state="This plan was deleted, so the scenes weren't saved."}scnStatus();return}
+  if(!p){delete SCN.pending[pid];if(SCN.pid===pid){SCN.dirty=false;SCN.state="This plan was deleted, so the scenes weren't saved."}scnStatus();return}
   const{id:_,...keep}=JSON.parse(JSON.stringify(p));
   const ok=await save("plans",pid,{...keep,scenes:JSON.parse(snap)});
-  if(!ok){
-    if(SCN.pid===pid){SCN.state="Couldn't save. Your changes are still here and will try again.";clearTimeout(SCN.timer);SCN.timer=setTimeout(scnFlush,5000)}
-    else setTimeout(()=>{scnQ=scnQ.then(()=>SCN.pid===pid?null:scnWrite(pid,snap))},5000);
+  if(!ok){const n=SCN.tries[pid]=(SCN.tries[pid]||0)+1,wait=Math.min(5000*n,30000),more=n<SCN_TRIES;
+    if(SCN.pid===pid){clearTimeout(SCN.timer);
+      SCN.state=more?"Couldn't save. Your changes are still here and will try again.":"Not saved. Check your connection or storage, then edit again to retry.";
+      if(more)SCN.timer=setTimeout(scnFlush,wait)}
+    else{SCN.pending[pid]=snap;
+      if(more)setTimeout(()=>scnQueue(()=>SCN.pending[pid]===snap&&SCN.pid!==pid?scnWrite(pid,snap):null),wait)}
     scnStatus();return}
+  SCN.tries[pid]=0;if(SCN.pending[pid]===snap)delete SCN.pending[pid];
   if(SCN.pid===pid&&JSON.stringify(SCN.d)===snap){SCN.dirty=false;SCN.legacy=false;SCN.state="Saved";SCN.ver=rec("plans",pid)?.updated}
   scnStatus()}
+// true when this plan has scene edits that aren't saved yet (open in the editor or held from a failed save)
+const scnUnsaved=pid=>(SCN.pid===pid&&SCN.dirty)||!!SCN.pending[pid];
 document.addEventListener("visibilitychange",()=>{if(document.hidden)scnFlush()});
 window.addEventListener("pagehide",()=>{scnFlush()});
 function scnLibHtml(){const q=SCN.q.trim();if(!q)return `<p class="vempty">Type to find people, places, quests and stat blocks.</p>`;const r=tmSearch(q);
@@ -2087,7 +2099,8 @@ function backlinksFrom(text){
 }
 const threadRow=t=>`<div class="th ${t.status==="resolved"?"done":""}"><input type="checkbox" id="th-${t.id}" data-thread="${t.id}" ${t.status==="resolved"?"checked":""} aria-label="Resolved"><button class="th-t" data-act="open" data-type="threads" data-id="${t.id}"><span>${linkify(esc(t.text||""),"")}</span>${t.notes?`<small>${esc(plain(t.notes).slice(0,90))}</small>`:""}</button>${isDM()&&t.status!=="resolved"?thPlanBtn(t):""}</div>`;
 /* one click: put a loose thread into the next session plan's "Threads to pull" */
-const thNext=()=>S.plans.filter(p=>p.status!=="played").sort((a,b)=>(num(a.session)||0)-(num(b.session)||0))[0]||null;
+// the next session to run: the lowest-numbered plan not yet played; plans with no session number come after numbered ones
+const thNext=()=>S.plans.filter(p=>p.status!=="played").sort((a,b)=>(num(a.session)||Infinity)-(num(b.session)||Infinity))[0]||null;
 const thLine=t=>plain(t.text||"").replace(/\s+/g," ").trim();
 const thInPlan=(t,p)=>!!p&&String(p.threads||"").toLowerCase().includes(thLine(t).toLowerCase().slice(0,60));
 function thPlanBtn(t){const p=thNext();const inn=thInPlan(t,p);return `<button type="button" class="th-plan ${inn?"on":""}" data-thplan="${t.id}" title="${inn?`Already in ${esc(p.title||"the plan")}. Click to take it out.`:p?`Add to Threads to pull in ${esc(p.title||"the next plan")}`:"Add to the next session plan"}" aria-label="${inn?"Remove from session plan":"Add to session plan"}">${inn?"✓ In plan":"+ Plan"}</button>`}
@@ -2592,20 +2605,32 @@ const fmtMin=m=>{m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mm=m%60;return 
 /* Time taps run one after another, so two quick taps both count. stMin holds the time just written until the queue is empty. */
 const ST_MAX_ADD=60*1440;  // never jump more than 60 days in one tap
 let stQ=Promise.resolve(),stPend=0,stMin=null;
-function stQueue(fn){stPend++;return stQ=stQ.then(fn).catch(e=>console.error(e)).finally(()=>{if(!--stPend)stMin=null;renderTable()})}
+function stQueue(fn){stPend++;return stQ=stQ.then(fn).catch(e=>console.error(e)).finally(()=>{if(!--stPend)stMin=null;try{renderTable()}catch(e){console.error(e)}})}
+// take a notes line back out, but only while it's still the last line of that session's notes
+async function stDropLine(l){if(!l)return;const lines=(rcNotesVal(l.session)||"").split("\n");if(!lines.length||!lines[lines.length-1].includes(l.text))return;
+  lines.pop();U.rcNotes=lines.join("\n");markDirty(l.session);await saveLog(l.session)}
 function stSay(t){let a=document.getElementById("sx-say");if(!a){a=document.createElement("div");a.id="sx-say";a.className="sr-only";a.setAttribute("aria-live","polite");document.body.append(a)}a.textContent=t}
 function stTime(add,long,line){return stQueue(async()=>{
   add=Math.max(0,Math.min(num(add)||0,ST_MAX_ADD));const cur=stMin??igMin(),total=cur+add;let nx=total%1440,days=Math.floor(total/1440);
   if(long){nx=480;days=1}
-  ST.undo.push({min:cur,days,long:!!long});if(ST.undo.length>20)ST.undo.shift();
-  if(days)await dayStep(days,!long);stMin=nx;await save("settings","igtime",{min:nx});
-  if(line)await addSessionLine(line);
+  // the time saves first; if that fails nothing else changes and there's nothing to undo
+  if(!await save("settings","igtime",{min:nx}))return;stMin=nx;
+  const u={min:cur,days,line:null};
+  if(days){await dayStep(days,!long);if(long&&LAST_TIME_LINE)u.line={...LAST_TIME_LINE}}
+  if(line)u.line={session:await addSessionLine(line),text:line};
+  ST.undo.push(u);if(ST.undo.length>20)ST.undo.shift();
   stSay("It is now "+fmtMin(nx))})}
+// each undo entry remembers its own notes line (long or short rest), so undoing in any order takes back the right one
 function stUndo(){return stQueue(async()=>{const u=ST.undo.pop();if(!u)return;
-  if(!u.long)LAST_TIME_LINE=null;  // only a long rest wrote a notes line for dayStep to take back
-  if(u.days)await dayStep(-u.days,true);stMin=u.min;await save("settings","igtime",{min:u.min});stSay("Time set back to "+fmtMin(u.min))})}
-async function stScenePatch(pid,fn){if(SCN.pid===pid&&SCN.dirty)await scnFlush();const p=rec("plans",pid);if(!p||!Array.isArray(p.scenes))return;
-  const{id:_,...keep}=JSON.parse(JSON.stringify(p));fn(keep.scenes);await save("plans",pid,keep);if(SCN.pid===pid)SCN.dirty=false;project();renderTable()}
+  if(!await save("settings","igtime",{min:u.min})){ST.undo.push(u);return}stMin=u.min;
+  await stDropLine(u.line);
+  if(u.days){LAST_TIME_LINE=null;await dayStep(-u.days,true)}
+  stSay("Time set back to "+fmtMin(u.min))})}
+// a change from the Table never writes over scene edits that haven't saved yet
+async function stScenePatch(pid,fn){if(SCN.pid===pid&&SCN.dirty)await scnFlush();
+  if(scnUnsaved(pid)){toast("Your scene edits haven't saved yet, so this change was skipped.");render();return}
+  const p=rec("plans",pid);if(!p||!Array.isArray(p.scenes))return;
+  const{id:_,...keep}=JSON.parse(JSON.stringify(p));fn(keep.scenes);await save("plans",pid,keep);project();renderTable()}
 const stAtt=(n,x)=>((logFor(n)||{}).att||{})[x.id]||x.attitude||"";
 async function stSetAtt(n,id,v){const l=logFor(n)||{};const{id:_i,dmOnly:_d,secret:_s,...keep}=l;const att={...(keep.att||{})};const x=rec("characters",id);att[id]=stAtt(n,x||{id})===v?"":v;
   await save("logs","s"+n,{...keep,session:n,notes:keep.notes||"",open:keep.open||"",att});project();renderTable()}
@@ -2693,7 +2718,7 @@ document.addEventListener("change",e=>{const t=e.target;
 document.addEventListener("input",e=>{if(e.target.id!=="sx-miles")return;ST.miles=e.target.value;const r=document.getElementById("sx-tr");if(r)r.innerHTML=stTravelHtml()});
 document.addEventListener("submit",async e=>{const f=e.target.closest("[data-stlog]");if(!f)return;e.preventDefault();e.stopPropagation();const i=document.getElementById("sx-log"),v=i.value.trim();if(!v)return;
   // the box keeps focus, so a full redraw would wait; draw the new line straight into the list instead
-  const tag=document.getElementById("sx-tag").value;i.value="";const n=await addSessionLine((tag?`[${tag}] `:"")+v);const ul=document.querySelector("#tablemode .sx-log");if(ul)ul.innerHTML=stLogHtml(n);i.focus()});
+  const tag=document.getElementById("sx-tag").value;i.value="";const n=await addSessionLine((tag?`[${tag}] `:"")+v);const ul=document.querySelector("#tablemode .sx-log");if(ul)ul.innerHTML=stLogHtml(n);document.getElementById("sx-log")?.focus()});  // look it up again: a redraw may have replaced the box
 function renderTable(){
   renderDock();if(!TM)return;const el=document.getElementById("tablemode");
   if(typingInTable()||TMD.drag){renderPending=true;return}
@@ -2896,7 +2921,7 @@ const GEN_ROLES={brute:"Brute",skirmisher:"Skirmisher",caster:"Spellcaster",defe
 const GEN_TYPES=["humanoid","beast","undead","fiend","monstrosity","construct","elemental","fey","dragon","aberration","giant","celestial","plant","ooze"];
 const GEN_DMG=["slashing","piercing","bludgeoning","fire","cold","lightning","thunder","acid","poison","necrotic","radiant","psychic","force"];
 const crNum=cr=>cr==="1/8"?.125:cr==="1/4"?.25:cr==="1/2"?.5:(num(cr)||0);
-function genMon(name,o){
+function genMon(name,o,isPerson){  // isPerson: the stat block is for a named NPC
   const cr=CRS.includes(o.cr)?o.cr:"1",n=crNum(cr),half=Math.floor(n/2),R=GEN_ROLES[o.role]?o.role:"brute",type=GEN_TYPES.includes(o.type)?o.type:"humanoid",dmg=GEN_DMG.includes(o.dmg)?o.dmg:"slashing";
   const low=["0","1/8","1/4","1/2"].indexOf(cr);
   let ac=12+half,hp=low>=0?[3,7,13,22][low]:Math.round(20*n),dpr=low>=0?[1,3,5,7][low]:Math.round(7*n);
@@ -2909,7 +2934,7 @@ function genMon(name,o){
   const conM=Math.floor((ab.con-10)/2),large=["giant","dragon"].includes(type)||(R==="brute"&&n>=5),die=large?5.5:4.5;
   const hd=Math.max(1,Math.round(hp/(die+conM)));hp=Math.max(1,Math.floor(hd*die)+hd*conM);
   // a named NPC reads as "Mira moves", a kind of creature as "the goblin moves"
-  const nm=String(name||"creature").trim()||"creature",proper=/^[A-Z]/.test(nm)&&!/^(the|a|an)\s/i.test(nm);
+  const nm=String(name||"creature").trim()||"creature",proper=!!isPerson&&/^[A-Z]/.test(nm)&&!/^(the|a|an)\s/i.test(nm);
   const who=proper?nm:"the "+nm.replace(/^(the|a|an)\s+/i,"").toLowerCase(),Who=who.charAt(0).toUpperCase()+who.slice(1);
   const count=n>=11?3:n>=3?2:1,per=dpr/count,dd=R==="skirmisher"?3.5:R==="caster"?5.5:4.5,dn=R==="skirmisher"?"d6":R==="caster"?"d10":"d8";
   const nd=Math.max(1,Math.round((per-pm)/dd)),avg=Math.max(1,Math.floor(nd*dd)+pm);
@@ -2943,12 +2968,12 @@ function vPeople(){
   const list=pplItems();let sel=U.pplSel&&rec(U.pplSel.col,U.pplSel.id)?U.pplSel:null;
   if(!sel||!list.some(i=>i.col===sel.col&&i.x.id===sel.id))sel=list[0]?{col:list[0].col,id:list[0].x.id}:null;U.pplSel=sel;
   // stat blocks are DM-only, so players get the notes tab and no Foes filter
-  const dm=isDM(),x=sel&&rec(sel.col,sel.id),npc=sel&&sel.col==="characters",tab=dm?(U.pplTab||"notes"):"notes";
+  const dm=isDM(),kind=dm?(U.pplKind||"all"):"all",x=sel&&rec(sel.col,sel.id),npc=sel&&sel.col==="characters",tab=dm?(U.pplTab||"notes"):"notes";
   const kinds=!dm?"":`<div class="seg">${[["all","All"],["npc","NPCs"],["foe","Foes"]].map(([k,l])=>`<button type="button" data-act="pplKind" data-v="${k}" aria-pressed="${(U.pplKind||"all")===k}">${l}</button>`).join("")}</div>`;
   const row=({col,x:r})=>`<button class="nitem" data-act="pplSel" data-col="${col}" data-id="${r.id}" aria-current="${!!sel&&sel.col===col&&sel.id===r.id}"><b>${esc(r.name||"Unnamed")}</b><small>${col==="characters"?["NPC",r.cls,r.location].filter(Boolean).map(esc).join(" · "):`Foe${r.cr?" · CR "+esc(r.cr):""}${r.meta?" · "+esc(r.meta):""}`}</small></button>`;
   const left=`<div class="nlist"><div class="ppl-tools"><input class="search" id="pplq" data-in="pplQ" type="search" placeholder="Search NPCs and foes" aria-label="Search NPCs and foes" value="${esc(U.pplQ||"")}">${kinds}
-    <form data-ppladd class="tq dm-only"><input id="ppl-add" placeholder="Add by name" aria-label="Name of a new NPC or foe"><select id="ppl-addk" aria-label="Add as"><option value="npc" ${U.pplKind==="foe"?"":"selected"}>NPC</option><option value="foe" ${U.pplKind==="foe"?"selected":""}>Foe</option></select><button class="btn sm primary" type="submit">Add</button></form></div>
-    <div class="lib-lh"><h3>${{all:"NPCs & Enemies",npc:"NPCs",foe:"Foes"}[U.pplKind||"all"]}</h3><span>${list.length}</span></div>${list.length?list.map(row).join(""):`<div class="empty">${U.pplQ?"Nothing matches that search.":"No one here yet. Add someone by name."}</div>`}</div>`;
+    <form data-ppladd class="tq dm-only"><input id="ppl-add" placeholder="Add by name" aria-label="Name of a new NPC or foe"><select id="ppl-addk" aria-label="Add as"><option value="npc" ${kind==="foe"?"":"selected"}>NPC</option><option value="foe" ${kind==="foe"?"selected":""}>Foe</option></select><button class="btn sm primary" type="submit">Add</button></form></div>
+    <div class="lib-lh"><h3>${{all:"NPCs & Enemies",npc:"NPCs",foe:"Foes"}[kind]}</h3><span>${list.length}</span></div>${list.length?list.map(row).join(""):`<div class="empty">${U.pplQ?"Nothing matches that search.":"No one here yet. Add someone by name."}</div>`}</div>`;
   if(!x)return `<div class="notes lib ppl ${U.noteReading?"reading":""}">${left}<div class="empty lib-pick">Pick someone to see their notes and stat block.</div></div>`;
   const m=npc?(x.mon&&rec("monsters",x.mon)):x;
   const tabs=!dm?"":`<div class="seg ppl-tabs">${[["notes","Notes"],["block","Stat block"],["gen","Quick stat block"]].map(([k,l])=>`<button type="button" data-act="pplTab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join("")}</div>`;
@@ -2965,7 +2990,7 @@ function vPeople(){
     body=m?`${statBlock(m)}<div class="ppl-acts dm-only"><button type="button" class="btn sm" data-act="edit" data-type="monsters" data-id="${m.id}">Edit stat block</button>${npc?`<button type="button" class="btn sm" data-act="pplUnlink">Unlink from ${esc(x.name||"this NPC")}</button>`:""}</div>`
       :`<p class="vempty">${esc(x.name||"This NPC")} has no stat block yet.</p><label class="scn-f dm-only"><span class="label">Use one from the Bestiary</span><select class="scn-in" id="ppl-link"><option value="">— Pick a stat block —</option>${S.monsters.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(k=>`<option value="${k.id}">${esc(k.name||"Monster")}${k.cr?` (CR ${esc(k.cr)})`:""}</option>`).join("")}</select></label><p class="vempty">Or make one in Quick stat block.</p>`}
   else{
-    const g=genMon(x.name,GEN),opt=(k,vals,lab)=>`<label class="scn-f"><span class="label">${lab}</span><select class="scn-in" data-gen="${k}">${vals.map(([v,l])=>`<option value="${v}" ${GEN[k]===v?"selected":""}>${esc(l)}</option>`).join("")}</select></label>`;
+    const g=genMon(x.name,GEN,npc),opt=(k,vals,lab)=>`<label class="scn-f"><span class="label">${lab}</span><select class="scn-in" data-gen="${k}">${vals.map(([v,l])=>`<option value="${v}" ${GEN[k]===v?"selected":""}>${esc(l)}</option>`).join("")}</select></label>`;
     body=`<p class="pb-sub">Numbers come from simple rules of thumb for the CR. Adjust anything after saving.</p>
       <div class="ppl-gen">${opt("cr",CRS.map(c=>[c,"CR "+c]),"Challenge")}${opt("role",Object.entries(GEN_ROLES),"Role")}${opt("type",GEN_TYPES.map(t=>[t,CAP(t)]),"Type")}${opt("dmg",GEN_DMG.map(t=>[t,CAP(t)]),"Damage")}</div>
       <div class="ppl-acts dm-only">${npc?`<button type="button" class="btn primary" data-act="genSave">${m?"Save as a new stat block and link it":"Save and link to "+esc(x.name||"this NPC")}</button>`:`<button type="button" class="btn danger ${U.genArm===x.id?"armed":""}" data-act="genApply">${U.genArm===x.id?"Yes, replace numbers and abilities":"Replace numbers and abilities"}</button><button type="button" class="btn" data-act="genSave">Save as a new stat block</button>`}</div>
@@ -2984,8 +3009,8 @@ async function pplAct(a,t){const sel=U.pplSel,x=sel&&rec(sel.col,sel.id);
   if(!x)return;
   if(a==="pplAtt"){await patchRec("characters",x.id,{attitude:x.attitude===t.dataset.v?"":t.dataset.v});return}
   if(a==="pplUnlink"){await patchRec("characters",x.id,{mon:""});return}
-  if(a==="genSave"){const id=uid(),g=genMon(x.name,GEN);await save("monsters",id,g);if(sel.col==="characters")await patchRec("characters",x.id,{mon:id});else U.pplSel={col:"monsters",id};U.pplTab="block";toast(`Saved a CR ${g.cr} stat block for ${g.name}`);project();render();return}
-  if(a==="genApply"){if(U.genArm!==x.id){U.genArm=x.id;render();return}U.genArm=null;const{name:_,...g}=genMon(x.name,GEN);
+  if(a==="genSave"){const id=uid(),g=genMon(x.name,GEN,sel.col==="characters");await save("monsters",id,g);if(sel.col==="characters")await patchRec("characters",x.id,{mon:id});else U.pplSel={col:"monsters",id};U.pplTab="block";toast(`Saved a CR ${g.cr} stat block for ${g.name}`);project();render();return}
+  if(a==="genApply"){if(U.genArm!==x.id){U.genArm=x.id;render();return}U.genArm=null;const{name:_,...g}=genMon(x.name,GEN,false);
     // clear the fields the maker doesn't fill so old values don't sit next to new numbers; keep legendary actions and notes
     await patchRec("monsters",x.id,{acNote:"",resist:"",...g});U.pplTab="block";toast("Numbers and abilities replaced");render()}}
 document.addEventListener("change",e=>{const t=e.target;
@@ -3006,8 +3031,8 @@ function vHeroes(){
   const langs=(S.settings.party||{}).languages||"";
   const row=p=>`<button class="nitem hero-i" data-act="heroSel" data-id="${p.id}" ${p.id===U.heroSel?'aria-current="true"':""}>${avatar(p,32)}<span><b>${esc(p.name||"Unnamed")}</b><small>${esc([p.cls,p.level?"Lv "+p.level:""].filter(Boolean).join(" · ")||"Player character")}${p.player?` · ${esc(p.player)}`:""}</small></span></button>`;
   const left=`<div class="nlist"><div class="ppl-tools">
-    <div class="hero-lv"><span><span class="label">Whole party</span><b>${lvTxt||"No heroes yet"}</b></span><span class="dm-only hero-lvb"><button type="button" class="btn ${U.lvArm?"sm danger armed":"icon"}" data-act="heroLvl" data-n="-1" aria-label="${U.lvArm?"Yes, every hero down one level":"Every hero down one level"}" ${pcs.length&&!busy?"":"disabled"}>${U.lvArm?"Yes, all down":"−"}</button><button type="button" class="btn sm" data-act="heroLvl" data-n="1" aria-label="Every hero up one level" ${pcs.length&&!busy?"":"disabled"}>Level up</button></span></div>
-    <label class="scn-f"><span class="label">Party languages</span><input class="search" id="party-lang" value="${esc(langs)}" placeholder="e.g. Common, Elvish, Dwarvish" aria-describedby="party-lang-h" ${dm?"":"readonly"}></label>${dm?`<small id="party-lang-h" class="muted">Saves when you leave the box. The Session Table cheat sheet shows it.</small>`:""}
+    <div class="hero-lv"><span><span class="label">Whole party</span><b>${lvTxt||"No heroes yet"}</b></span><span class="dm-only hero-lvb"><button type="button" class="btn ${U.lvArm?"sm danger armed":"icon"}" data-act="heroLvl" data-n="-1" aria-label="${U.lvArm?"Yes, every hero down one level":"Every hero down one level"}" ${pcs.length?"":"disabled"} ${busy?'aria-disabled="true"':""}>${U.lvArm?"Yes, all down":"−"}</button><button type="button" class="btn sm" data-act="heroLvl" data-n="1" aria-label="Every hero up one level" ${pcs.length?"":"disabled"} ${busy?'aria-disabled="true"':""}>Level up</button></span></div>
+    <label class="scn-f"><span class="label">Party languages</span><input class="search" id="party-lang" value="${esc(langs)}" placeholder="e.g. Common, Elvish, Dwarvish" ${dm?'aria-describedby="party-lang-h"':"readonly"}></label>${dm?`<small id="party-lang-h" class="muted">Saves when you leave the box. The Session Table cheat sheet shows it.</small>`:""}
     <form data-heroadd class="tq dm-only"><input id="hero-add" placeholder="Add a hero by name" aria-label="Name of a new hero"><button class="btn sm primary" type="submit">Add</button></form></div>
     <div class="lib-lh"><h3>The Party</h3><span>${pcs.length}</span></div>${pcs.length?pcs.map(row).join(""):`<div class="empty">No heroes yet. Add one by name.</div>`}</div>`;
   if(!x)return `<div class="notes lib ppl hero ${U.noteReading?"reading":""}">${left}<div class="empty lib-pick">Pick a hero to see their sheet and story.</div></div>`;
@@ -3029,12 +3054,14 @@ function vHeroes(){
 async function heroAct(a,t){if(a!=="heroLvl")U.lvArm=false;
   if(a==="heroSel"){U.heroSel=t.dataset.id;U.noteReading=true;render();if(isPhone())window.scrollTo({top:0});return}
   if(a==="heroTab"){U.heroTab=t.dataset.v;render();return}
-  if(a==="heroLvl"){const n=num(t.dataset.n);
-    if(n<0&&!U.lvArm){U.lvArm=true;render();return}  // going down asks for a second tap
-    U.lvArm=false;U.heroBusy=true;render();
+  if(a==="heroLvl"){const n=num(t.dataset.n);if(U.heroBusy)return;
+    // going down asks for a second tap; the ask lapses after a few seconds or when you leave the Party screen
+    if(n<0&&!U.lvArm){U.lvArm=true;clearTimeout(U.lvArmT);U.lvArmT=setTimeout(()=>{if(U.lvArm){U.lvArm=false;render()}},5000);render();return}
+    U.lvArm=false;clearTimeout(U.lvArmT);U.heroBusy=true;render();  // buttons stay focusable (aria-disabled) so keyboard focus isn't lost
     try{const jobs=pcList().map(p=>{const cur=num(p.level)||0;if(!cur&&n<0)return null;const nx=cur?Math.max(1,Math.min(20,cur+n)):1;return nx!==cur?charPatch(p.id,{level:nx}):null}).filter(Boolean);
-      const ok=(await Promise.all(jobs)).filter(Boolean).length;
-      if(jobs.length)toast(ok===jobs.length?`${ok} hero${ok===1?"":"es"} went ${n>0?"up":"down"} a level`:`Only ${ok} of ${jobs.length} heroes changed level. Try again.`)}
+      if(!jobs.length){toast(n>0?"Every hero is already level 20":"Every hero is already level 1");return}
+      const ok=(await Promise.allSettled(jobs)).filter(r=>r.status==="fulfilled"&&r.value).length;
+      toast(ok===jobs.length?`${ok} hero${ok===1?"":"es"} went ${n>0?"up":"down"} a level`:`Only ${ok} of ${jobs.length} heroes changed level. Try again.`)}
     finally{U.heroBusy=false;render()}}}
 document.addEventListener("change",e=>{if(e.target.id!=="party-lang"||!isDM())return;const v=e.target.value.trim();if(v===((S.settings.party||{}).languages||""))return;save("settings","party",{...(S.settings.party||{}),languages:v}).then(ok=>{if(ok)toast("Party languages saved")})});
 document.addEventListener("submit",async e=>{const f=e.target.closest("[data-heroadd]");if(!f)return;e.preventDefault();e.stopPropagation();const i=document.getElementById("hero-add"),v=i.value.trim();if(!v)return;
@@ -3937,11 +3964,17 @@ async function calMigrate(){
 /* ---------- render ---------- */
 /* Keep keyboard focus on the same button across a redraw. Buttons without an id are found again by their data- attributes.
    Set FOCUS_NEXT to a selector to move focus somewhere else after the next redraw (a moved row, a new input). */
-const FOCUS_ATTRS=["act","id","n","i","v","type","gen","k","tab"];
+// every data- attribute counts (calendar days need y, m and d), except label, which armed buttons change in place
+const FOCUS_SKIP=new Set(["label"]);
 let FOCUS_NEXT=null;
-function focusSel(ae,root){if(!ae||!root||!root.contains(ae)||ae.id||!ae.dataset)return null;const ks=FOCUS_ATTRS.filter(k=>ae.dataset[k]!=null);if(!ks.length)return null;
-  return ae.tagName.toLowerCase()+ks.map(k=>`[data-${k}="${CSS.escape(ae.dataset[k])}"]`).join("")}
-function focusAfter(root,sel){const s=FOCUS_NEXT||sel;FOCUS_NEXT=null;if(!s||!root)return;const el=root.querySelector(s);if(el&&!el.disabled)el.focus({preventScroll:true})}
+function focusSel(ae,root){if(!ae||!root||!root.contains(ae)||ae.id||!ae.dataset)return null;const ks=Object.keys(ae.dataset).filter(k=>!FOCUS_SKIP.has(k));if(!ks.length)return null;
+  return ae.tagName.toLowerCase()+ks.map(k=>`[data-${k.replace(/[A-Z]/g,m=>"-"+m.toLowerCase())}="${CSS.escape(ae.dataset[k])}"]`).join("")}
+function focusAfter(root,sel){const own=!!FOCUS_NEXT,s=FOCUS_NEXT||sel;FOCUS_NEXT=null;if(!s||!root)return;
+  const all=root.querySelectorAll(s);if(!all.length||(!own&&all.length>1))return;  // two lookalikes: don't guess
+  let el=all[0];
+  // a button that turned itself off (Undo with nothing left) hands focus to the next usable control beside it
+  if(el.disabled)el=[...(el.parentElement?.querySelectorAll("button,input,select")||[])].find(x=>!x.disabled&&x!==el)||null;
+  if(el)el.focus({preventScroll:true})}
 function render(){
   if(!BOOT.ready){const app=document.getElementById("app");if(app&&!app.querySelector(".boot"))app.innerHTML=`<div class="boot"><span class="boot-sigil">✦</span><p>Opening the Desk…</p></div>`;return}
   const ae=document.activeElement,aid=ae&&ae.id,sel=ae&&ae.selectionStart,fsel=focusSel(ae,document.getElementById("app"));
@@ -3953,6 +3986,7 @@ function render(){
   document.body.classList.toggle("player",!isDM());
   if(document.getElementById("modal").hidden&&!TM)document.documentElement.classList.remove("locked");
   if(U.tab==="prep"&&!isDM())U.tab="home";if(U.tab==="home"&&isDM())U.tab="party";
+  if(U.lvArm&&!(U.tab==="party"&&U.charFilter==="pc"))U.lvArm=false;  // the level-down ask never waits on another screen
   const counts={party:S.characters.length,notes:S.notes.length,calendar:S.events.length,quests:S.quests.filter(q=>q.status==="active").length,world:S.maps.length,prep:S.threads.filter(t=>t.status!=="resolved").length};
   const tabLinks=TABS.filter(([k])=>((k!=="prep")||isDM())&&(k!=="home"||!isDM())).map(([k,l,sh])=>[k,`<a href="#${k}" ${U.tab===k?'aria-current="page"':""}><span class="full">${l}</span><span class="short">${sh}</span><span class="n">${counts[k]||""}</span></a>`]);
   // Side menu (Wood & Wax, wide screens): brand, Session, Prep, Party/Characters, then the rest under "Reference". Number keys follow this order (visibleTabs).
