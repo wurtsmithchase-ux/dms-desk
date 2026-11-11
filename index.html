@@ -1156,6 +1156,88 @@ header.top .clock{display:none!important}
   :root[data-skin="wood"] body.docked{padding-left:calc(var(--navw) + 400px)}
   :root[data-skin="wood"] body.docked .scrim{padding-left:calc(var(--navw) + 424px)}
 }
+/* ===== Design match (DM's Desk Interface Options): dark wood page, framed parchment cards, the design's page header ===== */
+.ph{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px;margin:0 0 20px}
+.ph-t{flex:1 1 260px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.ph-sub{color:#b5a07e;font:italic 400 16px var(--body)}
+.ph-h{margin:0;padding:0;border:0;font:700 32px/1.15 var(--drop);color:var(--gold);letter-spacing:0;text-transform:none}
+.ph-search,.ph .lib-q{flex:0 1 380px;min-width:0;display:flex;align-items:center;gap:10px;min-height:44px;margin:0;padding:0 12px;border-radius:4px;background:#efe0be;border:1px solid var(--gilt-edge);color:#5e4630;font:400 16px var(--body);cursor:pointer;text-align:left}
+.ph .lib-q{cursor:text;color:var(--ink)}
+.ph-search span{flex:1}
+.ph-search kbd{font:12px var(--ui);opacity:.7}
+.ph .btn{min-height:44px;font:400 17px var(--sc);letter-spacing:.02em}
+.ph-new,.ph-back,.ph .more>button{background:var(--hdr2);color:var(--hdr-ink);border:1px solid var(--gilt-edge)}
+.ph-new:hover,.ph-back:hover{background:#3a291b}
+.ph-go{padding:0 18px;font-size:18px!important;background:var(--accent);border:1px solid #5e140b;color:var(--accent-ink)}
+.ph-page{background:var(--bg);border-radius:3px;margin:5px;padding:22px 26px;box-shadow:var(--frame2);min-width:0}
+.ph-page>.bar>h2{display:none}
+.ph-tools{justify-content:flex-end}
+.ph-gap{margin-top:26px}
+@media (min-width:641px){body:not(.player) .scn-top .label{color:var(--gold)}body:not(.player) .scn-state{color:#b5a07e}:root[data-skin="wood"] body:not(.player) #app>.empty{background:var(--bg);box-shadow:var(--frame);margin:5px}}
+@media (min-width:641px){
+  :root[data-skin="wood"] body:not(.player) #app{background:transparent;border:0;box-shadow:none;margin-block:0;padding-block:26px 40px}
+}
+@media (max-width:640px){
+  .ph-sub{color:var(--muted)}.ph-h{color:var(--accent);font-size:26px}
+  .ph-search,.ph .lib-q{flex:1 1 100%}
+  .ph-page{margin:0;padding:14px;box-shadow:none;background:none}
+}
+@media (min-width:1101px){
+  header.top{position:static;background:none;border:0;box-shadow:none}
+  header.top .topbar{display:none}
+  :root[data-skin="wood"] nav.tabs a.nav-lib{min-height:40px;font:400 17px var(--body);letter-spacing:0}
+  :root[data-skin="wood"] nav.tabs a .nav-go{color:var(--gold);opacity:1;font-size:18px}
+  .nav-fill{flex:1 0 16px}
+  .nav-camp{display:flex;flex-direction:column;gap:2px;text-align:left;padding:12px;border-radius:3px;border:1px solid #5a4220;background:none;color:var(--hdr-ink);font:400 15px var(--body);cursor:pointer}
+  .nav-camp:hover{background:rgba(201,162,78,.14)}
+  .nav-camp b{font-weight:600}.nav-camp small{color:#b5a07e;font-size:15px}
+  .nav-tools{display:flex;justify-content:space-between;padding-top:8px}
+  .nav-tools button{display:inline-flex;align-items:center;justify-content:center;gap:2px;min-width:40px;height:40px;border:0;border-radius:3px;background:none;color:#b5a07e;cursor:pointer}
+  .nav-tools button:hover{color:var(--gold);background:rgba(201,162,78,.14)}
+  .nav-tools button[hidden]{display:none}
+  .nav-tools b{font:600 12px var(--ui)}
+  :root[data-skin="wood"] #ds-pill{left:calc(var(--navw) + 12px)}
+}
+/* Prep Board cards as in the design */
+.pboard{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;align-items:stretch}
+:root[data-skin="wood"] .pb-card{background:var(--bg);padding:20px;gap:10px}
+.pb-span2,.pb-next,.pb-pathc{grid-column:span 2}.pb-full{grid-column:1/-1}
+@media (max-width:700px){.pb-span2,.pb-next,.pb-pathc{grid-column:auto}}
+:root[data-skin="wood"] .pb-next{background:var(--wood2);color:var(--hdr-ink);box-shadow:inset 0 0 0 1px var(--gold),0 0 0 4px var(--wood),0 0 0 5px var(--gilt-edge);flex-direction:row;flex-wrap:wrap;gap:24px;align-items:center;padding:22px}
+.pb-nx-l{flex:1 1 200px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.pb-nx-r{flex:1 1 220px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.pb-nx-r .pb-prog{width:100%}
+.pb-kick{font:400 18px var(--sc);color:var(--gold)}
+.pb-when{font:700 28px/1.2 var(--drop);color:#f6e8c6}
+.pb-next .pb-sub{color:#b5a07e}
+.pb-nx-row{display:flex;justify-content:space-between;width:100%;font-size:15px}
+.pb-next .pb-prog{background:#3e2c1b;border:0}
+.pb-nx-next{font-size:15px;color:#b5a07e}
+.pb-h2{display:flex;flex-direction:column}.pb-h2 small{font-size:14px;font-style:italic;color:var(--muted)}
+.pb-date{display:flex;align-items:center;gap:14px}
+.pb-moon{font-size:40px;line-height:1}
+.pb-date b{display:block;font:700 22px/1.2 var(--drop)}.pb-date small{color:var(--muted);font-size:15px}
+.pb-days{display:flex;flex-wrap:wrap;gap:6px}
+.pb-scn{display:flex;flex-wrap:wrap;align-items:center;gap:12px;width:100%;min-height:52px;padding:6px 12px;border-radius:3px;background:var(--paper);border:1px solid var(--gilt-rule);color:var(--ink);text-align:left;cursor:pointer;font:inherit}
+.pb-scn:hover{background:#fbf3df}
+.pb-scn.res{background:transparent;border:1px dashed #b08e52;padding-left:60px;min-height:48px}
+.pb-scn-n{font:700 18px var(--drop);color:var(--accent);width:36px}
+.pb-scn-t{flex:1 1 200px;min-width:0;display:flex;flex-direction:column}
+.pb-scn-t b{font:600 17px/1.3 var(--body)}.pb-scn-t small{font-size:14px;font-style:italic;color:var(--muted)}.pb-scn-t .pb-scn-w{color:var(--accent)}
+.pb-chip{padding:2px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);font-size:13px}
+.pb-res-h{font:400 17px var(--sc);color:var(--muted);margin-top:8px}
+.pb-tl-wrap{overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.pb-tl{list-style:none;margin:0;padding:6px 0 0;display:flex;position:relative;min-width:max-content}
+.pb-tl::before{content:"";position:absolute;left:0;right:0;top:33px;height:2px;background:var(--gilt-rule)}
+.pb-tl li{flex:1 1 0;min-width:130px}
+.pb-tl button{position:relative;width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 8px;border:0;background:none;color:var(--ink);text-align:center;cursor:pointer;font:inherit}
+.pb-tl-w{font:400 14px var(--sc);color:var(--muted);height:18px}
+.pb-tl-dot{width:14px;height:14px;border-radius:50%;background:var(--bg);border:2px solid var(--gold)}
+.pb-tl li.past .pb-tl-dot{background:#b08e52;border-color:#b08e52}
+.pb-tl li.now .pb-tl-dot{background:var(--accent);border-color:var(--accent)}
+.pb-tl-t{font-size:15px;line-height:1.3}.pb-tl li.past .pb-tl-t{color:var(--muted)}
+.pb-more{display:flex;flex-wrap:wrap;gap:6px}
+.lib-more{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px}
 :root[data-fonts="storybook"]{--title:"IM Fell English SC",Georgia,serif;--display:"IM Fell English SC",Georgia,serif;--drop:"IM Fell English SC",Georgia,serif;--body:"IM Fell English",Georgia,serif}
 :root[data-fonts="elvish"]{--title:"Uncial Antiqua",Georgia,serif;--display:"Alegreya SC",Georgia,serif;--drop:"Uncial Antiqua",Georgia,serif;--body:"Alegreya",Georgia,serif}
 :root[data-fonts="gothic"]{--title:"UnifrakturCook",Georgia,serif;--display:"Pirata One",Georgia,serif;--drop:"UnifrakturCook",Georgia,serif;--body:"EB Garamond",Georgia,serif}
@@ -1574,16 +1656,45 @@ const EVKIND={session:"Session",festival:"Festival",deadline:"Deadline",travel:"
 const TABS=[["home","Party page","Party"],["party","Characters","Cast"],["notes","Library","Library"],["quests","Quests","Quests"],["calendar","Calendar","Calendar"],["world","World","World"],["prep","Prep","Prep"]];
 
 const S={characters:[],notes:[],quests:[],events:[],threads:[],plans:[],links:[],loot:[],maps:[],logs:[],encounters:[],tables:[],clocks:[],chats:[],meta:[],monsters:[],todos:[],settings:{},loaded:false,live:false};
-const U={tab:"party",charFilter:"all",charQ:"",noteSel:null,noteQ:"",libGrp:"all",calY:null,calM:null,noteReading:false,calSel:null,questTab:"active",preview:false,prepTab:"board",calView:"month",tableSel:null,worldTab:"maps",planSel:null};
+const U={tab:"party",charFilter:"pc",charQ:"",noteSel:null,noteQ:"",libGrp:"places",calY:null,calM:null,noteReading:false,calSel:null,questTab:"active",preview:false,prepTab:"board",calView:"month",tableSel:null,worldTab:"maps",planSel:null};
 const isPhone=()=>window.matchMedia("(max-width:640px)").matches;
 // Wood & Wax turns the tabs into a side menu at 1101px and wider (matches the CSS media query)
 const SIDE_MQ=window.matchMedia("(min-width:1101px)");
-const sideMenu=()=>STYLE.skin==="wood"&&SIDE_MQ.matches;
-// the tabs this viewer has, in the order the menu shows them (the side menu puts Prep, Session and Party first)
-const SIDE_TOP=["prep","home","party"];
-const visibleTabs=()=>{const v=TABS.filter(([k])=>(k!=="prep"||isDM())&&(k!=="home"||!isDM()));if(!sideMenu())return v;
-  return [...SIDE_TOP.map(k=>v.find(t=>t[0]===k)).filter(Boolean),...v.filter(t=>!SIDE_TOP.includes(t[0]))]};
-try{SIDE_MQ.addEventListener("change",()=>{if(STYLE.skin==="wood")render()})}catch(e){}
+const sideMenu=()=>SIDE_MQ.matches;
+/* The DM's menu (design: Session, Prep Board, Scenes, Party, then The Library). Quests, World and Calendar open from Library groups and the board.
+   Number keys 1-5 follow NAV_DM; players keep the tab list. */
+const NAV_DM=[["board","Prep Board","Prep"],["scenes","Scenes","Scenes"],["party","Party","Party"],["npcs","NPCs & Enemies","NPCs"],["library","The Library","Library"]];
+const NAV_GROUPS=()=>LIB_GROUPS.filter(g=>g[0]!=="all");
+const visibleTabs=()=>TABS.filter(([k])=>(k!=="prep"||isDM())&&(k!=="home"||!isDM()));
+// which menu item the current screen belongs to
+function navCur(){
+  if(U.tab==="prep")return U.prepTab==="scenes"?"scenes":"board";
+  if(U.tab==="party")return U.charFilter==="npc"?"npcs":"party";
+  if(U.tab==="notes")return String(U.noteQ||"").trim()?"library":"lib:"+U.libGrp;
+  return {quests:"lib:quests",world:"lib:places",calendar:"lib:sessions"}[U.tab]||""}
+function navGo(v){let tab;
+  if(v==="board"||v==="scenes"){tab="prep";U.prepTab=v}
+  else if(v==="party"||v==="npcs"){tab="party";U.charFilter=v==="npcs"?"npc":"pc"}
+  else{tab="notes";if(v.startsWith("lib:")){U.libGrp=v.slice(4);U.noteQ="";U.noteReading=false}}
+  closeSheet();
+  if(location.hash!=="#"+tab)location.hash=tab;else{render();window.scrollTo(0,0)}}
+const NAV_ICONS={search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/>',note:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',dock:'<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M9 4v16"/>',size:'<path d="M4 18 9 6l5 12M5.6 14h6.8M15 18l3-7 3 7M15.9 16h4.2"/>',keys:'<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>'};
+const navIco=k=>`<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${NAV_ICONS[k]}</svg>`;
+function sideNav(){
+  const cur=navCur(),it=(v,l,extra,cls)=>`<a href="#${v==="board"||v==="scenes"?"prep":v==="party"||v==="npcs"?"party":"notes"}" class="${cls||""}" data-act="nav" data-v="${v}" ${cur===v?'aria-current="page"':""}><span>${l}</span>${extra||""}</a>`;
+  const pcs=S.characters.filter(x=>x.kind==="pc"&&x.status!=="dead"),lv=pcs.map(p=>num(p.level)).filter(Boolean),one=lv.length===pcs.length&&lv.length&&lv.every(x=>x===lv[0]);
+  return `<span class="nav-brand" aria-hidden="true">DM's Desk</span>`
+    +`<button type="button" class="nav-sess" data-act="tmOpen" title="A big-text screen for running the session (T)">Session</button>`
+    +it("board","Prep Board")+it("scenes","Scenes")+it("party","Party")
+    +`<span class="nav-h" role="presentation">The Library</span>`
+    +it("npcs","NPCs &amp; Enemies",`<span class="n nav-go" aria-hidden="true">›</span>`,"nav-lib")
+    +NAV_GROUPS().map(([k,l])=>it("lib:"+k,esc(l),`<span class="n">${libItems(k).length}</span>`,"nav-lib")).join("")
+    +`<span class="nav-fill" aria-hidden="true"></span>`
+    +`<button type="button" class="nav-camp" data-act="campaign" title="Campaign settings"><b>${esc(S.settings.campaign?.name||"The Campaign")}</b><small>${pcs.length} player${pcs.length===1?"":"s"}${one?` · level ${lv[0]}`:""}</small></button>`
+    +`<div class="nav-tools"><button type="button" data-act="gsearch" aria-label="Search everything" title="Search (/)">${navIco("search")}</button><button type="button" data-act="quickNote" aria-label="Quick note" title="Quick note (N)">${navIco("note")}</button><button type="button" class="nav-dock" data-dock hidden aria-pressed="false" aria-label="Kept open" title="Kept open (P)">${navIco("dock")}<b></b></button><button type="button" data-act="styleOpen" aria-label="Text size" title="Text size">${navIco("size")}</button><button type="button" data-act="keysOpen" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)">${navIco("keys")}</button></div>`}
+function phoneNav(){const cur=navCur(),lib=cur==="library"||cur.startsWith("lib:");
+  return NAV_DM.map(([v,l,sh])=>`<a href="#${v==="board"||v==="scenes"?"prep":v==="party"||v==="npcs"?"party":"notes"}" data-act="nav" data-v="${v}" ${(v==="library"?lib:cur===v)?'aria-current="page"':""}><span class="full">${l}</span><span class="short">${sh}</span><span class="n"></span></a>`).join("")}
+try{SIDE_MQ.addEventListener("change",()=>render())}catch(e){}
 let db=null;
 
 /* ---------- helpers ---------- */
@@ -1892,14 +2003,25 @@ function treasury(){
 /* ================= prep tab ================= */
 function recapNext(){return Math.max(0,...S.notes.filter(n=>n.category==="session").map(n=>n.session||0))+1}
 function nextSession(){return Math.max(0,...S.notes.filter(n=>n.category==="session").map(n=>n.session||0),...S.plans.map(p=>p.session||0))+1}
+/* The design's page header for the DM's screens: a small italic line, the gilt title, search, + New entry and Begin the session.
+   o.search replaces the search button (the Library uses its own box); o.extra adds buttons before + New entry. */
+function pageHead(sub,title,o={}){
+  if(!isDM())return `<div class="bar"><h2>${title}</h2>${o.search||""}</div>`;
+  return `<header class="ph"><div class="ph-t">${sub?`<span class="ph-sub">${sub}</span>`:""}<h2 class="ph-h">${title}</h2></div>
+    ${o.search||`<button type="button" class="ph-search" data-act="gsearch" aria-label="Search every entry">${navIco("search")}<span>Search every entry</span><kbd>/</kbd></button>`}
+    ${o.extra||""}<button type="button" class="btn ph-new" data-act="phNew">+ New entry</button><button type="button" class="btn primary ph-go" data-act="tmOpen" title="Open the Session Table (T)">Begin the session ❯</button></header>`}
 function vPrep(c){
   if(!isDM())return `<div class="empty">Session prep is only visible to the DM.</div>`;
   const t=U.prepTab||"board";
-  const tabs=`<div class="seg sub-tabs">${[["board","Board"],["plan","Session plan"],["scenes","Scenes"],["todos","To-do"],["encounters","Encounters"],["bestiary","Bestiary"],["clocks","Clocks"],["tables","Roll tables"],["spotlight","Spotlight"],["milestones","Milestones"],["ideas","Saved ideas"]].map(([k,l])=>`<button data-act="prepTab" data-v="${k}" aria-pressed="${t===k}">${l}</button>`).join("")}</div>`;
-  if(t==="board")return `<div class="bar"><h2>Prep Board</h2>${tabs}<button class="btn tm-phone" data-act="tmOpen">Table mode</button></div>`+vPrepBoard(c);
-  if(t==="scenes")return `<div class="bar"><h2>Scenes</h2>${tabs}</div>`+vScenes();
-  if(t!=="plan")return `<div class="bar"><h2>Session Prep</h2>${tabs}</div>`+(t==="todos"?vTodos():t==="bestiary"?vBestiary():t==="milestones"?vMilestones():t==="encounters"?vEncounters():t==="clocks"?vClocks():t==="tables"?vTables():t==="ideas"?vBrainstorm():vSpotlight());
-  return vPrepPlan(c,tabs);
+  // no sub-tab row: Board and Scenes are in the menu; the other prep pages open from the board and come back with this button
+  const back=`<button type="button" class="btn ph-back" data-act="prepTab" data-v="board">‹ Prep Board</button>`;
+  if(t==="board"){const p=thNext(),n=p?(p.session||"?"):nextSession();
+    return pageHead(esc(new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})),`Prep for Session ${n}`)+vPrepBoard(c)}
+  if(t==="scenes"){const p=scnPlan(),ng=nextGameText();
+    return pageHead(`Prep${ng?` · ${esc(ng)}`:""}`,p?(p.session?`Session ${esc(String(p.session))}${p.title&&p.title!==`Session ${p.session}`?` · ${esc(p.title)}`:""}`:esc(p.title||"Scenes")):"Scenes")+vScenes()}
+  const PREP_PAGES={todos:"Prep to-dos",bestiary:"Bestiary",milestones:"Milestones",encounters:"Encounters",clocks:"Clocks",tables:"Roll tables",spotlight:"Spotlight",ideas:"Saved ideas"};
+  if(t!=="plan")return pageHead("Prep",PREP_PAGES[t]||"Prep",{extra:back})+`<div class="ph-page">`+(t==="todos"?vTodos():t==="bestiary"?vBestiary():t==="milestones"?vMilestones():t==="encounters"?vEncounters():t==="clocks"?vClocks():t==="tables"?vTables():t==="ideas"?vBrainstorm():vSpotlight())+`</div>`;
+  return pageHead("Prep","Session plan",{extra:back})+`<div class="ph-page">`+vPrepPlan(c,"")+`</div>`;
 }
 /* session plans read as bullets: one point per line, "Label: details" lines get a bold label with the details split into sub-points */
 const plInline=(t,key)=>rich(t,key).replace(/^\s*<p>([\s\S]*)<\/p>\s*$/,"$1");
@@ -1926,11 +2048,22 @@ function vPrepBoard(c){
   const card=(title,count,go,body,cls)=>`<section class="pb-card ${cls||""}"><div class="pb-h"><h3>${title}${count!=null?` <span class="pb-n">${count}</span>`:""}</h3>${go||""}</div>${body}</section>`;
   const goTab=(v,l)=>`<button class="btn sm" data-act="prepTab" data-v="${v}">${l}</button>`;
   const ng=nextGameText();
-  const next=card(`Session ${n}`,null,cur?`<button class="btn sm primary" data-act="pbPlan" data-id="${cur.id}">Open plan</button>`:`<button class="btn sm primary" data-act="newPlan">Plan session ${n}</button>`,
-    `${cur?`<p class="pb-title">${esc(cur.title||`Session ${n}`)}</p>`:`<p class="vempty">No plan for the next session yet.</p>`}${ng?`<p class="pb-sub">${esc(ng)}</p>`:""}
-    ${cur?`<div class="pb-prog" role="progressbar" aria-valuemin="0" aria-valuemax="${PB_SECS.length}" aria-valuenow="${filled.length}" aria-label="Plan sections filled"><span style="width:${pct}%"></span></div>
-    <ul class="pb-check" aria-label="Plan sections">${PB_SECS.map(([k,l])=>{const d=!!String(cur[k]||"").trim();return `<li class="${d?"done":""}">${l}<span class="sr-only">${d?" (filled)":" (empty)"}</span></li>`}).join("")}</ul>`:""}`,"pb-next");
-  const pathC=card(`The path${cur?` for session ${n}`:""}`,null,cur?`<button class="btn sm" data-act="scnOpen" data-id="${cur.id}">Edit scenes</button>`:"",path.length?`<ol class="pb-path">${path.map(l=>`<li>${linkify(esc(l),"")}</li>`).join("")}</ol>`:`<p class="vempty">${cur?"Add scenes in the Scenes tab, or lines in the plan's Encounters & scenes.":"Plan the next session to see its path here."}</p>`,"pb-pathc");
+  // The Next Gathering: dark card with when, the plan and how far its prep has come
+  const todo=cur?PB_SECS.find(([k])=>!String(cur[k]||"").trim()):null;
+  const next=`<section class="pb-card pb-next" aria-label="Next session"><div class="pb-nx-l"><span class="pb-kick">The Next Gathering</span><span class="pb-when">${esc(ng||`Session ${n}`)}</span><span class="pb-sub">${cur?esc(ng?`Session ${n}${cur.title&&cur.title!==`Session ${n}`?` · ${cur.title}`:""}`:(cur.title&&cur.title!==`Session ${n}`?cur.title:"Plan ready to fill in")):"No plan for the next session yet."}</span></div>
+    <div class="pb-nx-r">${cur?`<div class="pb-nx-row"><span>Prep checklist</span><span>${filled.length} of ${PB_SECS.length}</span></div><div class="pb-prog" role="progressbar" aria-valuemin="0" aria-valuemax="${PB_SECS.length}" aria-valuenow="${filled.length}" aria-label="Plan sections filled"><span style="width:${pct}%"></span></div><span class="pb-nx-next">${todo?`Next: ${esc(todo[1].toLowerCase())}`:"Every section is filled."}</span>`:""}
+      ${cur?`<button class="btn sm" data-act="pbPlan" data-id="${cur.id}">Open plan</button>`:`<button class="btn sm primary" data-act="newPlan">Plan session ${n}</button>`}</div></section>`;
+  // In the World: today's in-game date, the first moon and quick day buttons
+  const tIdx=toIdx(c,c.today),mn=(c.moons||[]).find(x=>x&&x.cycle),sa=seasonAt(c,tIdx);
+  const worldC=`<section class="pb-card pb-world" aria-label="In-game date"><div class="pb-h"><h3>In the World</h3><button class="btn sm" data-act="pbCal">Calendar</button></div>
+    <div class="pb-date">${mn?`<span class="pb-moon" role="img" aria-label="${esc(mn.name)}: ${MOON_NAMES[moonStep(mn,tIdx)]}">${MOON_ICONS[moonStep(mn,tIdx)]}</span>`:""}<span><b>${esc(fmtDate(c,c.today))}</b><small>${esc(weekdayText(c,c.today)+(sa?` · ${sa.s.name}`:""))}</small></span></div>
+    <div class="pb-days"><button class="btn icon" data-act="day" data-n="-1" aria-label="Back one day">−</button><button class="btn sm" data-act="day" data-n="1" title="Long rest: next day, and it's written into this session's notes. Shift-click to move the date without logging a rest.">+1 day</button><button class="btn sm" data-act="day" data-n="week">+1 ${esc(c.weekName)}</button></div></section>`;
+  // The path: scenes in order, then the reserve
+  const scs=cur&&Array.isArray(cur.scenes)?cur.scenes:null,main=scs?scs.filter(x=>!x.reserve):null,res=scs?scs.filter(x=>x.reserve):[];
+  const sRow=(x,i)=>`<button type="button" class="pb-scn ${x.reserve?"res":""}" data-act="scnOpen" data-id="${cur.id}">${x.reserve?"":`<span class="pb-scn-n">${i+1}</span>`}<span class="pb-scn-t"><b>${esc(x.title||"Untitled scene")}</b>${x.reserve?(x.when?`<small class="pb-scn-w">${esc(x.when)}</small>`:""):x.note?`<small>${esc(x.note)}</small>`:""}</span>${(x.who||[]).length?`<span class="pb-chip">${x.who.length} here</span>`:""}${(x.clues||[]).length?`<span class="pb-chip">${x.clues.length} clue${x.clues.length===1?"":"s"}</span>`:""}</button>`;
+  const pathBody=main&&main.length?main.slice(0,PB_PATH_MAX).map(sRow).join("")+(res.length?`<span class="pb-res-h">In Reserve · if they stray</span>`+res.map(sRow).join(""):"")
+    :path.length?`<ol class="pb-path">${path.map(l=>`<li>${linkify(esc(l),"")}</li>`).join("")}</ol>`:`<p class="vempty">${cur?"Add scenes in the scene editor, or lines in the plan's Encounters & scenes.":"Plan the next session to see its path here."}</p>`;
+  const pathC=`<section class="pb-card pb-pathc" aria-label="Scenes for session ${n}"><div class="pb-h"><span class="pb-h2"><h3>The Path for Session ${n}</h3>${main&&main.length?`<small>${main.length} scene${main.length===1?"":"s"}${res.length?` · ${res.length} in reserve`:""} · becomes the Session screen</small>`:""}</span>${cur?`<button class="btn sm primary" data-act="scnOpen" data-id="${cur.id}">Open the scene editor ›</button>`:""}</div>${pathBody}</section>`;
   const quests=S.quests.filter(q=>q.status==="active").sort((a,b)=>(b.updated||0)-(a.updated||0));
   const qC=card("Active quests",quests.length,`<a class="btn sm" href="#quests">All quests</a>`,quests.length?quests.slice(0,8).map(q=>{const bs=beatList(q),d=bs.filter(b=>b.done).length;return `<button class="pb-row" data-act="open" data-type="quests" data-id="${q.id}"><b>${esc(q.title||"Untitled quest")}</b>${bs.length?`<small>${d} of ${bs.length} story beats</small>`:q.giver?`<small>From ${esc(q.giver)}</small>`:""}</button>`}).join(""):`<p class="vempty">No active quests.</p>`);
   const open=S.threads.filter(t=>t.status!=="resolved").sort((a,b)=>(b.updated||0)-(a.updated||0));
@@ -1938,7 +2071,7 @@ function vPrepBoard(c){
   const pcs=S.characters.filter(x=>x.kind==="pc").sort((a,b)=>(a.name||"").localeCompare(b.name||""));
   const ss=spotSessions(),last=ss[ss.length-1]||0;
   const since=pc=>{const lit=ss.filter(s=>(logFor(s)?.spotlight||[]).includes(pc));return lit.length?last-lit[lit.length-1]:null};
-  const sC=card("Spotlight",null,goTab("spotlight","Spotlight"),pcs.length?`<div class="pb-spot">${pcs.map(p=>{const d=since(p.id);return `<div class="pb-sp ${d===null||d>=2?"warn":""}">${avatar(p,24)}<b>${esc(p.name)}</b><small>${d===null?"No moment yet":d===0?"Moment last session":`No moment for ${d} sessions`}</small></div>`}).join("")}</div>`:`<p class="vempty">Add party members to track the spotlight.</p>`);
+  const sC=card("Spotlight",null,goTab("spotlight","Spotlight"),pcs.length?`<div class="pb-spot">${pcs.map(p=>{const d=since(p.id);return `<div class="pb-sp ${d===null||d>=2?"warn":""}">${avatar(p,24)}<b>${esc(p.name)}</b><small>${d===null?"No moment yet":d===0?"Moment last session":`No moment for ${d} sessions`}</small></div>`}).join("")}</div>`:`<p class="vempty">Add party members to track the spotlight.</p>`,"pb-span2");
   // clocks closest to filling first; full ones have already happened, so leave them off the board
   const clkR=k=>(num(k.filled)||0)/Math.max(1,num(k.segments)||0);
   const clocks=S.clocks.filter(k=>clkR(k)<1).sort((a,b)=>clkR(b)-clkR(a));
@@ -1948,7 +2081,15 @@ function vPrepBoard(c){
   const todos=S.todos.filter(t=>t.kind!=="goal"&&!t.done).sort((a,b)=>(a.due||"9999").localeCompare(b.due||"9999")||(a.updated||0)-(b.updated||0));
   const dC=card("Prep to-dos",todos.length,goTab("todos","All to-dos"),`<form data-form="todoQuick" data-kind="todo" class="tq"><input id="tq-todo-pb" placeholder="Add a to-do" aria-label="New to-do"><button class="btn sm primary" type="submit">Add</button></form>
     ${todos.length?todos.slice(0,8).map(todoRow).join(""):`<p class="vempty">Nothing on the list.</p>`}`);
-  return `<div class="pboard">${next}${pathC}${qC}${tC}${sC}${kC}${fC}${dC}</div>`;
+  // Campaign timeline: calendar events by in-world date around today (this is the Calendar's short view)
+  const yl=yearLen(c),evI=e=>e.yearly?(()=>{let i=toIdx(c,{y:c.today.y,m:e.m,d:e.d});if(i<tIdx-yl/2)i+=yl;return i})():toIdx(c,{y:e.y,m:e.m,d:e.d});
+  const evs=S.events.map(e=>({e,i:evI(e)})).sort((a,b)=>a.i-b.i),past=evs.filter(x=>x.i<tIdx).slice(-3),soon=evs.filter(x=>x.i>=tIdx).slice(0,6);
+  const tl=[...past,...soon];
+  const tlC=`<section class="pb-card pb-full" aria-label="Campaign timeline"><div class="pb-h"><span class="pb-h2"><h3>Campaign Timeline</h3><small>By in-world date · scroll sideways for more</small></span><button class="btn sm" data-act="pbCal">Calendar</button></div>
+    ${tl.length?`<div class="pb-tl-wrap"><ol class="pb-tl">${tl.map(({e,i})=>`<li class="${i<tIdx?"past":i===tIdx?"now":""}"><button type="button" data-act="view" data-type="events" data-id="${e.id}"><span class="pb-tl-w">${esc(shortDate(c,{y:e.y||c.today.y,m:e.m,d:e.d}))}</span><span class="pb-tl-dot" aria-hidden="true"></span><span class="pb-tl-t">${esc(e.title||"Untitled")}</span></button></li>`).join("")}</ol></div>`:`<p class="vempty">No calendar events yet. Add festivals, deadlines and travel in the Calendar.</p>`}</section>`;
+  // the prep pages that used to be tabs
+  const moreC=card("More prep",null,"",`<div class="pb-more">${goTab("plan","Session plans")}${goTab("encounters","Encounters")}${goTab("bestiary","Bestiary")}${goTab("tables","Roll tables")}${goTab("milestones","Milestones")}${goTab("ideas","Saved ideas")}</div>`);
+  return `<div class="pboard">${next}${worldC}${pathC}${kC}${sC}${qC}${tC}${dC}${tlC}${fC}${moreC}</div>`;
 }
 /* Scene Editor: scenes live in the plan record as plan.scenes [{id,title,note,read,clues:[{t,found}],ifs:[{if,then}],who:[{col,id}],reserve,when}].
    Edits go to a draft (SCN.d) and save on their own about a second after typing stops. Plans without scenes start from their opener and reveals. */
@@ -2079,7 +2220,7 @@ function vPrepPlan(c,tabs){
     </article>`;
   }else plan=`<div class="empty">No session plan yet. Plan the next game: the opener, likely encounters, who might show up and what loot to hand out.</div>`;
   const others=plans.filter(p=>p!==cur);
-  return `<div class="bar"><h2>Session Prep</h2>${tabs}<button class="btn tm-phone" data-act="tmOpen">Table mode</button><button class="btn primary" data-act="newPlan">Plan session ${nextSession()}</button></div>
+  return `<div class="bar ph-tools">${tabs}<button class="btn primary" data-act="newPlan">Plan session ${nextSession()}</button></div>
   <div class="prep">
     <div class="prep-main">${plan}
       ${others.length?`<details class="past"><summary>Other plans · ${others.length}</summary>${others.map(p=>`<button class="bl-i" data-act="planPick" data-id="${p.id}"><b>${esc(p.title||"Session "+p.session)}</b><small>Session ${p.session||"?"} · ${p.status==="played"?"played":"planned"}</small></button>`).join("")}</details>`:""}
@@ -3105,17 +3246,6 @@ function vTodos(){
 }
 
 /* ---------- style options ---------- */
-const SKINS=[
-  {id:"auto",name:"Match device",note:"Parchment by day, candlelit at night",top:"#2b1510",ink:"#f0dcae",bg:"linear-gradient(90deg,#f8efd9 50%,#1d1611 50%)",h:"#7a200d",line:"#b8913f",dots:["#7a200d","#e69a28","#e4876c"]},
-  {id:"parchment",name:"Parchment",note:"The classic rulebook",top:"#2b1510",ink:"#f0dcae",bg:"#f8efd9",h:"#7a200d",line:"#d6c19a",dots:["#7a200d","#e69a28","#3f6b2a"]},
-  {id:"candlelit",name:"Candlelit",note:"Warm and dark",top:"#0f0907",ink:"#e9cf94",bg:"#1d1611",h:"#e4876c",line:"#4b3a2a",dots:["#e4876c","#c27a1c","#a5c47f"]},
-  {id:"arcane",name:"Arcane Study",note:"Midnight and violet",top:"#0a0916",ink:"#ddd4ff",bg:"#1a1830",h:"#b79bff",line:"#3d3765",dots:["#b79bff","#7c5cd6","#b9c2d8"]},
-  {id:"infernal",name:"Infernal",note:"Ember and ash",top:"#090404",ink:"#f7c98a",bg:"#1a0f0d",h:"#ff7a50",line:"#4d2a24",dots:["#ff7a50","#c4361b","#e0a03a"]},
-  {id:"shadowfell",name:"Shadowfell",note:"Drained of color",top:"#0b0b0c",ink:"#d4d6db",bg:"#191a1c",h:"#a9bed3",line:"#3a3c42",dots:["#a9bed3","#5d6b7a","#8d8f96"]},
-  {id:"feywild",name:"Feywild",note:"Moss and blossom",top:"#1e3220",ink:"#f3e9c6",bg:"#f4f8ee",h:"#8a2f6b",line:"#c3d3b3",dots:["#8a2f6b","#d77fb0","#7e9a4e"]},
-  {id:"frost",name:"Frostmaiden",note:"Ice and steel blue",top:"#142333",ink:"#e3eef8",bg:"#f3f7fa",h:"#1f5a8a",line:"#c2cfdb",dots:["#1f5a8a","#5aa0d0","#7f9bb5"]},
-  {id:"forge",name:"Dwarven Forge",note:"Slate and brass",top:"#23272b",ink:"#e8d29d",bg:"#f1eee8",h:"#2f4f5f",line:"#c9c1b2",dots:["#2f4f5f","#b5852f","#a07a32"]},
-  {id:"wood",name:"Wood & Wax",note:"Dark wood, wax red and gilt, with a side menu",top:"#17100b",ink:"#ead9b5",bg:"#efe0be",h:"#8e1f12",line:"#c9a24e",dots:["#8e1f12","#c9a24e","#241811"]}];
 const SKIN_MODE={parchment:"light",candlelit:"dark",arcane:"dark",infernal:"dark",shadowfell:"dark",feywild:"light",frost:"light",forge:"light",wood:"light"};
 const SKIN_FONTS={wood:"Cinzel+Decorative:wght@700&family=IM+Fell+English+SC&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400"};
 const FONTSETS=[
@@ -3127,9 +3257,7 @@ const FONTSETS=[
   {id:"easy",name:"Easy reading",t:"Atkinson Hyperlegible",b:"Atkinson Hyperlegible",css:"Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400"}];
 const SIZES=[["0.9","Small"],["1","Normal"],["1.1","Large"],["1.2","Extra large"]];
 
-const TEXTURES=[["theme","Theme default"],["parchment","Parchment"],["leather","Leather"],["linen","Linen"],["stone","Stone"],["wood","Wood grain"],["stars","Starfield"],["embers","Embers"],["frost","Frost"],["none","None"]];
 const THEME_TEX={wood:"none",auto:"parchment",parchment:"parchment",candlelit:"leather",arcane:"stars",infernal:"embers",shadowfell:"stone",feywild:"linen",frost:"frost",forge:"stone"};
-const TEX_STRENGTH=[["0.5","Subtle"],["0.8","Medium"],["1","Bold"]];
 function rgbOf(hex){hex=(hex||"#000").trim().replace("#","");if(hex.length===3)hex=hex.split("").map(c=>c+c).join("");const n=parseInt(hex,16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]}
 function noiseUri(o,rgb){const{size=240,freq=".8",oct=3,type="fractalNoise",a=1.2,b=-.45,k=1,seed=7}=o;const[r,g,bl]=rgb.map(v=>v.toFixed(3));
   const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}'><filter id='n' x='0' y='0' width='100%' height='100%'><feTurbulence type='${type}' baseFrequency='${freq}' numOctaves='${oct}' seed='${seed}' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 ${r} 0 0 0 0 ${g} 0 0 0 0 ${bl} ${(a*k).toFixed(3)} 0 0 0 ${(b*k).toFixed(3)}'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>`;
@@ -3159,6 +3287,8 @@ function applyTexture(){let el=document.getElementById("texture");if(!el){el=doc
 try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>applyStyle())}catch(e){}
 let STYLE={skin:"auto",fonts:"classic",size:"1",texture:"theme",texStrength:"0.8"};
 try{const s=JSON.parse(localStorage.getItem("dmdesk-style")||"null");if(s&&typeof s==="object")STYLE={...STYLE,...s}}catch(e){}
+// one look: Wood & Wax with its own lettering and no texture; only the text size is still a choice
+STYLE.skin="wood";STYLE.fonts="classic";STYLE.texture="theme";
 function loadFontLink(id,family){if(!family||document.getElementById(id))return;const l=document.createElement("link");l.id=id;l.rel="stylesheet";l.href="https://fonts.googleapis.com/css2?family="+family+"&display=swap";document.body.appendChild(l)}
 function loadFontSet(id){const f=FONTSETS.find(x=>x.id===id);if(f)loadFontLink("font-"+id,f.css)}
 function applyStyle(){const r=document.documentElement;
@@ -3173,17 +3303,10 @@ function applyStyle(){const r=document.documentElement;
 }
 function setStyle(k,v){STYLE[k]=v;try{localStorage.setItem("dmdesk-style",JSON.stringify(STYLE))}catch(e){}applyStyle();if(k==="skin")render();styleSheet(true)}
 function styleSheet(re){
-  FONTSETS.forEach(f=>loadFontSet(f.id));
-  const skin=s=>`<button type="button" class="st-card" data-act="setStyle" data-k="skin" data-v="${s.id}" aria-pressed="${STYLE.skin===s.id}"><span class="sw-top" style="background:${s.top};color:${s.ink}">Desk</span><span class="sw-body" style="background:${s.bg}"><span class="sw-h" style="color:${s.h}">Session 19</span><span class="sw-line" style="background:${s.line};width:85%"></span><span class="sw-line" style="background:${s.line};width:60%"></span><span class="sw-dots">${s.dots.map(c=>`<i style="background:${c}"></i>`).join("")}</span></span><span class="sw-name">${esc(s.name)}<small>${esc(s.note)}</small></span></button>`;
-  const font=f=>`<button type="button" class="st-card st-font" data-act="setStyle" data-k="fonts" data-v="${f.id}" aria-pressed="${STYLE.fonts===f.id}"><span class="ft" style="font-family:'${f.t}',Georgia,serif">The Old Mill</span><span class="fb" style="font-family:'${f.b}',Georgia,serif">The thief slipped away across the lake.</span><span class="fn">${esc(f.name)}</span></button>`;
-  const html=`<div class="sheet wide" role="dialog" aria-label="Style"><h2>Style</h2>
+  const html=`<div class="sheet" role="dialog" aria-label="Text size"><h2>Text size</h2>
     <div class="st-body">
-      <section class="st-sec"><h3>Theme</h3><div class="st-grid">${SKINS.map(skin).join("")}</div></section>
-      <section class="st-sec"><h3>Lettering</h3><div class="st-grid">${FONTSETS.map(font).join("")}</div></section>
       <section class="st-sec"><h3>Text size</h3><div class="st-seg">${SIZES.map(([v,n])=>`<button type="button" data-act="setStyle" data-k="size" data-v="${v}" aria-pressed="${String(STYLE.size)===v}">${n}</button>`).join("")}</div></section>
-      <section class="st-sec"><h3>Texture</h3><div class="st-grid tex-grid">${TEXTURES.map(([id,n])=>{const tid=id==="theme"?(THEME_TEX[STYLE.skin]||"parchment"):id;const t=texCss(tid,getComputedStyle(document.documentElement).getPropertyValue("--ink"));return `<button type="button" class="st-card tex-card" data-act="setStyle" data-k="texture" data-v="${id}" aria-pressed="${(STYLE.texture||"theme")===id}"><span class="tex-sw" style="${t?`background-image:${esc(t.img)};background-size:${esc(t.size)}`:""}"></span><span class="sw-name">${esc(n)}${id==="theme"?`<small>${esc((TEXTURES.find(x=>x[0]===tid)||[])[1]||"")}</small>`:""}</span></button>`}).join("")}</div>
-        <div class="st-seg" style="margin-top:10px"><span class="st-lab">Strength</span>${TEX_STRENGTH.map(([v,n])=>`<button type="button" data-act="setStyle" data-k="texStrength" data-v="${v}" aria-pressed="${String(STYLE.texStrength||"0.8")===v}">${n}</button>`).join("")}</div>
-        <p class="st-note">Your style is saved on this device only, so each phone or computer can look different.</p></section>
+      <p class="st-note">Saved on this device only, so each phone or computer can have its own size.</p>
     </div><div class="foot"><span class="grow"><button type="button" class="btn" data-act="setStyle" data-k="reset">Reset to default</button></span><button type="button" class="btn primary" data-act="close">Done</button></div></div>`;
   if(re){const m=document.getElementById("modal");const sh=m.querySelector(".sheet");if(!sh||m.hidden)return;const top=sh.scrollTop;m.querySelector(".scrim").innerHTML=html;m.querySelector(".sheet").scrollTop=top}
   else showSheet(html,true);
@@ -3446,7 +3569,7 @@ function pinsPanel(){
   return `<div class="pin-tabs">${PINS.map((p,i)=>`<span class="pin-tab ${i===PINSEL?"on":""}"><button type="button" data-pinsel="${i}">${esc(pinTitle(p))}</button><button type="button" class="pin-x" data-pinx="${i}" aria-label="Stop keeping open">✕</button></span>`).join("")}</div><div class="pin-body" data-pintype="${cur.type}">${captureView(cur.type,cur.id)||""}</div>`}
 function renderDock(){
   let d=document.getElementById("pindock");if(!d){d=document.createElement("aside");d.id="pindock";d.setAttribute("aria-label","Kept open");document.body.appendChild(d)}
-  const btn=document.getElementById("dockBtn");if(btn){btn.hidden=!PINS.length&&!DOCK_OPEN;btn.querySelector("b").textContent=PINS.length||"";btn.setAttribute("aria-pressed",DOCK_OPEN)}
+  document.querySelectorAll("#dockBtn,[data-dock]").forEach(btn=>{btn.hidden=!PINS.length&&!DOCK_OPEN;btn.querySelector("b").textContent=PINS.length||"";btn.setAttribute("aria-pressed",DOCK_OPEN)});
   const show=DOCK_OPEN&&!TM&&isDM();document.body.classList.toggle("docked",show);d.hidden=!show;if(!show)return;
   const y=d.querySelector(".pin-body")?.scrollTop||0;
   d.innerHTML=`<div class="dock-h"><b>Kept open</b><span class="grow"></span><button type="button" class="btn icon" data-dockclose aria-label="Close panel">✕</button></div>${pinsPanel()}`;
@@ -3455,7 +3578,7 @@ document.addEventListener("click",e=>{
   const ps=e.target.closest("[data-pinsel]");if(ps){e.stopPropagation();PINSEL=+ps.dataset.pinsel;renderDock();if(TM)renderTable();return}
   const px=e.target.closest("[data-pinx]");if(px){e.stopPropagation();PINS.splice(+px.dataset.pinx,1);PINSEL=Math.max(0,Math.min(PINSEL,PINS.length-1));pinsSave();renderDock();if(TM)renderTable();return}
   if(e.target.closest("[data-dockclose]")){e.stopPropagation();DOCK_OPEN=false;pinsSave();renderDock();return}
-  if(e.target.closest("#dockBtn")){e.stopPropagation();DOCK_OPEN=!DOCK_OPEN;pinsSave();renderDock();return}
+  if(e.target.closest("#dockBtn,[data-dock]")){e.stopPropagation();DOCK_OPEN=!DOCK_OPEN;pinsSave();renderDock();return}
   const ko=e.target.closest("[data-act=keepOpen]");if(ko){e.stopPropagation();pinToggle(ko.dataset.type,ko.dataset.id);return}
 },true);
 /* a small "more" menu: rarely used actions tucked behind one button */
@@ -3485,7 +3608,7 @@ document.addEventListener("keydown",e=>{
   if(k==="k"||k==="K"){if(OPEN&&(OPEN.kind==="view"||OPEN.kind==="monster")){e.preventDefault();pinToggle(OPEN.kind==="monster"?"monsters":OPEN.type,OPEN.id)}return}
   if(k==="p"||k==="P"){e.preventDefault();DOCK_OPEN=!DOCK_OPEN;pinsSave();renderDock();return}
   if((k==="t"||k==="T")&&isDM()){e.preventDefault();document.querySelector(TM?"[data-act=tmExit]":"[data-act=tmOpen]")?.click();return}
-  if(/^[1-7]$/.test(k)&&!TM){e.preventDefault();const t=visibleTabs()[+k-1];if(t){closeSheet();location.hash=t[0]}return}
+  if(/^[1-7]$/.test(k)&&!TM){e.preventDefault();if(isDM()){const n=NAV_DM[+k-1];if(n)navGo(n[0]);return}const t=visibleTabs()[+k-1];if(t){closeSheet();location.hash=t[0]}return}
   if((k==="b"||k==="B")&&isDM()&&!TM){e.preventDefault();closeSheet();U.prepTab="ideas";if(location.hash!=="#prep")location.hash="prep";else render();return}
 
   if(k==="?"){e.preventDefault();showKeys();return}
@@ -3989,14 +4112,10 @@ function render(){
   if(U.lvArm&&!(U.tab==="party"&&U.charFilter==="pc"))U.lvArm=false;  // the level-down ask never waits on another screen
   const counts={party:S.characters.length,notes:S.notes.length,calendar:S.events.length,quests:S.quests.filter(q=>q.status==="active").length,world:S.maps.length,prep:S.threads.filter(t=>t.status!=="resolved").length};
   const tabLinks=TABS.filter(([k])=>((k!=="prep")||isDM())&&(k!=="home"||!isDM())).map(([k,l,sh])=>[k,`<a href="#${k}" ${U.tab===k?'aria-current="page"':""}><span class="full">${l}</span><span class="short">${sh}</span><span class="n">${counts[k]||""}</span></a>`]);
-  // Side menu (Wood & Wax, wide screens): brand, Session, Prep, Party/Characters, then the rest under "Reference". Number keys follow this order (visibleTabs).
-  const sideTop=SIDE_TOP,linkHtml=list=>list.map(([,h])=>h).join("");
-  document.getElementById("tabs").innerHTML=sideMenu()
-    ?`<span class="nav-brand" aria-hidden="true">DM's Desk</span>${isDM()?`<button type="button" class="nav-sess" data-act="tmOpen" title="A big-text screen for running the session (T)">Session</button>`:""}`
-      +linkHtml(sideTop.map(k=>tabLinks.find(([t])=>t===k)).filter(Boolean))
-      +`<span class="nav-h" role="presentation">Reference</span>`
-      +linkHtml(tabLinks.filter(([k])=>!sideTop.includes(k)))
-    :linkHtml(tabLinks);
+  // The DM's menu follows the design: Session, Prep Board, Scenes, Party, then The Library. Players keep their own short list.
+  const linkHtml=list=>list.map(([,h])=>h).join("");
+  document.getElementById("tabs").innerHTML=isDM()?(sideMenu()?sideNav():phoneNav())
+    :(sideMenu()?`<span class="nav-brand" aria-hidden="true">DM's Desk</span>`:"")+linkHtml(tabLinks);
   const banner=(S.live?"":`<div class="banner">Saving isn't available in this view, so changes last only until you close the page.</div>`)+(U.preview?`<div class="preview-bar"><span>Previewing what your players see.</span><button class="btn sm" data-act="previewToggle">Stop previewing</button></div>`:"");
   const views={home:vHome,party:vParty,notes:vNotes,calendar:vCalendar,quests:vQuests,world:vWorld,prep:vPrep};
   const y=window.scrollY,ta=aid&&ae.tagName==="TEXTAREA"?ae.scrollTop:0;
@@ -4004,7 +4123,9 @@ function render(){
   const hs=[...document.querySelectorAll("#app .sub-tabs, #app .seg, #app .lib-groups, #app .table-wrap, #app .spot-wrap, #app .graph-wrap, #app .calgrid-wrap")].map(e=>e.scrollLeft);
   // keep the comment panel where you were reading when the page redraws behind it
   const popEl=null,popKey=popEl&&popEl.getAttribute("aria-label"),popS=popEl?[popEl.scrollTop,popEl.querySelector(".bs-thread")?.scrollTop||0]:null;
-  document.getElementById("app").innerHTML=banner+views[U.tab](c);
+  // the DM's older pages (quests, world, calendar) sit in one parchment card under the design's header
+  const OLD_PAGES={quests:"Quests",world:"Places &amp; World",calendar:"Calendar"};
+  document.getElementById("app").innerHTML=banner+(isDM()&&OLD_PAGES[U.tab]?pageHead("The Library",OLD_PAGES[U.tab])+`<div class="ph-page">${views[U.tab](c)}</div>`:views[U.tab](c));
   [...document.querySelectorAll("#app .sub-tabs, #app .seg, #app .lib-groups, #app .table-wrap, #app .spot-wrap, #app .graph-wrap, #app .calgrid-wrap")].forEach((e,i)=>{if(hs[i])e.scrollLeft=hs[i]});
   if(popS){const np=document.querySelector("#app .bs-pop");if(np&&np.getAttribute("aria-label")===popKey){np.scrollTop=popS[0];const t=np.querySelector(".bs-thread");if(t)t.scrollTop=popS[1]}}
   if(aid&&!FOCUS_NEXT){const el=document.getElementById(aid);if(el){el.focus({preventScroll:true});try{if(sel!=null)el.setSelectionRange(sel,sel)}catch(_){}if(ta)el.scrollTop=ta}}
@@ -4022,6 +4143,8 @@ function vParty(){
   const match=x=>!q||[x.name,x.cls,x.player,x.location,x.faction,x.race,x.notes].join(" ").toLowerCase().includes(q);
   const pcs=S.characters.filter(x=>x.kind==="pc"&&match(x)).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
   const npcs=S.characters.filter(x=>x.kind!=="pc"&&match(x)).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  // the DM gets the design's two screens (Party, NPCs & Enemies) from the menu; players keep the whole cast list
+  if(isDM()){if(U.charFilter==="npc")return pageHead("The Library","NPCs &amp; Enemies")+vPeople();return pageHead("Prep","The Party")+vHeroes()+`<div class="ph-page ph-gap">${treasury()}</div>`}
   const f=U.charFilter;
   let h=`<div class="bar"><h2>Characters</h2>
     <div class="seg">${[["all","All"],["pc","Party"],["npc","NPCs & Enemies"]].map(([k,l])=>`<button data-act="charFilter" data-v="${k}" aria-pressed="${f===k}">${l}</button>`).join("")}</div>
@@ -4104,14 +4227,17 @@ function vNotes(c){
   // the main button follows the group (or "New note" while searching); the menu never repeats it
   const nw=libNewFor(),mainAct=nw?"libNew":"newRecap";
   const extra=[["newRecap","New session recap"],["libNewNote","New note"]].filter(([a,l])=>a!==mainAct&&!(nw&&nw[2]===l));
-  let h=`<div class="bar"><h2>Library</h2>
-    <input class="search lib-q" id="libq" data-in="noteQ" type="search" placeholder="Search every entry" aria-label="Search every entry" value="${esc(U.noteQ||"")}">
-    <span class="split dm-only"><button class="btn primary" data-act="${mainAct}">${nw?nw[2]:"New session recap"}</button>${extra.length?moreMenu(extra.map(([a,l])=>mi(a,l)),{label:"▾",title:"More ways to add",sm:false,cls:"split-m"}):""}</span></div>`;
-  const groups=`<div class="lib-groups" role="group" aria-label="Library groups">${LIB_GROUPS.map(([k,l])=>`<button type="button" class="lib-g" data-act="libGrp" data-v="${k}" aria-pressed="${!q&&g===k}">${l}<span class="n">${libItems(k).length}</span></button>`).join("")}</div>`;
+  const qBox=`<input class="search lib-q" id="libq" data-in="noteQ" type="search" placeholder="Search every entry" aria-label="Search every entry" value="${esc(U.noteQ||"")}">`;
+  // the DM's header follows the design (the group list is in the side menu on wide screens); players keep the old bar
+  let h=isDM()?pageHead(q?`Every entry matching “${esc(U.noteQ.trim())}”`:esc(gName||""),q?"Search":"The Library",{search:qBox,extra:extra.length?moreMenu(extra.map(([a,l])=>mi(a,l)),{label:"More ▾",title:"More ways to add",sm:false}):""}):`<div class="bar"><h2>Library</h2>${qBox}</div>`;
+  // pages that used to be their own tabs open from their Library group
+  const goW=(v,l)=>`<button type="button" class="btn sm" data-act="pbWorld" data-v="${v}">${l}</button>`,goP=(v,l)=>`<button type="button" class="btn sm" data-act="libPrep" data-v="${v}">${l}</button>`;
+  const more=q?"":{quests:`<a class="btn sm" href="#quests">Quest board</a>`,places:goW("maps","Maps")+goW("rel","Relationships")+goW("places","Places")+goW("know","Party knows"),sessions:`<a class="btn sm" href="#calendar">Calendar</a>`+goP("plan","Session plans")+goP("milestones","Milestones"),bestiary:goP("bestiary","Bestiary page")+goP("encounters","Encounters"),tables:goP("tables","Roll tables")+goP("clocks","Clocks"),lore:goP("ideas","Saved ideas")}[g]||"";
+  const groups=sideMenu()&&isDM()?"":`<div class="lib-groups" role="group" aria-label="Library groups">${LIB_GROUPS.map(([k,l])=>`<button type="button" class="lib-g" data-act="libGrp" data-v="${k}" aria-pressed="${!q&&g===k}">${l}<span class="n">${libItems(k).length}</span></button>`).join("")}</div>`;
   const nb=(col,x)=>{const b=libBlurb(col,x);return b?`<span class="nb">${esc(b)}</span>`:""};
   const row=({col,x})=>col==="notes"?`<button class="nitem" data-act="pick" data-id="${x.id}" aria-current="${x.id===U.noteSel}"><b>${x.pinned?'<span class="pill acc">Pinned</span> ':""}${esc(x.title||"Untitled")}</b><small>${esc(libTag(col,x))}${x.session?` · Session ${x.session}`:""}${x.ig?` · ${esc(shortDate(c,x.ig))}`:""}</small>${nb(col,x)}</button>`
     :`<button class="nitem" data-act="open" data-type="${col}" data-id="${x.id}"><b>${esc(titleOf(col,x)||"Untitled")}</b><small>${esc(libTag(col,x))}</small>${nb(col,x)}</button>`;
-  h+=`<div class="notes lib ${U.noteReading?"reading":""}"><div class="nlist">${groups}<div class="lib-lh"><h3>${q?"Search results":esc(gName)}</h3><span>${list.length}</span></div>${list.length?list.map(row).join(""):`<div class="empty">${q?"Nothing matches that search.":`Nothing in ${esc(gName)} yet.`}</div>`}</div>`;
+  h+=`<div class="notes lib ${U.noteReading?"reading":""}"><div class="nlist">${groups}<div class="lib-lh"><h3>${q?"Search results":esc(gName)}</h3><span>${list.length}</span></div>${more?`<div class="lib-more">${more}</div>`:""}${list.length?list.map(row).join(""):`<div class="empty">${q?"Nothing matches that search.":`Nothing in ${esc(gName)} yet.`}</div>`}</div>`;
   const fl=[cur&&cur.session&&["Session",cur.session],cur&&cur.ig&&["In-game date",fmtDate(c,cur.ig)],cur&&cur.played&&["Played",new Date(cur.played+"T12:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})]].filter(Boolean);
   h+=cur?`<article class="reader lib-entry"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ Back to the list</button>${backBtn()}</div><div class="le-head"><div class="le-t"><span class="le-crumb">${esc((LIB_GROUPS.find(x=>x[0]===noteGroup(cur))||[])[1]||"")} · ${esc(NOTE_CATS[cur.category]||"Note")}</span>
     <h3 class="t">${esc(cur.title||"Untitled")}</h3></div><span class="dm-only acts-r">${tmCardBtn("notes",cur.id)}<button class="btn sm" data-act="edit" data-type="notes" data-id="${cur.id}">Edit</button>${moreMenu([mi("copyR20","Copy for Roll20",`data-type="notes" data-id="${cur.id}"`),mi("pin",cur.pinned?"Unpin from the top":"Pin to the top",`data-id="${cur.id}"`),mi("keepOpen",isPinned("notes",cur.id)?"Kept open ✓":"Keep open beside other pages",`data-type="notes" data-id="${cur.id}"`)])}</span></div>
@@ -4471,10 +4597,15 @@ document.addEventListener("click",async e=>{
       if(t.classList.contains("day")&&isPhone()){U.calSel={y:+t.dataset.y,m:+t.dataset.m,d:+t.dataset.d};render();break}openForm("events",null,{y:+t.dataset.y,m:+t.dataset.m,d:+t.dataset.d,kind:"event"});break;
     case"del":if(!t.classList.contains("armed")){t.classList.add("armed");t.dataset.label="Delete";t.textContent="Confirm delete";return}
       await remove(t.dataset.type,t.dataset.id);closeSheet();toast("Deleted");break;
+    case"nav":navGo(t.dataset.v);break;
     case"charFilter":U.charFilter=t.dataset.v;render();break;
     case"libGrp":U.libGrp=t.dataset.v;U.noteQ="";U.noteReading=false;render();break;
     case"libNew":{const n=libNewFor()||LIB_NEW.all;openForm(n[0],null,{...n[1]});break}
     case"libNewNote":openForm("notes",null,{category:"lore"});break;
+    // + New entry: a draft in the group you're looking at (Places & World from the board and prep pages)
+    case"phNew":{const g=U.tab==="party"?(U.charFilter==="npc"?"npcs":"party"):U.tab==="notes"&&!String(U.noteQ||"").trim()?U.libGrp:U.tab==="quests"?"quests":"places";
+      if(g==="sessions"){const n=nextSession();openForm("plans",null,{session:n,title:`Session ${n}`,status:"planned"});break}
+      const n=LIB_NEW[g]||LIB_NEW.places;openForm(n[0],null,{...n[1]});break}
     case"pick":NAV=[];U.noteSel=t.dataset.id;U.noteReading=true;render();if(isPhone())window.scrollTo({top:0});break;
     case"noteBack":U.noteReading=false;render();break;
     case"calSel":U.calSel={y:+t.dataset.y,m:+t.dataset.m,d:+t.dataset.d};render();break;
@@ -4533,7 +4664,7 @@ document.addEventListener("click",async e=>{
     case"msDel":await msDel(t.dataset.id);break;
     case"learnDel":await learnDel(t.dataset.id);break;
     case"homeKnow":U.worldTab="know";location.hash="world";break;
-    case"setStyle":{const k=t.dataset.k,v=t.dataset.v;if(k==="reset"){STYLE={skin:"auto",fonts:"classic",size:"1",texture:"theme",texStrength:"0.8"};setStyle("skin","auto")}else setStyle(k,v)}break;
+    case"setStyle":{const k=t.dataset.k,v=t.dataset.v;if(k==="reset"){STYLE={skin:"wood",fonts:"classic",size:"1",texture:"theme",texStrength:"0.8"};setStyle("size","1")}else if(k==="skin"||k==="fonts"||k==="texture"){/* fixed in the one look */}else setStyle(k,v)}break;
     case"previewToggle":U.preview=!U.preview;closeSheet();project();render();window.scrollTo({top:0});break;
     case"exportGo":exportGo();break;
     case"importGo":t.disabled=true;await importGo();break;
@@ -4555,6 +4686,8 @@ document.addEventListener("click",async e=>{
     case"heroSel":case"heroTab":case"heroLvl":heroAct(a,t);break;
     case"pplSel":case"pplKind":case"pplTab":case"pplAtt":case"pplUnlink":case"genSave":case"genApply":pplAct(a,t);break;
     case"scnOpen":U.planSel=t.dataset.id;U.prepTab="scenes";render();window.scrollTo({top:0});break;
+    case"pbCal":if(location.hash!=="#calendar")location.hash="calendar";else render();break;
+    case"libPrep":U.prepTab=t.dataset.v;if(location.hash!=="#prep")location.hash="prep";else render();window.scrollTo(0,0);break;
     case"pbWorld":U.worldTab=t.dataset.v;if(location.hash!=="#world")location.hash="world";else render();break;
     case"planPick":U.planSel=t.dataset.id;render();window.scrollTo({top:0});break;
     case"rcNew":if(logTimer)saveLog(rcSession());U.rcN=recapNext();U.rcDirty=null;render();break;
