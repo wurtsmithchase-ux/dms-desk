@@ -260,6 +260,79 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 .hero-stats b{font:700 24px var(--title)}
 .hero-stats span{font:400 13px var(--sc);color:var(--muted)}
 :root[data-skin="wood"] .hero-stats > div{background:var(--paper);border-color:#c9a86a}
+/* Session Table */
+.tablemode.sx-mode{background:var(--bg)}
+.sx-top .btn{background:transparent;color:var(--hdr-ink);border-color:rgba(214,179,106,.5)}
+.sx-top .btn:hover{border-color:var(--gold);background:rgba(214,179,106,.15)}
+.sx-top .btn:disabled{opacity:.45}
+.sx-sess{color:var(--gold);font:400 16px var(--sc)}
+.sx-time{display:inline-flex;gap:10px;align-items:baseline;padding:4px 10px;border:1px solid var(--gold);border-radius:2px;background:rgba(0,0,0,.25);font-family:var(--title)}
+.sx-tb{display:inline-flex;flex-wrap:wrap;gap:6px}
+.sx-body{flex:1;min-height:0;overflow:auto}
+.sx-grid{display:grid;grid-template-columns:minmax(240px,.8fr) minmax(0,1.6fr) minmax(240px,.9fr) minmax(240px,.9fr);gap:16px;padding:16px;height:100%;box-sizing:border-box}
+.sx-col{min-height:0;overflow:auto;display:flex;flex-direction:column;gap:14px;padding:4px}
+@media (max-width:1499px){.sx-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);height:auto}.sx-col{overflow:visible}}
+@media (max-width:900px){.sx-grid{grid-template-columns:minmax(0,1fr);padding:12px}.sx-scene{order:-1}.sx-time,.sx-tb{flex:0 0 auto;white-space:nowrap}.sx-tb{flex-wrap:nowrap}}
+.sx-att{display:flex;flex-wrap:wrap}
+.sx-npc,.sx-npcb,.sx-card{min-width:0}
+.sx-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.sx-card h3{margin:0;font:400 20px var(--display);color:var(--accent)}
+.sx-cur h2{margin:0;font:700 30px/1.15 var(--title)}
+.sx-h{margin:6px 0 0;font:400 19px var(--display);color:var(--accent)}
+.sx-pr{display:flex;align-items:center;gap:8px}
+.sx-pr input{width:20px;height:20px;flex:0 0 20px;accent-color:var(--accent)}
+.sx-pr .scn-pb{flex:1}
+.sx-pr.done .scn-pt{text-decoration:line-through;opacity:.7}
+.sx-when{color:var(--muted);font-style:italic;margin:-4px 0 4px 30px}
+.sx-pc{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.sx-pcs{grid-column:1;font-size:14px;color:var(--muted)}
+.sx-spot{grid-column:2;grid-row:1/span 2;display:flex;align-items:center;gap:6px;min-height:44px;font-size:14px}
+.sx-spot input{width:20px;height:20px;accent-color:var(--accent)}
+.sx-prev{display:flex;flex-direction:column;gap:6px}
+.sx-prev > .btn,.sx-prevb{align-self:flex-start}
+.sx-read summary,.sx-if summary,.sx-rule summary{cursor:pointer;min-height:36px;display:flex;align-items:center;font:400 17px var(--display);color:var(--accent)}
+.sx-read .prose{font-size:19px;font-style:italic;padding:8px 12px;border-left:0;background:var(--surface);border-radius:var(--r)}
+.sx-clues{display:flex;flex-direction:column;gap:6px}
+.sx-clue{text-align:left;min-height:44px;padding:8px 12px;border:1px dashed var(--accent);border-radius:var(--r);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer}
+.sx-clue[aria-pressed="true"]{border-style:solid;background:var(--accent-soft);text-decoration:line-through;color:var(--muted)}
+.sx-if{border:1px solid var(--line);border-radius:var(--r);padding:2px 12px;background:var(--surface)}
+.sx-if p{margin:0 0 10px}
+.sx-who{display:flex;flex-direction:column;gap:8px}
+.sx-npc{display:flex;gap:10px;align-items:flex-start;padding:8px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.sx-npcb{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.sx-npch{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.sx-npcb small{color:var(--muted);font-size:14px}
+.sx-att{margin-top:4px}
+.sx-foe{border:1px solid var(--blood);border-radius:var(--r);padding:8px 10px;background:var(--surface)}
+.sx-foeh{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sx-foeh .btn{margin-left:auto}
+.sx-foea p{margin:4px 0;font-size:15px}
+.sx-tac{margin:4px 0 0;font-size:15px}
+.sx-other{display:flex;flex-wrap:wrap;gap:6px}
+.sx-next{align-self:flex-start;min-height:44px;margin-top:6px}
+.sx-dice{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.sx-dice .btn{min-height:44px}
+.sx-rolls{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.sx-rolls li{display:flex;gap:10px;align-items:baseline}
+.sx-rolls li:first-child b{font-size:30px;color:var(--accent)}
+.sx-rolls b{font:700 20px var(--title);min-width:2.2em}
+.sx-rolls span{color:var(--muted);font-size:14px}
+.sx-logf{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px}
+.sx-logf input{grid-column:1/-1}
+.sx-log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:15px}
+.sx-log li{padding:4px 0;border-bottom:1px solid var(--line)}
+.sx-dcs{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 6px}
+.sx-conds{margin:0;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.sx-conds dt{font-weight:700}
+.sx-conds dd{margin:0;color:var(--muted)}
+.sx-lang{margin:4px 0 0}
+.sx-travel{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
+.sx-tr{margin:4px 0}
+:root[data-skin="wood"] .sx-card{background:var(--surface2);border:0;margin:5px;box-shadow:0 0 0 1px #8a6a2c,0 0 0 4px var(--wood2),0 0 0 5px var(--gold)}
+:root[data-skin="wood"] .sx-cur{background:var(--bg);box-shadow:0 0 0 1px #8a6a2c,0 0 0 5px var(--wood2),0 0 0 6px var(--gold)}
+:root[data-skin="wood"] .tablemode.sx-mode{background:var(--wood)}
+:root[data-skin="wood"] .sx-cur h2{font-family:var(--drop)}
+:root[data-skin="wood"] .sx-clue,:root[data-skin="wood"] .sx-npc,:root[data-skin="wood"] .sx-if{background:var(--paper)}
 @media (max-width:640px){.lib-groups{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.lib-groups::-webkit-scrollbar{display:none}.lib-g{flex:0 0 auto;min-height:40px}.lib-q{max-width:none;flex-basis:100%}}
 .reader .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font:500 14px var(--sc);letter-spacing:.04em;margin-bottom:6px}
 .prose{max-width:68ch;overflow-wrap:anywhere;margin-top:14px}
@@ -2473,9 +2546,110 @@ function tmTidy(){const board=document.querySelector("#tablemode .tm-board");if(
     const b=top+n.offsetHeight+TM_GAP;for(let i=c;i<c+span;i++)bottoms[i]=b});
   notes.forEach(tmStore);tmBoardSize(board);toast("Tidied. Ctrl+Z puts it back.")}
 
+/* Session Table: four columns for game night (path and party · current scene · dice, clocks and log · rules and travel).
+   It is what Table mode opens; the arranged board (panels, stickies, Arrange) is one tap away and remembered per device. */
+let TMV=(()=>{try{return localStorage.getItem("desk.tmview")||"session"}catch(_){return "session"}})();
+function setTMV(v){TMV=v;try{localStorage.setItem("desk.tmview",v)}catch(_){}renderTable()}
+const ST={scene:null,adv:"normal",rolls:[],undo:[],miles:"",pace:"normal",prevHide:false};
+function stPlan(){const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));return plans.find(p=>p.id===U.planSel)||plans.find(p=>p.status!=="played")||null}
+const stScenes=p=>p?(Array.isArray(p.scenes)?p.scenes:scnLegacy(p)):[];
+/* in-game time of day: minutes after midnight in settings/igtime; crossing midnight moves the date quietly */
+const igMin=()=>{const m=num((S.settings.igtime||{}).min);return m==null?480:m};
+const fmtMin=m=>{m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mm=m%60;return `${(h%12)||12}:${String(mm).padStart(2,"0")} ${h<12?"am":"pm"}`};
+async function stTime(add,long){const cur=igMin();let nx=cur+add,days=0;while(nx>=1440){nx-=1440;days++}
+  if(long){nx=480;days=1}
+  ST.undo.push({min:cur,days});if(ST.undo.length>20)ST.undo.shift();
+  if(days)await dayStep(days,!long);await save("settings","igtime",{min:nx});renderTable()}
+async function stUndo(){const u=ST.undo.pop();if(!u)return;if(u.days)await dayStep(-u.days,true);await save("settings","igtime",{min:u.min});renderTable()}
+async function stScenePatch(pid,fn){if(SCN.pid===pid&&SCN.dirty)await scnFlush();const p=rec("plans",pid);if(!p||!Array.isArray(p.scenes))return;
+  const{id:_,...keep}=JSON.parse(JSON.stringify(p));fn(keep.scenes);await save("plans",pid,keep);if(SCN.pid===pid)SCN.dirty=false;project();renderTable()}
+const stAtt=(n,x)=>((logFor(n)||{}).att||{})[x.id]||x.attitude||"";
+async function stSetAtt(n,id,v){const l=logFor(n)||{};const{id:_i,dmOnly:_d,secret:_s,...keep}=l;const att={...(keep.att||{})};const x=rec("characters",id);att[id]=stAtt(n,x||{id})===v?"":v;
+  await save("logs","s"+n,{...keep,session:n,notes:keep.notes||"",open:keep.open||"",att});project();renderTable()}
+function stRoll(sides){const r=()=>1+Math.floor(Math.random()*sides);const a=r();let b=null,v=a;if(sides===20&&ST.adv!=="normal"){b=r();v=ST.adv==="adv"?Math.max(a,b):Math.min(a,b)}
+  ST.rolls.unshift({sides,v,a,b,adv:ST.adv});ST.rolls=ST.rolls.slice(0,8);renderTable()}
+const ST_PACE={fast:[4,"Fast · 4 mph"],normal:[3,"Normal · 3 mph"],slow:[2,"Slow · 2 mph"]};
+function stTravelHtml(){const mi=parseFloat(ST.miles);if(!(mi>0))return `<p class="vempty">Enter a distance to see how long it takes.</p>`;
+  const h=mi/ST_PACE[ST.pace][0],mins=Math.round(h*60),days=Math.ceil(h/8);
+  return `<p class="sx-tr">About <b>${h<1?mins+" minutes":(Math.round(h*10)/10)+" hours"}</b> on the road${h>8?` · ${days} days of travel at 8 hours a day`:""}.</p><button type="button" class="btn sm" data-act="stTravel" data-n="${h>8?days*1440:mins}">Advance time by ${h>8?days+" days":h<1?mins+" minutes":(Math.round(h*10)/10)+" hours"}</button>`}
+function renderSession(el){
+  const c=cal(),plan=stPlan(),n=rcSession(),scenes=stScenes(plan),legacy=!!plan&&!Array.isArray(plan.scenes);
+  const main=scenes.filter(s=>!s.reserve),res=scenes.filter(s=>s.reserve);
+  const cur=scenes.find(s=>s.id===ST.scene)||main.find(s=>!s.done)||main[0]||res[0]||null;ST.scene=cur?cur.id:null;
+  const pcs=S.characters.filter(x=>x.kind==="pc").sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  const lit=new Set((logFor(n)||{}).spotlight||[]);
+  const keep=[...el.querySelectorAll(".sx-col")].map(x=>x.scrollTop),bodyY=el.querySelector(".sx-body")?.scrollTop||0;
+  const top=`<div class="tm-top sx-top"><b class="tm-title">${esc(S.settings.campaign?.name||"Campaign")}</b><span class="sx-sess">Session ${n}${plan&&plan.title?` · ${esc(plan.title)}`:""}</span>
+    <button class="btn sm" data-act="gsearch" title="Search (/)">Search</button>
+    <span class="sx-time" role="status" aria-label="In-game date and time"><b>${esc(fmtDate(c,c.today))}</b><b>${fmtMin(igMin())}</b></span>
+    <span class="sx-tb"><button class="btn sm" data-act="stTime" data-n="10">+10 min</button><button class="btn sm" data-act="stTime" data-n="60">+1 hour</button><button class="btn sm" data-act="stTime" data-n="60" title="A short rest takes an hour">Short rest</button><button class="btn sm" data-act="stLong" title="Next day at 8 am, logged in this session's notes">Long rest</button><button class="btn sm" data-act="stUndo" ${ST.undo.length?"":"disabled"} title="Undo the last time change">Undo</button></span>
+    <span class="grow"></span>${clockHtml()}<button class="btn sm" data-act="stView" data-v="board" title="Your arranged board with panels and stickies">Arranged board</button><button class="btn sm" data-act="wrapUp">End session</button><button class="btn sm" data-act="tmExit" title="Exit table mode (T)">Exit</button></div>`;
+  const sRow=(s,i)=>`<div class="sx-pr ${s.done?"done":""}">${legacy||s.reserve?"":`<input type="checkbox" data-stdone="${s.id}" ${s.done?"checked":""} aria-label="${esc(s.title||"Scene")} done">`}<button type="button" class="scn-pb" data-act="stScene" data-id="${s.id}" aria-current="${!!cur&&s.id===cur.id}">${s.reserve?"":`<span class="scn-num">${i+1}</span>`}<span class="scn-pt">${esc(s.title||"Untitled scene")}</span></button></div>${s.reserve&&s.when?`<small class="sx-when">${esc(s.when)}</small>`:""}`;
+  const col1=`<section class="sx-col" aria-label="Path and party"><div class="sx-card"><h3>The Path Tonight</h3>${plan?(main.map(sRow).join("")||`<p class="vempty">No scenes yet.</p>`)+`<button type="button" class="btn sm" data-act="stEdit" data-id="${plan.id}">Edit scenes</button>`:`<p class="vempty">No session plan yet. Make one on the Prep tab.</p>`}</div>
+    ${res.length?`<div class="sx-card"><h3>In Reserve</h3>${res.map(x=>sRow(x)).join("")}</div>`:""}
+    <div class="sx-card"><h3>The Party</h3>${pcs.length?`<p class="pb-sub">${pcs.filter(p=>lit.has(p.id)).length} of ${pcs.length} have had a moment tonight</p>`+pcs.map(p=>`<div class="sx-pc"><button type="button" class="linkish" data-act="view" data-type="characters" data-id="${p.id}">${esc(p.name||"Unnamed")}</button><span class="sx-pcs">AC ${p.ac??"–"} · HP ${p.hp??p.hpMax??"–"}${p.hpMax?"/"+p.hpMax:""} · Perception ${p.pp??"–"}</span><label class="sx-spot"><input type="checkbox" data-spot="${p.id}|${n}" ${lit.has(p.id)?"checked":""}> Moment</label></div>`).join(""):`<p class="vempty">No heroes yet.</p>`}</div></section>`;
+  const who=cur?cur.who.map(w=>({w,x:rec(w.col,w.id)})).filter(o=>o.x):[];
+  const ppl=who.filter(o=>o.w.col==="characters"),foes=who.filter(o=>o.w.col==="monsters"),other=who.filter(o=>o.w.col!=="characters"&&o.w.col!=="monsters");
+  const ltc=lastTimeCard(plan);
+  const col2=`<section class="sx-col sx-scene" aria-label="Current scene">
+    ${ltc?(ST.prevHide?`<button type="button" class="btn sm sx-prevb" data-act="stPrev">Show “last time”</button>`:`<div class="sx-prev">${ltc}<button type="button" class="btn sm" data-act="stPrev">Hide</button></div>`):""}
+    ${cur?`<div class="sx-card sx-cur"><span class="scn-kicker">${cur.reserve?"From reserve":`Scene ${main.indexOf(cur)+1} of ${main.length}`}</span><h2>${esc(cur.title||"Untitled scene")}</h2>${cur.note?`<p class="pb-sub">${esc(cur.note)}</p>`:""}
+      ${cur.read?`<details class="sx-read" open><summary>Read aloud</summary><div class="prose vprose">${rich(cur.read)}</div></details>`:""}
+      ${cur.clues.length?`<h3 class="sx-h">Secrets &amp; Clues <span class="pb-n">${cur.clues.filter(k=>k.found).length} of ${cur.clues.length} revealed</span></h3><div class="sx-clues">${cur.clues.map((k,i)=>`<button type="button" class="sx-clue" data-act="stClue" data-i="${i}" aria-pressed="${!!k.found}">${esc(k.t)}</button>`).join("")}</div>`:""}
+      ${cur.ifs.length?`<h3 class="sx-h">If They…</h3>${cur.ifs.map(k=>`<details class="sx-if"><summary>If they ${esc(k.if||"…")}</summary><p>${esc(k.then||"")}</p></details>`).join("")}`:""}
+      ${ppl.length?`<h3 class="sx-h">Who's Here</h3><div class="sx-who">${ppl.map(({x})=>{const a=stAtt(n,x),m=x.mon&&rec("monsters",x.mon);return `<div class="sx-npc">${avatar(x,40)}<div class="sx-npcb"><span class="sx-npch"><button type="button" class="linkish" data-act="view" data-type="characters" data-id="${x.id}"><b>${esc(x.name||"Unnamed")}</b></button>${m?`<button type="button" class="btn sm" data-act="open" data-type="monsters" data-id="${m.id}">Stat block</button>`:""}</span>${x.cls||x.voice?`<small>${esc([x.cls,x.voice].filter(Boolean).join(" · "))}</small>`:""}${x.wants?`<small><i>Wants</i> ${esc(x.wants)}</small>`:""}<div class="seg sx-att" role="group" aria-label="Attitude tonight">${[["friendly","Friendly"],["neutral","Neutral"],["hostile","Hostile"]].map(([k,l])=>`<button type="button" data-act="stAtt" data-id="${x.id}" data-v="${k}" aria-pressed="${a===k}">${l}</button>`).join("")}</div></div></div>`}).join("")}</div>`:""}
+      ${foes.length?`<h3 class="sx-h">Foes</h3>${foes.map(({x})=>`<div class="sx-foe"><div class="sx-foeh"><b>${esc(x.name||"Monster")}</b><span class="pb-n">${[x.cr&&"CR "+x.cr,x.ac&&"AC "+x.ac,x.hp&&"HP "+x.hp].filter(Boolean).map(esc).join(" · ")}</span><button type="button" class="btn sm" data-act="open" data-type="monsters" data-id="${x.id}">Stat block</button></div>${x.actions?`<div class="sx-foea">${blockLines(String(x.actions).split("\n").filter(l=>l.trim()).slice(0,3).join("\n"))}</div>`:""}${x.notes?`<p class="sx-tac"><b>Tactics.</b> ${esc(plain(x.notes).split("\n")[0])}</p>`:""}</div>`).join("")}`:""}
+      ${other.length?`<div class="sx-other">${other.map(({w,x})=>`<button type="button" class="chip" data-act="open" data-type="${w.col}" data-id="${x.id}">${esc(titleOf(w.col,x)||"Untitled")}</button>`).join("")}</div>`:""}
+      ${!legacy&&!cur.reserve?`<button type="button" class="btn primary sx-next" data-act="stNext">Scene done · next</button>`:""}
+      ${legacy?`<p class="scn-note">This plan has no scenes yet, so this shows its opener and reveals. Add scenes in Prep › Scenes.</p>`:""}
+    </div>`:`<div class="empty">No scenes for tonight. Add them in Prep › Scenes.</div>`}
+  </section>`;
+  const col3=`<section class="sx-col" aria-label="Dice, clocks and log"><div class="sx-card"><h3>Secret Dice</h3><div class="sx-dice">${[4,6,8,10,12,20,100].map(d=>`<button type="button" class="btn sm" data-act="stRoll" data-n="${d}">d${d}</button>`).join("")}</div>
+      <div class="seg sx-adv" role="group" aria-label="d20 rolls">${[["dis","Disadvantage"],["normal","Normal"],["adv","Advantage"]].map(([k,l])=>`<button type="button" data-act="stAdv" data-v="${k}" aria-pressed="${ST.adv===k}">${l}</button>`).join("")}</div>
+      <ol class="sx-rolls" aria-live="polite">${ST.rolls.map(r=>`<li><b>${r.v}</b><span>d${r.sides}${r.b!=null?` · ${r.a} and ${r.b}, ${r.adv==="adv"?"advantage":"disadvantage"}`:""}</span></li>`).join("")||`<li class="vempty">Only you see these.</li>`}</ol></div>
+    ${S.clocks.length?`<div class="sx-card"><h3>Clocks</h3><div class="clks compact">${S.clocks.map(k=>clockCard(k,true)).join("")}</div></div>`:""}
+    <div class="sx-card"><h3>Log a Moment</h3><form data-stlog class="sx-logf"><input class="scn-in" id="sx-log" placeholder="What just happened? Enter to log" aria-label="Log a moment" enterkeyhint="done"><select class="scn-in" id="sx-tag" aria-label="Tag"><option value="">No tag</option><option value="Loot">Loot</option><option value="Milestone">Milestone</option></select><button class="btn sm primary" type="submit">Log</button></form>
+      <ul class="sx-log">${noteLines(rcNotesVal(n)).slice(-12).reverse().map(l=>`<li>${esc(l.replace(/^-\s*/,""))}</li>`).join("")||`<li class="vempty">Nothing logged yet. It goes into this session's notes for the recap.</li>`}</ul></div></section>`;
+  const langs=(S.settings.party||{}).languages;
+  const col4=`<section class="sx-col" aria-label="Rules and travel"><div class="sx-card"><h3>Rules at a Glance</h3>
+      <details class="sx-rule" open><summary>Typical DCs</summary><p class="sx-dcs">${[["Very easy",5],["Easy",10],["Medium",15],["Hard",20],["Very hard",25],["Nearly impossible",30]].map(([l,v])=>`<span>${l} <b>${v}</b></span>`).join("")}</p></details>
+      <details class="sx-rule"><summary>Conditions</summary><dl class="sx-conds">${Object.entries(RULES).filter(([k])=>CONDS.includes(k)||k==="Exhaustion").map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl></details>
+      <details class="sx-rule"><summary>Cover</summary><p>Half cover: +2 to AC and Dexterity saves. Three-quarters cover: +5. Total cover: can't be targeted directly.</p></details>
+      ${langs?`<p class="sx-lang"><b>Party languages.</b> ${esc(langs)}</p>`:""}</div>
+    ${S.tables.length?`<div class="sx-card"><h3>Roll Tables</h3><div class="tm-rolls">${S.tables.slice().sort((a,b)=>(a.title||"").localeCompare(b.title||"")).map(t=>{const r=(ROLLS[t.id]||[])[0];return `<div class="tm-roll"><button class="btn sm" data-act="tmRoll" data-id="${t.id}">${esc(t.title)}</button>${r?`<span><b class="mono">${r.n}</b> ${esc(r.text)}</span>`:""}</div>`}).join("")}</div></div>`:""}
+    <div class="sx-card"><h3>Travel</h3><div class="sx-travel"><label class="scn-f"><span class="label">Miles</span><input class="scn-in" id="sx-miles" type="number" min="0" step="any" inputmode="decimal" value="${esc(ST.miles)}"></label><label class="scn-f"><span class="label">Pace</span><select class="scn-in" id="sx-pace">${Object.entries(ST_PACE).map(([k,[,l]])=>`<option value="${k}" ${ST.pace===k?"selected":""}>${l}</option>`).join("")}</select></label></div><div id="sx-tr">${stTravelHtml()}</div></div></section>`;
+  el.innerHTML=`${top}<div class="tm-body sx-body"><div class="sx-grid">${col1}${col2}${col3}${col4}</div></div>`;el.hidden=false;
+  el.querySelectorAll(".sx-col").forEach((x,i)=>{if(keep[i])x.scrollTop=keep[i]});const b=el.querySelector(".sx-body");if(b)b.scrollTop=bodyY;
+}
+async function stAct(a,t){const plan=stPlan(),n=rcSession(),i=num(t.dataset.i);
+  if(a==="stView")return setTMV(t.dataset.v);
+  if(a==="stTime")return stTime(num(t.dataset.n));
+  if(a==="stTravel")return stTime(num(t.dataset.n));
+  if(a==="stLong")return stTime(0,true);
+  if(a==="stUndo")return stUndo();
+  if(a==="stScene"){ST.scene=t.dataset.id;renderTable();document.querySelector("#tablemode .sx-scene")?.scrollTo({top:0});return}
+  if(a==="stPrev"){ST.prevHide=!ST.prevHide;renderTable();return}
+  if(a==="stAdv"){ST.adv=t.dataset.v;renderTable();return}
+  if(a==="stRoll")return stRoll(num(t.dataset.n));
+  if(a==="stAtt")return stSetAtt(n,t.dataset.id,t.dataset.v);
+  if(a==="stEdit"){closeTableMode();U.planSel=t.dataset.id;U.prepTab="scenes";if(location.hash!=="#prep")location.hash="prep";else render();return}
+  if(!plan)return;
+  if(a==="stClue"){const sc0=stScenes(plan),cur=sc0.find(s=>s.id===ST.scene)||(Array.isArray(plan.scenes)?null:sc0[0]);if(!cur||!cur.clues[i])return;
+    if(!Array.isArray(plan.scenes))return toggleReveal(plan.id,i,!cur.clues[i].found).then(()=>{project();renderTable()});
+    return stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===ST.scene);if(s&&s.clues[i])s.clues[i].found=!s.clues[i].found})}
+  if(a==="stNext"){const main=stScenes(plan).filter(s=>!s.reserve),k=main.findIndex(s=>s.id===ST.scene),nx=main.slice(k+1).find(s=>!s.done)||main.find((s,j)=>j!==k&&!s.done);
+    await stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===ST.scene);if(s)s.done=true});ST.scene=nx?nx.id:ST.scene;renderTable();if(!nx)toast("That was the last scene on tonight's path.");}}
+document.addEventListener("change",e=>{const t=e.target;
+  if(t.dataset&&t.dataset.stdone){const plan=stPlan();if(plan)stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===t.dataset.stdone);if(s)s.done=t.checked});return}
+  if(t.id==="sx-pace"){ST.pace=t.value;const r=document.getElementById("sx-tr");if(r)r.innerHTML=stTravelHtml()}});
+document.addEventListener("input",e=>{if(e.target.id!=="sx-miles")return;ST.miles=e.target.value;const r=document.getElementById("sx-tr");if(r)r.innerHTML=stTravelHtml()});
+document.addEventListener("submit",async e=>{const f=e.target.closest("[data-stlog]");if(!f)return;e.preventDefault();e.stopPropagation();const i=document.getElementById("sx-log"),v=i.value.trim();if(!v)return;
+  const tag=document.getElementById("sx-tag").value;i.value="";await addSessionLine((tag?`[${tag}] `:"")+v);renderTable();document.getElementById("sx-log")?.focus()});
 function renderTable(){
   renderDock();if(!TM)return;const el=document.getElementById("tablemode");
   if(typingInTable()||TMD.drag){renderPending=true;return}
+  if(TMV!=="board"){el.className="tablemode sx-mode";renderSession(el);return}
+  el.classList.remove("sx-mode");
   const c=cal(),plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));
   const plan=plans.find(p=>p.id===U.planSel)||plans.find(p=>p.status!=="played")||null;
   const n=rcSession();
@@ -2485,7 +2659,7 @@ function renderTable(){
   const sec=(l,v)=>v?`<section class="tm-s"><h3>${l}</h3><div class="prose vprose">${l==="Scene opener"?rich(v):planBullets(v)}</div></section>`:"";
   const y=el.querySelector(".tm-body")?.scrollTop||0;
   el.innerHTML=`<div class="tm-top"><b class="tm-title">${esc(S.settings.campaign?.name||"Campaign")}</b><span class="tm-date">${esc(fmtDate(c,c.today))}</span><button class="btn sm" data-act="day" data-n="1" title="Long rest: next day, logged in this session's notes. Shift-click to skip logging.">+1 day</button><button class="btn sm" data-act="travel" title="Work out travel time and move the calendar">Travel</button>
-    ${clockHtml()}<span class="grow"></span><button class="btn sm" data-act="quickNote" title="Quick note (N)">Quick note</button><button class="btn sm" data-act="wrapUp">Wrap up</button><button class="btn sm" data-cztoggle="#tablemode" title="Collapse or expand every panel">Collapse all</button>${tmArrangeBtns()}<button class="btn sm" data-act="gsearch" title="Search (/)">Search</button><button class="btn sm keys-btn" data-act="keysOpen" title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></button><button class="btn sm primary" data-act="tmExit" title="Exit table mode (T)">Exit table mode</button></div>
+    ${clockHtml()}<span class="grow"></span><button class="btn sm" data-act="stView" data-v="session" title="The four-column game-night screen">Session Table</button><button class="btn sm" data-act="quickNote" title="Quick note (N)">Quick note</button><button class="btn sm" data-act="wrapUp">Wrap up</button><button class="btn sm" data-cztoggle="#tablemode" title="Collapse or expand every panel">Collapse all</button>${tmArrangeBtns()}<button class="btn sm" data-act="gsearch" title="Search (/)">Search</button><button class="btn sm keys-btn" data-act="keysOpen" title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></button><button class="btn sm primary" data-act="tmExit" title="Exit table mode (T)">Exit table mode</button></div>
   <div class="tm-body">${partyStrip()}<div class="tm-grid">
     <div class="tm-main">
       ${lastTimeCard(plan)}
@@ -4267,6 +4441,7 @@ document.addEventListener("click",async e=>{
     case"planPlayed":{const pl=rec("plans",t.dataset.id);if(pl){const{id,...r}=pl;save("plans",id,{...r,status:pl.status==="played"?"planned":"played"})}break}
     case"pbPlan":U.planSel=t.dataset.id;U.prepTab="plan";render();window.scrollTo({top:0});break;
     case"scnSel":case"scnMove":case"scnDel":case"scnReserve":case"scnClueDel":case"scnIfAdd":case"scnIfDel":case"scnWhoAdd":case"scnWhoDel":scnAct(a,t);break;
+    case"stView":case"stTime":case"stTravel":case"stLong":case"stUndo":case"stScene":case"stPrev":case"stAdv":case"stRoll":case"stAtt":case"stEdit":case"stClue":case"stNext":stAct(a,t);break;
     case"heroSel":case"heroTab":case"heroLvl":heroAct(a,t);break;
     case"pplSel":case"pplKind":case"pplTab":case"pplAtt":case"pplUnlink":case"genSave":case"genApply":pplAct(a,t);break;
     case"scnOpen":U.planSel=t.dataset.id;U.prepTab="scenes";render();window.scrollTo({top:0});break;
