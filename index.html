@@ -169,6 +169,35 @@ td .clip{display:block;max-width:320px;color:var(--muted);overflow:hidden;text-o
 .le-side:empty{display:none}
 .le-side > .taper:first-child{display:none}
 .le-h{margin:0 0 4px;font:400 20px var(--display);color:var(--accent)}
+/* Prep Board */
+.pboard{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;align-items:start}
+.pb-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px 16px;min-width:0;display:flex;flex-direction:column;gap:8px}
+.pb-next,.pb-pathc{grid-column:span 2}
+@media (max-width:700px){.pb-next,.pb-pathc{grid-column:auto}}
+.pb-h{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.pb-h h3{margin:0;font:400 22px var(--display);color:var(--accent)}
+.pb-n{font:400 14px var(--ui);color:var(--muted)}
+.pb-title{margin:0;font:700 24px/1.2 var(--title)}
+.pb-sub{margin:0;color:var(--muted);font-style:italic}
+.pb-prog{height:10px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);overflow:hidden}
+.pb-prog span{display:block;height:100%;background:var(--accent)}
+.pb-check{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px 14px}
+.pb-check li{display:flex;align-items:center;gap:8px;color:var(--muted)}
+.pb-check li::before{content:"";width:14px;height:14px;border:1.5px solid var(--muted);border-radius:2px;flex:0 0 14px}
+.pb-check li.done{color:var(--ink)}
+.pb-check li.done::before{background:var(--accent);border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--paper)}
+.pb-path{margin:0;padding-left:24px;display:flex;flex-direction:column;gap:6px}
+.pb-path li::marker{color:var(--accent);font-weight:700}
+.pb-row{display:flex;flex-direction:column;gap:1px;min-height:44px;justify-content:center;text-align:left;padding:6px 10px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--ink);cursor:pointer}
+.pb-row:hover{background:var(--surface2)}
+.pb-row b{font:600 16px/1.25 var(--body)}
+.pb-row small{color:var(--muted);font-size:14px}
+.pb-spot{display:flex;flex-direction:column;gap:6px}
+.pb-sp{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:10px;align-items:center}
+.pb-sp > :first-child{grid-row:span 2}
+.pb-sp small{color:var(--muted);font-size:14px}
+.pb-sp.warn small{color:var(--blood);font-weight:600}
+.clks.pb-clks{grid-template-columns:minmax(0,1fr)}
 @media (max-width:640px){.lib-groups{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.lib-groups::-webkit-scrollbar{display:none}.lib-g{flex:0 0 auto;min-height:40px}.lib-q{max-width:none;flex-basis:100%}}
 .reader .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font:500 14px var(--sc);letter-spacing:.04em;margin-bottom:6px}
 .prose{max-width:68ch;overflow-wrap:anywhere;margin-top:14px}
@@ -954,6 +983,10 @@ header.top .clock{display:none!important}
 :root[data-skin="wood"] .lib-entry .secret{background:var(--wood2);color:var(--hdr-ink);border:0;box-shadow:inset 0 0 0 1px var(--gold)}
 :root[data-skin="wood"] .lib-entry .secret-h{color:var(--gold);font:400 18px var(--sc);letter-spacing:0}
 :root[data-skin="wood"] .lib-entry .secret a{color:#f0c987}
+:root[data-skin="wood"] .pb-card{background:var(--surface2);border:0;margin:5px;box-shadow:0 0 0 1px #8a6a2c,0 0 0 4px var(--wood2),0 0 0 5px var(--gold)}
+:root[data-skin="wood"] .pb-next{background:var(--bg)}
+:root[data-skin="wood"] .pb-row{background:var(--paper);border-color:#c9a86a}
+:root[data-skin="wood"] .pb-title{font-family:var(--drop)}
 @media (max-width:640px){:root[data-skin="wood"] .lib-entry h3.t{font-size:28px}}
 @media (max-width:640px){:root[data-skin="wood"] body{background:var(--bg)}:root[data-skin="wood"] #app{margin:0;border:0;border-radius:0;box-shadow:none}}
 @media (min-width:1101px){
@@ -1391,7 +1424,7 @@ const EVKIND={session:"Session",festival:"Festival",deadline:"Deadline",travel:"
 const TABS=[["home","Party page","Party"],["party","Characters","Cast"],["notes","Library","Library"],["quests","Quests","Quests"],["calendar","Calendar","Calendar"],["world","World","World"],["prep","Prep","Prep"]];
 
 const S={characters:[],notes:[],quests:[],events:[],threads:[],plans:[],links:[],loot:[],maps:[],logs:[],encounters:[],tables:[],clocks:[],chats:[],meta:[],monsters:[],todos:[],settings:{},loaded:false,live:false};
-const U={tab:"party",charFilter:"all",charQ:"",noteSel:null,noteQ:"",libGrp:"all",calY:null,calM:null,noteReading:false,calSel:null,questTab:"active",preview:false,prepTab:"plan",calView:"month",tableSel:null,worldTab:"maps",planSel:null};
+const U={tab:"party",charFilter:"all",charQ:"",noteSel:null,noteQ:"",libGrp:"all",calY:null,calM:null,noteReading:false,calSel:null,questTab:"active",preview:false,prepTab:"board",calView:"month",tableSel:null,worldTab:"maps",planSel:null};
 const isPhone=()=>window.matchMedia("(max-width:640px)").matches;
 // Wood & Wax turns the tabs into a side menu at 1101px and wider (matches the CSS media query)
 const SIDE_MQ=window.matchMedia("(min-width:1101px)");
@@ -1587,7 +1620,7 @@ function backBtn(){const prev=NAV[NAV.length-1];if(!prev)return "";const x=rec(p
 function openEntry(type,id){
   closeSheet(true);
   if(type==="notes"){U.noteSel=id;U.noteReading=true;U.noteQ="";U.libGrp=noteGroup(rec("notes",id));if(location.hash!=="#notes")location.hash="notes";else render();window.scrollTo({top:0})}
-  else if(type==="plans"){U.planSel=id;if(location.hash!=="#prep")location.hash="prep";else render();window.scrollTo({top:0})}
+  else if(type==="plans"){U.planSel=id;U.prepTab="plan";if(location.hash!=="#prep")location.hash="prep";else render();window.scrollTo({top:0})}
   else if(type==="threads"||type==="links"||type==="loot")openForm(type,id);
   else if(type==="encounters")openEncounter(id);
   else if(type==="clocks")openForm("clocks",id);
@@ -1706,8 +1739,9 @@ function recapNext(){return Math.max(0,...S.notes.filter(n=>n.category==="sessio
 function nextSession(){return Math.max(0,...S.notes.filter(n=>n.category==="session").map(n=>n.session||0),...S.plans.map(p=>p.session||0))+1}
 function vPrep(c){
   if(!isDM())return `<div class="empty">Session prep is only visible to the DM.</div>`;
-  const t=U.prepTab||"plan";
-  const tabs=`<div class="seg sub-tabs">${[["plan","Session plan"],["todos","To-do"],["encounters","Encounters"],["bestiary","Bestiary"],["clocks","Clocks"],["tables","Roll tables"],["spotlight","Spotlight"],["milestones","Milestones"],["ideas","Saved ideas"]].map(([k,l])=>`<button data-act="prepTab" data-v="${k}" aria-pressed="${t===k}">${l}</button>`).join("")}</div>`;
+  const t=U.prepTab||"board";
+  const tabs=`<div class="seg sub-tabs">${[["board","Board"],["plan","Session plan"],["todos","To-do"],["encounters","Encounters"],["bestiary","Bestiary"],["clocks","Clocks"],["tables","Roll tables"],["spotlight","Spotlight"],["milestones","Milestones"],["ideas","Saved ideas"]].map(([k,l])=>`<button data-act="prepTab" data-v="${k}" aria-pressed="${t===k}">${l}</button>`).join("")}</div>`;
+  if(t==="board")return `<div class="bar"><h2>Prep Board</h2>${tabs}<button class="btn tm-phone" data-act="tmOpen">Table mode</button></div>`+vPrepBoard(c);
   if(t!=="plan")return `<div class="bar"><h2>Session Prep</h2>${tabs}</div>`+(t==="todos"?vTodos():t==="bestiary"?vBestiary():t==="milestones"?vMilestones():t==="encounters"?vEncounters():t==="clocks"?vClocks():t==="tables"?vTables():t==="ideas"?vBrainstorm():vSpotlight());
   return vPrepPlan(c,tabs);
 }
@@ -1726,6 +1760,38 @@ function planBullets(text,key){
       out+=`<li><b class="pl-lab">${plInline(m[1],key)}${parts.length>1||lead?":":""}</b>${parts.length>1?`${lead?` ${plInline(lead,key)}`:""}<ul>${parts.map(x=>`<li>${plInline(x,key)}</li>`).join("")}</ul>`:` ${lead?plInline(lead,key)+" ":""}${plInline(parts[0]||m[2],key)}`}</li>`}
     else plSentences(l).forEach(x=>{out+=`<li>${plInline(x,key)}</li>`});
   });close();return out}
+/* Prep Board: one page that gathers the next session, the path, quests, threads, spotlight, clocks, factions and to-dos */
+const PB_SECS=[["opener","Scene opener"],["encounters","Encounters & scenes"],["cast","NPCs & places"],["loot","Loot to hand out"],["threads","Threads to pull"],["reveals","Reveals"]];
+function vPrepBoard(c){
+  const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));
+  const cur=plans.find(p=>p.status!=="played")||null,n=cur?(cur.session||"?"):nextSession();
+  const filled=cur?PB_SECS.filter(([k])=>String(cur[k]||"").trim()):[],pct=Math.round(filled.length/PB_SECS.length*100);
+  const path=cur?String(cur.encounters||"").split("\n").map(l=>l.trim()).filter(l=>l&&!/^#/.test(l)).map(l=>plain(l.replace(/^[-*•]\s+/,""))).slice(0,8):[];
+  const card=(title,count,go,body,cls)=>`<section class="pb-card ${cls||""}"><div class="pb-h"><h3>${title}${count!=null?` <span class="pb-n">${count}</span>`:""}</h3>${go||""}</div>${body}</section>`;
+  const goTab=(v,l)=>`<button class="btn sm" data-act="prepTab" data-v="${v}">${l}</button>`;
+  const ng=nextGameText();
+  const next=card(`Session ${n}`,null,cur?`<button class="btn sm primary" data-act="pbPlan" data-id="${cur.id}">Open plan</button>`:`<button class="btn sm primary" data-act="newPlan">Plan session ${n}</button>`,
+    `${cur?`<p class="pb-title">${esc(cur.title||`Session ${n}`)}</p>`:`<p class="vempty">No plan for the next session yet.</p>`}${ng?`<p class="pb-sub">${esc(ng)}</p>`:""}
+    ${cur?`<div class="pb-prog" role="progressbar" aria-valuemin="0" aria-valuemax="${PB_SECS.length}" aria-valuenow="${filled.length}" aria-label="Plan sections filled"><span style="width:${pct}%"></span></div>
+    <ul class="pb-check">${PB_SECS.map(([k,l])=>`<li class="${String(cur[k]||"").trim()?"done":""}">${l}</li>`).join("")}</ul>`:""}`,"pb-next");
+  const pathC=card(`The path${cur?` for session ${n}`:""}`,null,"",path.length?`<ol class="pb-path">${path.map(l=>`<li>${linkify(esc(l),"")}</li>`).join("")}</ol>`:`<p class="vempty">${cur?"Lines in the plan's Encounters & scenes show here, one per line.":"Plan the next session to see its path here."}</p>`,"pb-pathc");
+  const quests=S.quests.filter(q=>q.status==="active").sort((a,b)=>(b.updated||0)-(a.updated||0));
+  const qC=card("Active quests",quests.length,`<a class="btn sm" href="#quests">All quests</a>`,quests.length?quests.slice(0,8).map(q=>{const bs=beatList(q),d=bs.filter(b=>b.done).length;return `<button class="pb-row" data-act="open" data-type="quests" data-id="${q.id}"><b>${esc(q.title||"Untitled quest")}</b>${bs.length?`<small>${d} of ${bs.length} story beats</small>`:q.giver?`<small>From ${esc(q.giver)}</small>`:""}</button>`}).join(""):`<p class="vempty">No active quests.</p>`);
+  const open=S.threads.filter(t=>t.status!=="resolved").sort((a,b)=>(b.updated||0)-(a.updated||0));
+  const tC=card("Threads to pay off",open.length,goTab("plan","Session plan"),open.length?open.slice(0,8).map(threadRow).join(""):`<p class="vempty">Nothing unresolved.</p>`);
+  const pcs=S.characters.filter(x=>x.kind==="pc").sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  const ss=spotSessions(),last=ss[ss.length-1]||0;
+  const since=pc=>{const lit=ss.filter(s=>(logFor(s)?.spotlight||[]).includes(pc));return lit.length?last-lit[lit.length-1]:null};
+  const sC=card("Spotlight",null,goTab("spotlight","Spotlight"),pcs.length?`<div class="pb-spot">${pcs.map(p=>{const d=since(p.id);return `<div class="pb-sp ${d===null||d>=2?"warn":""}">${avatar(p,24)}<b>${esc(p.name)}</b><small>${d===null?"No moment yet":d===0?"Moment last session":`No moment for ${d} sessions`}</small></div>`}).join("")}</div>`:`<p class="vempty">Add party members to track the spotlight.</p>`);
+  const clocks=S.clocks.slice().sort((a,b)=>((num(b.filled)||0)/(num(b.segments)||1))-((num(a.filled)||0)/(num(a.segments)||1)));
+  const kC=card("Clocks",clocks.length,goTab("clocks","All clocks"),clocks.length?`<div class="clks pb-clks">${clocks.slice(0,6).map(k=>clockCard(k,true)).join("")}</div>`:`<p class="vempty">No clocks yet.</p>`);
+  const facs=S.notes.filter(x=>x.category==="faction").sort((a,b)=>(a.title||"").localeCompare(b.title||""));
+  const fC=card("Factions",facs.length,`<button class="btn sm" data-act="pbWorld" data-v="rel">Relationships</button>`,facs.length?facs.map(f=>`<button class="pb-row" data-act="open" data-type="notes" data-id="${f.id}"><b>${esc(f.title||"Untitled")}</b>${f.leader||f.base?`<small>${esc([f.leader&&"Led by "+f.leader,f.base&&"Based in "+f.base].filter(Boolean).join(" · "))}</small>`:""}</button>`).join(""):`<p class="vempty">No faction notes yet. Add a note with the Faction category.</p>`);
+  const todos=S.todos.filter(t=>t.kind!=="goal"&&!t.done).sort((a,b)=>(a.due||"9999").localeCompare(b.due||"9999")||(a.updated||0)-(b.updated||0));
+  const dC=card("Prep to-dos",todos.length,goTab("todos","All to-dos"),`<form data-form="todoQuick" data-kind="todo" class="tq"><input id="tq-todo" placeholder="Add a to-do" aria-label="New to-do"><button class="btn sm primary" type="submit">Add</button></form>
+    ${todos.length?todos.slice(0,8).map(t=>`<div class="th"><input type="checkbox" data-todo="${t.id}" aria-label="Done"><button class="th-t" data-act="edit" data-type="todos" data-id="${t.id}"><span>${linkify(esc(t.text||""),"")}</span>${t.due?`<small>Due ${esc(t.due)}</small>`:""}</button></div>`).join(""):`<p class="vempty">Nothing on the list.</p>`}`);
+  return `<div class="pboard">${next}${pathC}${qC}${tC}${sC}${kC}${fC}${dC}</div>`;
+}
 function vPrepPlan(c,tabs){
   const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));
   const cur=plans.find(p=>p.id===U.planSel)||plans.find(p=>p.status!=="played")||plans[0];
@@ -3907,6 +3973,8 @@ document.addEventListener("click",async e=>{
     case"newRel":openForm("links",null,{a:t.dataset.id,kind:"ally",dmOnly:true});break;
     case"newPlan":{const n=nextSession();openForm("plans",null,{session:n,title:`Session ${n}`,status:"planned"});break}
     case"planPlayed":{const pl=rec("plans",t.dataset.id);if(pl){const{id,...r}=pl;save("plans",id,{...r,status:pl.status==="played"?"planned":"played"})}break}
+    case"pbPlan":U.planSel=t.dataset.id;U.prepTab="plan";render();window.scrollTo({top:0});break;
+    case"pbWorld":U.worldTab=t.dataset.v;if(location.hash!=="#world")location.hash="world";else render();break;
     case"planPick":U.planSel=t.dataset.id;render();window.scrollTo({top:0});break;
     case"rcNew":if(logTimer)saveLog(rcSession());U.rcN=recapNext();U.rcDirty=null;render();break;
     case"rename":showSheet(`<form class="sheet" data-form="rename"><h2>Campaign name</h2><div class="fields"><label class="field"><span class="label">Name</span><input id="r-name" value="${esc(S.settings.campaign?.name||"")}" placeholder="The Campaign"></label></div><div class="foot"><span class="grow"></span><button type="button" class="btn" data-act="close">Cancel</button><button class="btn primary" type="submit">Save</button></div></form>`);break;
@@ -3954,7 +4022,7 @@ document.addEventListener("submit",async e=>{
     else if(type==="plans"){if(!data.title)data.title=`Session ${data.session||nextSession()}`}
     else if(!data.title&&!data.name){toast(type==="characters"||type==="loot"?"Give it a name.":"Give it a title.");return}
     const old=S[type].find(x=>x.id===id)||{};const{id:_,...keep}=old;
-    await save(type,id,{...keep,...data});if(type==="notes")U.noteSel=id;if(type==="plans")U.planSel=id;
+    await save(type,id,{...keep,...data});if(type==="notes"){U.noteSel=id;if(U.libGrp!=="all"&&!U.noteQ)U.libGrp=noteGroup({...keep,...data})}if(type==="plans"){U.planSel=id;U.prepTab="plan"}
     if(type==="maps"){closeSheet();toast("Saved");setTimeout(()=>openMap(id),60)}else{closeSheet();toast("Saved")}}
   if(k==="cal"){const months=document.getElementById("c-months").value.split("\n").map(l=>l.split(",").map(x=>x.trim())).filter(p=>p[0]).map(([n,d,...fl])=>{const mm=n.match(/^(.*?)\s*\((.*)\)\s*$/);const o={name:(mm?mm[1]:n).trim(),days:Math.max(1,num(d)||30)};if(mm&&mm[2])o.sub=mm[2].trim();fl.forEach(f=>{if(/^festival$/i.test(f))o.festival=true;const lp=f.match(/^leap\s+(\d+)(?:\+(\d+))?\s*(.*)$/i);if(lp){o.leapEvery=+lp[1];if(lp[2])o.leapOffset=+lp[2];if(lp[3])o.leapName=lp[3].trim()}});return o});
     const moons=document.getElementById("c-moon").value.split(";").map(x=>x.split(",").map(y=>y.trim())).filter(p=>p[0]&&parseFloat(p[1])>0).map(([n,cy,sh])=>({name:n,cycle:parseFloat(cy),shift:parseFloat(sh)||0}));
