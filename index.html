@@ -144,6 +144,32 @@ td .clip{display:block;max-width:320px;color:var(--muted);overflow:hidden;text-o
 .nitem small{color:var(--muted);font:500 13px var(--sc);letter-spacing:.04em}
 .reader{background:var(--paper);border:1px solid var(--line);box-shadow:0 4px 14px rgba(40,20,5,.12);padding:26px 32px;min-width:0}
 .reader h3.t{font:700 34px/1.1 var(--display);color:var(--accent);margin:6px 0 2px;text-wrap:balance;padding-bottom:4px;border-bottom:2px solid var(--gold)}
+/* Library groups, list and entry page */
+.lib-q{flex:1 1 220px;max-width:380px}
+.lib-groups{display:flex;flex-wrap:wrap;gap:5px;padding:10px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:1;background:var(--paper)}
+.lib-g{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);font:500 14px var(--sc);letter-spacing:.03em;cursor:pointer}
+.lib-g .n{font:400 12px var(--ui);color:var(--muted)}
+.lib-g[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.lib-g[aria-pressed="true"] .n{color:inherit;opacity:.85}
+.lib-lh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:12px 12px 6px;border-bottom:1px solid var(--line)}
+.lib-lh h3{margin:0;font:400 20px var(--display);color:var(--accent)}
+.lib-lh span{font-size:14px;color:var(--muted)}
+.nitem .nb{font-size:14px;color:var(--muted);line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.le-head{display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px 14px}
+.le-t{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.le-crumb{font-size:14px;color:var(--muted)}
+.le-head .acts-r{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.lib-entry h3.t{margin-top:0}
+.le-fields{margin:14px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;padding:12px 16px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.le-fields dt{font:400 14px var(--sc);color:var(--muted)}
+.le-fields dd{margin:2px 0 0;font-weight:600}
+.le-cols{display:flex;flex-wrap:wrap;gap:20px 28px;margin-top:16px}
+.le-main{flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:14px}
+.le-side{flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:14px}
+.le-side:empty{display:none}
+.le-side > .taper:first-child{display:none}
+.le-h{margin:0 0 4px;font:400 20px var(--display);color:var(--accent)}
+@media (max-width:640px){.lib-groups{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.lib-groups::-webkit-scrollbar{display:none}.lib-g{flex:0 0 auto;min-height:40px}.lib-q{max-width:none;flex-basis:100%}}
 .reader .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font:500 14px var(--sc);letter-spacing:.04em;margin-bottom:6px}
 .prose{max-width:68ch;overflow-wrap:anywhere;margin-top:14px}
 .prose > p:first-child::first-letter{font:700 3.3em/.85 var(--drop);color:var(--accent);float:left;margin:.06em .08em 0 0}
@@ -220,6 +246,7 @@ td .clip{display:block;max-width:320px;color:var(--muted);overflow:hidden;text-o
 @media (max-width:860px){
   .notes,.cal-layout{grid-template-columns:minmax(0,1fr)}
   .nlist{max-height:260px}
+  .notes.lib .nlist{max-height:420px}
   .board{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:520px){
@@ -279,7 +306,7 @@ td .clip{display:block;max-width:320px;color:var(--muted);overflow:hidden;text-o
   .npc small.npc-role{color:var(--ink);font-style:italic;font-family:var(--body)}
 
   .notes{display:block}
-  .nlist{max-height:none;overflow:visible}
+  .nlist,.notes.lib .nlist{max-height:none;overflow:visible}
   .nitem{padding:12px}
   .notes.reading .nlist{display:none}
   .notes:not(.reading) .reader{display:none}
@@ -918,6 +945,16 @@ header.top .clock{display:none!important}
 :root[data-skin="wood"] body{background:var(--wood);background-image:none}
 :root[data-skin="wood"] #app{background:var(--bg);border:1px solid #8a6a2c;border-radius:4px;margin-block:18px 28px;box-shadow:0 2px 14px rgba(0,0,0,.45)}
 .nav-brand,.nav-sess,.nav-h{display:none}
+:root[data-skin="wood"] .notes.lib .nlist{background:var(--surface2);border:0;margin:5px;box-shadow:0 0 0 1px #8a6a2c,0 0 0 4px var(--wood2),0 0 0 5px var(--gold)}
+:root[data-skin="wood"] .notes.lib .lib-groups{background:var(--surface2);border-bottom-color:#c9a86a}
+:root[data-skin="wood"] .notes.lib .nitem,:root[data-skin="wood"] .notes.lib .lib-lh{border-bottom-color:#c9a86a}
+:root[data-skin="wood"] .lib-entry{background:var(--bg);border:0;margin:5px;box-shadow:0 0 0 1px #8a6a2c,0 0 0 5px var(--wood2),0 0 0 6px var(--gold)}
+:root[data-skin="wood"] .lib-entry h3.t{font:700 34px/1.15 var(--drop);color:var(--ink);border-bottom:0;padding-bottom:0}
+:root[data-skin="wood"] .lib-entry .le-fields{background:var(--paper);border-color:#c9a86a}
+:root[data-skin="wood"] .lib-entry .secret{background:var(--wood2);color:var(--hdr-ink);border:0;box-shadow:inset 0 0 0 1px var(--gold)}
+:root[data-skin="wood"] .lib-entry .secret-h{color:var(--gold);font:400 18px var(--sc);letter-spacing:0}
+:root[data-skin="wood"] .lib-entry .secret a{color:#f0c987}
+@media (max-width:640px){:root[data-skin="wood"] .lib-entry h3.t{font-size:28px}}
 @media (max-width:640px){:root[data-skin="wood"] body{background:var(--bg)}:root[data-skin="wood"] #app{margin:0;border:0;border-radius:0;box-shadow:none}}
 @media (min-width:1101px){
   :root[data-skin="wood"] body{padding-left:232px}
@@ -1351,10 +1388,10 @@ const DEFAULT_CAL={months:HARPTOS.map(n=>({name:n,days:30})),weekdays:["1st","2n
 const NOTE_CATS={session:"Session recap",location:"Location",faction:"Faction",lore:"Lore",monster:"Monster",shop:"Shop & inn",item:"Item",plot:"Plot hook",rules:"Rules & rulings",other:"Other"};
 const QSTAT={active:"Active",rumor:"Rumor",completed:"Completed",failed:"Failed"};
 const EVKIND={session:"Session",festival:"Festival",deadline:"Deadline",travel:"Travel",event:"Event"};
-const TABS=[["home","Party page","Party"],["party","Characters","Cast"],["notes","Notes","Notes"],["quests","Quests","Quests"],["calendar","Calendar","Calendar"],["world","World","World"],["prep","Prep","Prep"]];
+const TABS=[["home","Party page","Party"],["party","Characters","Cast"],["notes","Library","Library"],["quests","Quests","Quests"],["calendar","Calendar","Calendar"],["world","World","World"],["prep","Prep","Prep"]];
 
 const S={characters:[],notes:[],quests:[],events:[],threads:[],plans:[],links:[],loot:[],maps:[],logs:[],encounters:[],tables:[],clocks:[],chats:[],meta:[],monsters:[],todos:[],settings:{},loaded:false,live:false};
-const U={tab:"party",charFilter:"all",charQ:"",noteSel:null,noteQ:"",noteCat:"all",calY:null,calM:null,noteReading:false,calSel:null,questTab:"active",preview:false,prepTab:"plan",calView:"month",tableSel:null,worldTab:"maps",planSel:null};
+const U={tab:"party",charFilter:"all",charQ:"",noteSel:null,noteQ:"",libGrp:"all",calY:null,calM:null,noteReading:false,calSel:null,questTab:"active",preview:false,prepTab:"plan",calView:"month",tableSel:null,worldTab:"maps",planSel:null};
 const isPhone=()=>window.matchMedia("(max-width:640px)").matches;
 let db=null;
 
@@ -1545,7 +1582,7 @@ function navBack(){const prev=NAV.pop();if(prev&&rec(prev.type,prev.id))openEntr
 function backBtn(){const prev=NAV[NAV.length-1];if(!prev)return "";const x=rec(prev.type,prev.id);if(!x)return "";return `<button type="button" class="btn sm navback" data-act="navBack" title="Go back">‹ Back to ${esc(titleOf(prev.type,x)||"previous")}</button>`}
 function openEntry(type,id){
   closeSheet(true);
-  if(type==="notes"){U.noteSel=id;U.noteReading=true;U.noteCat="all";if(location.hash!=="#notes")location.hash="notes";else render();window.scrollTo({top:0})}
+  if(type==="notes"){U.noteSel=id;U.noteReading=true;U.noteQ="";U.libGrp=noteGroup(rec("notes",id));if(location.hash!=="#notes")location.hash="notes";else render();window.scrollTo({top:0})}
   else if(type==="plans"){U.planSel=id;if(location.hash!=="#prep")location.hash="prep";else render();window.scrollTo({top:0})}
   else if(type==="threads"||type==="links"||type==="loot")openForm(type,id);
   else if(type==="encounters")openEncounter(id);
@@ -2814,7 +2851,7 @@ document.addEventListener("submit",async e=>{const f=e.target.closest("[data-qno
 document.addEventListener("click",e=>{if(e.target.closest("[data-qclose]")){e.stopPropagation();closeQuick()}if(e.target.closest("[data-act=quickNote]")){e.stopPropagation();quickNote()}},true);
 
 /* shortcuts */
-const KEYS=[["/","Search"],["D","Dice tray"],["N","Quick note"],["K","Keep the open entry open"],["P","Show or hide Kept open"],["T","Table mode"],["B","Saved ideas"],["1–6","Characters, Notes, Quests, Calendar, World, Prep"],["1–9 (table mode)","Play a Music button"],["?","This list (or the keyboard button at the top)"],["Esc","Close"],["Alt + click","On a heading: collapse or expand that whole group"]];
+const KEYS=[["/","Search"],["D","Dice tray"],["N","Quick note"],["K","Keep the open entry open"],["P","Show or hide Kept open"],["T","Table mode"],["B","Saved ideas"],["1–6","Characters, Library, Quests, Calendar, World, Prep"],["1–9 (table mode)","Play a Music button"],["?","This list (or the keyboard button at the top)"],["Esc","Close"],["Alt + click","On a heading: collapse or expand that whole group"]];
 function showKeys(){showSheet(`<div class="sheet" role="dialog" aria-label="Keyboard shortcuts"><h2>Keyboard shortcuts</h2><table class="keys">${KEYS.map(([k,l])=>`<tr><td><kbd>${k}</kbd></td><td>${l}</td></tr>`).join("")}</table><p class="vempty">Shortcuts work when you're not typing in a box. Forgot them? Click the keyboard button at the top of the page, or press <kbd>?</kbd>. Hover over a button to see its shortcut.</p><div class="foot"><span class="grow"></span><button type="button" class="btn primary" data-act="close">Done</button></div></div>`,true)}
 document.addEventListener("keydown",e=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;const a=document.activeElement;if(a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)))return;
@@ -3315,11 +3352,11 @@ function render(){
   const views={home:vHome,party:vParty,notes:vNotes,calendar:vCalendar,quests:vQuests,world:vWorld,prep:vPrep};
   const y=window.scrollY,ta=aid&&ae.tagName==="TEXTAREA"?ae.scrollTop:0;
   renderPending=false;
-  const hs=[...document.querySelectorAll("#app .sub-tabs, #app .seg, #app .table-wrap, #app .spot-wrap, #app .graph-wrap, #app .calgrid-wrap")].map(e=>e.scrollLeft);
+  const hs=[...document.querySelectorAll("#app .sub-tabs, #app .seg, #app .lib-groups, #app .table-wrap, #app .spot-wrap, #app .graph-wrap, #app .calgrid-wrap")].map(e=>e.scrollLeft);
   // keep the comment panel where you were reading when the page redraws behind it
   const popEl=null,popKey=popEl&&popEl.getAttribute("aria-label"),popS=popEl?[popEl.scrollTop,popEl.querySelector(".bs-thread")?.scrollTop||0]:null;
   document.getElementById("app").innerHTML=banner+views[U.tab](c);
-  [...document.querySelectorAll("#app .sub-tabs, #app .seg, #app .table-wrap, #app .spot-wrap, #app .graph-wrap, #app .calgrid-wrap")].forEach((e,i)=>{if(hs[i])e.scrollLeft=hs[i]});
+  [...document.querySelectorAll("#app .sub-tabs, #app .seg, #app .lib-groups, #app .table-wrap, #app .spot-wrap, #app .graph-wrap, #app .calgrid-wrap")].forEach((e,i)=>{if(hs[i])e.scrollLeft=hs[i]});
   if(popS){const np=document.querySelector("#app .bs-pop");if(np&&np.getAttribute("aria-label")===popKey){np.scrollTop=popS[0];const t=np.querySelector(".bs-thread");if(t)t.scrollTop=popS[1]}}
   if(aid){const el=document.getElementById(aid);if(el){el.focus({preventScroll:true});try{if(sel!=null)el.setSelectionRange(sel,sel)}catch(_){}if(ta)el.scrollTop=ta}}
   if(Math.abs(window.scrollY-y)>1)window.scrollTo(0,y);
@@ -3387,19 +3424,46 @@ function facBlock(n){
   if(!f.length&&!n.goals&&!n.members)return "";
   return `<div class="facblock">${f.map(([l,v])=>`<div class="prop"><b>${l}.</b> ${linkify(esc(v),"notes:"+n.id)}</div>`).join("")}${n.goals?`<div class="prop full"><b>Goals.</b> ${linkify(esc(n.goals),"notes:"+n.id)}</div>`:""}${n.members?`<div class="full"><div class="prop"><b>Key members.</b></div><div class="prose vprose">${rich(n.members,"notes:"+n.id)}</div></div>`:""}</div>`;
 }
+/* Library: every entry sorted into groups. Notes read here; other entries open their own page. */
+const LIB_GROUPS=[["all","All notes"],["places","Places & World"],["lore","Lore & Notes"],["quests","Quests & Threads"],["sessions","Sessions"],["party","Party"],["npcs","NPCs"],["bestiary","Bestiary"],["tables","Tables & Clocks"]];
+const NOTE_GROUP={location:"places",shop:"places",faction:"places",plot:"quests",monster:"bestiary",session:"sessions",lore:"lore",item:"lore",rules:"lore",other:"lore"};
+const noteGroup=n=>NOTE_GROUP[n&&n.category]||"lore";
+const LIB_NEW={all:["notes",{category:"lore"},"New note"],places:["notes",{category:"location"},"New place"],lore:["notes",{category:"lore"},"New note"],quests:["quests",{status:"active"},"New quest"],party:["characters",{kind:"pc",status:"alive"},"New character"],npcs:["characters",{kind:"npc",status:"alive"},"New NPC"],bestiary:["monsters",{},"New stat block"],tables:["tables",{},"New roll table"]};
+const LIB_COLS=["notes","characters","quests","threads","monsters","plans","tables","clocks"];
+function libItems(g){const T=(col,f)=>(S[col]||[]).filter(f||(()=>true)).map(x=>({col,x})),N=k=>T("notes",n=>noteGroup(n)===k);
+  switch(g){
+    case"all":return T("notes");
+    case"party":return T("characters",x=>x.kind==="pc");
+    case"npcs":return T("characters",x=>x.kind!=="pc");
+    case"quests":return [...T("quests"),...T("threads"),...N("quests")];
+    case"bestiary":return [...T("monsters"),...N("bestiary")];
+    case"sessions":return [...N("sessions"),...T("plans")];
+    case"tables":return [...T("tables"),...T("clocks")];
+    default:return N(g)}}
+const libTag=(col,x)=>col==="notes"?(NOTE_CATS[x.category]||"Note"):col==="characters"?(x.kind==="pc"?"Player character":"NPC"):(COL_LABEL[col]||"Entry");
+const libBlurb=(col,x)=>(plain(col==="notes"?x.body:textOf(col,x)).split("\n").map(s=>s.trim()).find(Boolean)||"").slice(0,90);
 function vNotes(c){
-  const q=U.noteQ.toLowerCase();
-  const list=S.notes.filter(n=>(U.noteCat==="all"||n.category===U.noteCat)&&(!q||(n.title+" "+n.body).toLowerCase().includes(q)))
-    .sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.session||0)-(a.session||0)||(b.updated||0)-(a.updated||0));
-  if(!list.find(n=>n.id===U.noteSel))U.noteSel=list[0]?.id||null;
-  const cur=S.notes.find(n=>n.id===U.noteSel);
-  let h=`<div class="bar"><h2>Notes</h2>
-    <select class="search" id="noteCat" data-in="noteCat" style="width:auto"><option value="all">All categories</option>${Object.entries(NOTE_CATS).map(([k,l])=>`<option value="${k}" ${U.noteCat===k?"selected":""}>${l}</option>`).join("")}</select>
-    <span class="split dm-only"><button class="btn primary" data-act="new" data-type="notes">New note</button>${moreMenu([mi("newRecap","New session recap")],{label:"▾",title:"More ways to add",sm:false,cls:"split-m"})}</span></div>`;
-  if(!S.notes.length)return h+`<div class="empty">No notes yet. Start with a session recap so you remember what the party did last time.</div>`;
-  h+=`<div class="notes ${U.noteReading?"reading":""}"><div class="nlist">${list.length?list.map(n=>`<button class="nitem" data-act="pick" data-id="${n.id}" aria-current="${n.id===U.noteSel}"><b>${n.pinned?'<span class="pill acc">Pinned</span> ':""}${esc(n.title||"Untitled")} ${dmBadge(n)}</b><small>${NOTE_CATS[n.category]||"Note"}${n.session?` · Session ${n.session}`:""}${n.ig?` · ${esc(shortDate(c,n.ig))}`:""}</small></button>`).join(""):`<div class="empty">Nothing matches.</div>`}</div>`;
-  h+=cur?`<article class="reader"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ All notes</button>${backBtn()}</div><div class="meta"><span class="pill acc">${NOTE_CATS[cur.category]||"Note"}</span>${dmBadge(cur)}${cur.played?`<span>Played ${esc(new Date(cur.played+"T12:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}))}</span>`:""}${cur.session?`<span class="mono">Session ${cur.session}</span>`:""}${cur.ig?`<span>${esc(fmtDate(c,cur.ig))}</span>`:""}<span style="margin-left:auto" class="dm-only acts-r">${tmCardBtn("notes",cur.id)}<button class="btn sm" data-act="edit" data-type="notes" data-id="${cur.id}">Edit</button>${moreMenu([mi("copyR20","Copy for Roll20",`data-type="notes" data-id="${cur.id}"`),mi("pin",cur.pinned?"Unpin from the top":"Pin to the top",`data-id="${cur.id}"`),mi("keepOpen",isPinned("notes",cur.id)?"Kept open ✓":"Keep open beside other pages",`data-type="notes" data-id="${cur.id}"`)])}</span></div>
-    <h3 class="t">${esc(cur.title||"Untitled")}</h3>${placeBlock(cur)}${cur.img?`<img class="note-img" src="${esc(imgUrl(cur.img))}" alt="">`:""}${cur.category==="faction"?facBlock(cur):""}${cur.body||cur.category!=="shop"?`<div class="prose">${rich(cur.body,"notes:"+cur.id)}</div>`:""}${cur.category==="shop"||cur.stock?stockBlock(cur):""}${secretBox(cur)}${backlinkBlock("notes",cur.id)}${bsEmbedHtml("notes",cur.id)}</article>`:`<div class="empty">Pick a note.</div>`;
+  const q=String(U.noteQ||"").trim().toLowerCase();if(!LIB_GROUPS.some(g=>g[0]===U.libGrp))U.libGrp="all";
+  const g=U.libGrp,alpha=["party","npcs","bestiary","tables"].includes(g);
+  const list=(q?LIB_COLS.flatMap(col=>(S[col]||[]).map(x=>({col,x}))).filter(({col,x})=>((titleOf(col,x)||"")+" "+textOf(col,x)).toLowerCase().includes(q)):libItems(g))
+    .sort((a,b)=>alpha&&!q?String(titleOf(a.col,a.x)||"").localeCompare(String(titleOf(b.col,b.x)||"")):(b.x.pinned?1:0)-(a.x.pinned?1:0)||(b.x.session||0)-(a.x.session||0)||(b.x.updated||0)-(a.x.updated||0));
+  const notesIn=list.filter(i=>i.col==="notes");
+  if(!notesIn.find(i=>i.x.id===U.noteSel))U.noteSel=notesIn[0]?.x.id||null;
+  const cur=S.notes.find(n=>n.id===U.noteSel),gName=(LIB_GROUPS.find(x=>x[0]===g)||[])[1];
+  const nw=LIB_NEW[g];
+  let h=`<div class="bar"><h2>Library</h2>
+    <input class="search lib-q" id="libq" data-in="noteQ" type="search" placeholder="Search every entry" aria-label="Search every entry" value="${esc(U.noteQ||"")}">
+    <span class="split dm-only">${nw?`<button class="btn primary" data-act="libNew">${nw[2]}</button>`:`<button class="btn primary" data-act="newRecap">New session recap</button>`}${moreMenu([mi("newRecap","New session recap"),mi("libNewNote","New note")],{label:"▾",title:"More ways to add",sm:false,cls:"split-m"})}</span></div>`;
+  const groups=`<div class="lib-groups" role="group" aria-label="Library groups">${LIB_GROUPS.map(([k,l])=>`<button type="button" class="lib-g" data-act="libGrp" data-v="${k}" aria-pressed="${!q&&g===k}">${l}<span class="n">${libItems(k).length}</span></button>`).join("")}</div>`;
+  const row=({col,x})=>col==="notes"?`<button class="nitem" data-act="pick" data-id="${x.id}" aria-current="${x.id===U.noteSel}"><b>${x.pinned?'<span class="pill acc">Pinned</span> ':""}${esc(x.title||"Untitled")}</b><small>${esc(libTag(col,x))}${x.session?` · Session ${x.session}`:""}${x.ig?` · ${esc(shortDate(c,x.ig))}`:""}</small>${libBlurb(col,x)?`<span class="nb">${esc(libBlurb(col,x))}</span>`:""}</button>`
+    :`<button class="nitem" data-act="open" data-type="${col}" data-id="${x.id}"><b>${esc(titleOf(col,x)||"Untitled")}</b><small>${esc(libTag(col,x))}</small>${libBlurb(col,x)?`<span class="nb">${esc(libBlurb(col,x))}</span>`:""}</button>`;
+  h+=`<div class="notes lib ${U.noteReading?"reading":""}"><div class="nlist">${groups}<div class="lib-lh"><h3>${q?"Search results":esc(gName)}</h3><span>${list.length}</span></div>${list.length?list.map(row).join(""):`<div class="empty">${q?"Nothing matches that search.":`Nothing in ${esc(gName)} yet.`}</div>`}</div>`;
+  const fl=[cur&&cur.session&&["Session",cur.session],cur&&cur.ig&&["In-game date",fmtDate(c,cur.ig)],cur&&cur.played&&["Played",new Date(cur.played+"T12:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})]].filter(Boolean);
+  h+=cur?`<article class="reader lib-entry"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ Back to the list</button>${backBtn()}</div><div class="le-head"><div class="le-t"><span class="le-crumb">${esc((LIB_GROUPS.find(x=>x[0]===noteGroup(cur))||[])[1]||"")} · ${esc(NOTE_CATS[cur.category]||"Note")}</span>
+    <h3 class="t">${esc(cur.title||"Untitled")}</h3></div><span class="dm-only acts-r">${tmCardBtn("notes",cur.id)}<button class="btn sm" data-act="edit" data-type="notes" data-id="${cur.id}">Edit</button>${moreMenu([mi("copyR20","Copy for Roll20",`data-type="notes" data-id="${cur.id}"`),mi("pin",cur.pinned?"Unpin from the top":"Pin to the top",`data-id="${cur.id}"`),mi("keepOpen",isPinned("notes",cur.id)?"Kept open ✓":"Keep open beside other pages",`data-type="notes" data-id="${cur.id}"`)])}</span></div>
+    ${fl.length?`<dl class="le-fields">${fl.map(([l,v])=>`<div><dt>${l}</dt><dd>${esc(String(v))}</dd></div>`).join("")}</dl>`:""}
+    <div class="le-cols"><div class="le-main">${placeBlock(cur)}${cur.img?`<img class="note-img" src="${esc(imgUrl(cur.img))}" alt="">`:""}${cur.category==="faction"?facBlock(cur):""}${cur.body||cur.category!=="shop"?`<section><h4 class="le-h">Notes</h4><div class="prose">${rich(cur.body,"notes:"+cur.id)}</div></section>`:""}${cur.category==="shop"||cur.stock?stockBlock(cur):""}</div>
+    <div class="le-side">${secretBox(cur)}${backlinkBlock("notes",cur.id)}${bsEmbedHtml("notes",cur.id)}</div></div></article>`:`<div class="empty lib-pick">Notes open here. Characters, quests, stat blocks and the rest open in their own page.</div>`;
   return h+"</div>";
 }
 
@@ -3754,6 +3818,9 @@ document.addEventListener("click",async e=>{
     case"del":if(!t.classList.contains("armed")){t.classList.add("armed");t.dataset.label="Delete";t.textContent="Confirm delete";return}
       await remove(t.dataset.type,t.dataset.id);closeSheet();toast("Deleted");break;
     case"charFilter":U.charFilter=t.dataset.v;render();break;
+    case"libGrp":U.libGrp=t.dataset.v;U.noteQ="";U.noteReading=false;render();break;
+    case"libNew":{const n=LIB_NEW[U.libGrp]||LIB_NEW.all;openForm(n[0],null,{...n[1]});break}
+    case"libNewNote":openForm("notes",null,{category:"lore"});break;
     case"pick":NAV=[];U.noteSel=t.dataset.id;U.noteReading=true;render();if(isPhone())window.scrollTo({top:0});break;
     case"noteBack":U.noteReading=false;render();break;
     case"calSel":U.calSel={y:+t.dataset.y,m:+t.dataset.m,d:+t.dataset.d};render();break;
