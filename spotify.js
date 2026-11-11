@@ -180,6 +180,9 @@ async function act(f,okPoll){
   try{await f();ST.err=null}catch(e){ST.err=e.message||"Spotify error";say(ST.err)}
   refresh(true);setTimeout(()=>poll(),okPoll||700);
 }
+// the All playlists popup closes on a tap outside it or Escape
+document.addEventListener("click",e=>{if(barOpen&&!e.target.closest(".sp-pop, [data-sp=all]")){barOpen=false;refreshBar(true)}},true);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&barOpen){barOpen=false;refreshBar(true);e.stopPropagation()}},true);
 document.addEventListener("click",e=>{
   const t=e.target.closest("[data-sp]");if(!t)return;
   e.preventDefault();e.stopPropagation();
