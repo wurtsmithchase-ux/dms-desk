@@ -262,84 +262,175 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 .hero-stats b{font:700 24px var(--title)}
 .hero-stats span{font:400 13px var(--sc);color:var(--muted)}
 :root[data-skin="wood"] .hero-stats > div{background:var(--paper);border-color:var(--gilt-rule)}
-/* Session Table */
-.tablemode.sx-mode{background:var(--bg)}
-.sx-top .btn{background:transparent;color:var(--hdr-ink);border-color:rgba(214,179,106,.5)}
-.sx-top .btn:hover{border-color:var(--gold);background:rgba(214,179,106,.15)}
-.sx-top .btn:disabled{opacity:.45}
-.sx-top .btn.primary{background:var(--gold);color:#17100b;border-color:var(--gold)}
-.sx-sess{color:var(--gold);font:400 16px var(--sc)}
-.sx-time{display:inline-flex;gap:10px;align-items:baseline;padding:4px 10px;border:1px solid var(--gold);border-radius:2px;background:rgba(0,0,0,.25);font-family:var(--title)}
-.sx-tb{display:inline-flex;flex-wrap:wrap;gap:6px}
-/* the grid carries the padding (with the safe-area insets), so the body itself has none and never scrolls twice */
+/* Session Table (design screen A): dark wood, the scene on parchment, everything else dark panels */
+.tablemode.sx-mode{background:#17100b;color:#ead9b5;font-size:16px;font-family:var(--body)}
+.sx-mode .vempty{color:#b5a07e;font-style:italic;margin:0}
+.sx-mode .btn{min-height:40px}
+.sx-top{position:relative;z-index:3;display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;padding:calc(10px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) 10px max(20px,env(safe-area-inset-left,0px));background:#241811;border-bottom:2px solid var(--gold)}
+.sx-top .btn{background:#2e2015;color:#ead9b5;border:1px solid var(--gilt-edge);font:400 15px var(--sc);letter-spacing:.02em}
+.sx-top .btn:hover{background:#3a291b}.sx-top .btn:disabled{opacity:.45}
+.sx-id{display:flex;flex-direction:column;min-width:0}
+.sx-camp{font:700 22px/1.15 var(--drop);color:var(--gold)}
+.sx-sess{font:400 14px var(--sc);color:#b5a07e}
+.sx-clk{border:0;background:none;color:var(--gold);cursor:pointer;font-size:12px;padding:2px 6px;min-height:28px}
+.sx-search{position:relative;flex:1 1 220px;max-width:340px;min-width:180px}
+.sx-q{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 10px;border-radius:4px;background:#efe0be;border:1px solid var(--gilt-edge);color:#5e4630}
+.sx-q input{flex:1;min-width:0;border:0;outline:none;background:transparent;font:inherit;color:#2a1b10}
+.sx-qx{border:0;background:none;font-size:20px;color:#5e4630;cursor:pointer;min-width:32px;min-height:32px}
+.sx-res{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:5;max-height:70vh;overflow:auto;background:#efe0be;color:#2a1b10;border-radius:3px;box-shadow:var(--frame),0 8px 24px rgba(0,0,0,.5);padding:8px;display:flex;flex-direction:column;gap:6px}
+.sx-ri{display:flex;flex-direction:column;gap:3px;padding:8px 10px;border:1px solid var(--gilt-rule);border-radius:3px;background:#f6ebd0}
+.sx-ri-h{display:flex;justify-content:space-between;gap:8px}.sx-ri-h small,.sx-ri-l{color:#5e4630;font-size:14px}
+.sx-ri-s{font-size:14px;color:var(--accent)}
+.sx-ri .btn{align-self:flex-start;background:#efe0be;color:#2a1b10;border:1px solid #b08e52}
+.sx-time{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.sx-moon{font-size:26px;line-height:1}
+.sx-dt{display:flex;flex-direction:column;line-height:1.2}.sx-dt b{font:700 16px var(--drop);color:#f6e8c6}.sx-dt span{font-size:14px;color:#b5a07e}
+.sx-music{flex:1 1 300px;min-width:0}
+.sx-alerts{display:flex;flex-direction:column;gap:4px;align-items:flex-end;font-size:14px;max-width:340px}
+.sx-alert{display:flex;align-items:center;gap:8px;padding:4px 4px 4px 10px;border-radius:3px;background:var(--accent);color:#f6e8c6}
+.sx-alert .btn{min-height:32px;padding:0 10px}
+.sx-nexttr{font-style:italic;color:#b5a07e;text-align:right}
+.sx-top .sx-end{background:var(--accent);border-color:#5e140b;color:#f6e8c6}
 .sx-body{flex:1;min-height:0;overflow:auto}
-.tm-body.sx-body{padding:0}
-.sx-grid{display:grid;grid-template-columns:minmax(240px,.8fr) minmax(0,1.6fr) minmax(240px,.9fr) minmax(240px,.9fr);gap:16px;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));height:100%;box-sizing:border-box}
-.sx-col{min-height:0;overflow:auto;display:flex;flex-direction:column;gap:14px;padding:4px 4px 80px}
-/* tablet: the scene on the left, everything else stacked on the right so dice and log stay near the top */
-@media (max-width:1499px){.sx-grid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);height:auto;align-items:start;grid-auto-flow:row dense;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}.sx-col{overflow:visible;padding:4px}.sx-scene{grid-column:1;grid-row:1/span 3}.sx-col:not(.sx-scene){grid-column:2}}
-@media (max-width:900px){.sx-grid{grid-template-columns:minmax(0,1fr);padding:12px 12px calc(96px + env(safe-area-inset-bottom,0px))}.sx-scene,.sx-col:not(.sx-scene){grid-column:auto;grid-row:auto}.sx-scene{order:-1}.sx-time,.sx-tb{flex:0 0 auto;white-space:nowrap}.sx-tb{flex-wrap:nowrap}}
-.sx-att{display:flex;flex-wrap:wrap}
-.sx-npc,.sx-npcb,.sx-card{min-width:0}
-.sx-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
-.sx-card h3{margin:0;font:400 20px var(--display);color:var(--accent)}
-.sx-cur h2{margin:0;font:700 30px/1.15 var(--title)}
-.sx-h{margin:6px 0 0;font:400 19px var(--display);color:var(--accent)}
-.sx-pr{display:flex;align-items:center;gap:8px}
-.sx-chk{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;margin:0 -12px;cursor:pointer}
-.sx-pr input{width:20px;height:20px;flex:0 0 20px;accent-color:var(--accent)}
-.sx-pr .scn-pb{flex:1}
-.sx-pr.done .scn-pt{text-decoration:line-through;opacity:.7}
-.sx-when{color:var(--muted);font-style:italic;margin:-4px 0 4px 30px}
-.sx-pc{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
-.sx-pcs{grid-column:1;font-size:14px;color:var(--muted)}
-.sx-spot{grid-column:2;grid-row:1/span 2;display:flex;align-items:center;gap:6px;min-height:44px;font-size:14px}
-.sx-spot input{width:20px;height:20px;accent-color:var(--accent)}
-.sx-prev{display:flex;flex-direction:column;gap:6px}
-.sx-prev > .btn,.sx-prevb{align-self:flex-start}
-.sx-read summary,.sx-if summary,.sx-rule summary{cursor:pointer;min-height:36px;display:flex;align-items:center;font:400 17px var(--display);color:var(--accent)}
-.sx-read .prose{font-size:19px;font-style:italic;padding:8px 12px;border-left:0;background:var(--surface);border-radius:var(--r)}
-.sx-clues{display:flex;flex-direction:column;gap:6px}
-.sx-clue{text-align:left;min-height:44px;padding:8px 12px;border:1px dashed var(--accent);border-radius:var(--r);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer}
-.sx-clue[aria-pressed="true"]{border-style:solid;background:var(--accent-soft);text-decoration:line-through;color:var(--muted)}
-.sx-if{border:1px solid var(--line);border-radius:var(--r);padding:2px 12px;background:var(--surface)}
-.sx-if p{margin:0 0 10px}
-.sx-who{display:flex;flex-direction:column;gap:8px}
-.sx-npc{display:flex;gap:10px;align-items:flex-start;padding:8px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
-.sx-npcb{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
-.sx-npch{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
-.sx-npcb small{color:var(--muted);font-size:14px}
-.sx-att{margin-top:4px}
-.sx-foe{border:1px solid var(--blood);border-radius:var(--r);padding:8px 10px;background:var(--surface)}
-.sx-foeh{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.sx-foeh .btn{margin-left:auto}
-.sx-foea p{margin:4px 0;font-size:15px}
-.sx-tac{margin:4px 0 0;font-size:15px}
+.tablemode .tm-body.sx-body{padding:0}
+.sx-grid{display:grid;grid-template-columns:280px minmax(0,1fr) 350px 350px;grid-template-rows:minmax(0,1fr);gap:18px;padding:16px max(20px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));height:100%;box-sizing:border-box}
+.sx-col{min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;scrollbar-width:none}
+.sx-col::-webkit-scrollbar{display:none}
+@media (max-width:1499px){.sx-grid{grid-template-columns:minmax(0,1fr);height:auto;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}.sx-col{overflow:visible}.sx-scene{order:-1}}
+@media (max-width:900px){.tablemode.sx-mode{overflow-y:auto}.sx-mode .sx-body{flex:none;overflow:visible}.sx-scene{padding:18px 16px;margin:4px}.sx-sh h1{font-size:26px}.sx-search{max-width:none}}
+.sx-ch{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sx-ch h2{margin:0;font:400 21px var(--sc);color:var(--gold)}.sx-ch small{color:#b5a07e;font-style:italic;font-size:14px}
+.sx-link{border:0;background:none;color:#b5a07e;font:400 15px var(--sc);cursor:pointer;min-height:36px;padding:0}
+.sx-link:hover{color:var(--gold)}
+.sx-c1{gap:8px}
+.sx-path{display:flex;flex-direction:column;gap:6px}
+.sx-pr{display:flex;gap:6px;align-items:stretch}
+.sx-tick{flex:0 0 32px;display:flex;align-items:center;justify-content:center;border:1px solid var(--gilt-edge);border-radius:3px;background:#2e2015;color:var(--gold);cursor:pointer;min-height:44px}
+.sx-pr.done .sx-tick{background:var(--gilt-edge);color:#17100b}
+.sx-ps{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;text-align:left;padding:8px 10px;border:1px solid #5a4220;border-radius:3px;background:#241811;color:#ead9b5;cursor:pointer;font:inherit;min-height:44px}
+.sx-ps[aria-current="true"]{background:var(--accent);border-color:#5e140b;color:#f6e8c6}
+.sx-pr.done .sx-ps{opacity:.6}.sx-pr.done .sx-pt span:last-child{text-decoration:line-through}
+.sx-pt{display:flex;gap:8px;align-items:baseline;font-weight:600}.sx-pn{font:700 15px var(--drop);color:var(--gold)}
+.sx-ps[aria-current="true"] .sx-pn{color:#f6e8c6}
+.sx-ps small{font-size:14px;font-style:italic;opacity:.85}
+.sx-resb{display:flex;justify-content:space-between;align-items:center;min-height:40px;margin-top:6px;padding:0 10px;border:1px dashed #8a6a2c;border-radius:3px;background:none;color:#b5a07e;font:400 15px var(--sc);cursor:pointer}
+.sx-resl{display:flex;flex-direction:column;gap:6px}
+.sx-resl .sx-ps{background:transparent;border-style:dashed}
+.sx-party{display:flex;flex-direction:column;gap:4px;padding-top:8px;border-top:1px solid #3e2c1b}
+.sx-pg{display:grid;grid-template-columns:minmax(0,1fr) 34px 34px 34px 78px;gap:4px;align-items:center;font-size:15px;text-align:center}
+.sx-pgh{font:400 13px var(--sc);color:#b5a07e}.sx-pgh span:first-child{text-align:left}
+.sx-pcn{display:flex;flex-direction:column;text-align:left;border:0;background:none;color:#ead9b5;cursor:pointer;padding:4px 0;min-height:40px;font:inherit}
+.sx-pcn b{font-weight:600}.sx-pcn small{font-size:13px;color:#b5a07e}
+.sx-pcn:hover b{color:var(--gold);text-decoration:underline}
+.sx-spot{display:flex;gap:3px;justify-content:flex-end}
+.sx-sm,.sx-sp{min-height:36px;border:1px solid #5a4220;border-radius:3px;background:#2e2015;color:#ead9b5;cursor:pointer;font:inherit;font-size:14px}
+.sx-sm{width:26px}.sx-sm:disabled{opacity:.35}.sx-sp{padding:0 6px}.sx-sp.on{border-color:var(--gold);color:var(--gold)}
+.sx-lang{margin:6px 0 0;font-size:14px;color:#b5a07e}.sx-lang b{color:#ead9b5}
+.sx-scene{margin:6px;background:#efe0be;color:#2a1b10;border-radius:3px;box-shadow:var(--frame2);padding:24px 32px;gap:16px}
+.sx-scene .vempty{color:#5e4630}
+.sx-sh{display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px}
+.sx-sht{flex:1 1 260px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.sx-kick{font:400 15px var(--sc);color:#5e4630}
+.sx-sh h1{margin:0;font:700 32px/1.15 var(--drop);color:#2a1b10}
+.sx-note{font-style:italic;color:#5e4630}
+.sx-scene .btn{font:400 16px var(--sc);min-height:44px}
+.sx-edit{background:#f6ebd0;border:1px solid #b08e52;color:#2a1b10}
+.sx-next{background:var(--accent);border:1px solid #5e140b;color:#f6e8c6}
+.sx-prev{background:#241811;color:#ead9b5;border-radius:3px;box-shadow:inset 0 0 0 1px var(--gold);padding:14px 18px;display:flex;flex-direction:column;gap:6px}
+.sx-prev p{margin:0;line-height:1.55}.sx-prev small{color:#b5a07e;font-style:italic}
+.sx-ph{display:flex;justify-content:space-between;align-items:center;gap:8px;font:400 17px var(--sc)}
+.sx-prev .sx-ph span{color:var(--gold)}
+.sx-prev .btn{background:#2e2015;color:#ead9b5;border:1px solid var(--gilt-edge);min-height:36px;font-size:14px}
+.sx-prevb{align-self:flex-start}
+.sx-read{background:#e4cfa3;border:1px solid #b08e52;border-radius:3px;padding:12px 18px;display:flex;flex-direction:column;gap:6px}
+.sx-read .sx-ph span{color:var(--accent)}
+.sx-read .btn{min-height:36px;font-size:14px;background:#efe0be;border:1px solid #b08e52;color:#2a1b10}
+.sx-read p{margin:0;font-size:19px;font-style:italic;line-height:1.55}
+.sx-drop{float:left;font:700 3em/.85 var(--drop);font-style:normal;color:var(--accent);margin:.06em .1em 0 0}
+.sx-two{display:flex;flex-wrap:wrap;gap:22px}
+.sx-cl{flex:1 1 260px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.sx-wh{flex:1.2 1 300px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.sx-cl h2,.sx-wh h2{margin:0;font:400 20px var(--sc);color:var(--accent)}.sx-cl h2 small{font:400 14px var(--body);color:#5e4630}
+.sx-cl h2+h2,.sx-cl .sx-if+h2,.sx-cl .sx-clue+h2,.sx-cl .vempty+h2{margin-top:10px}
+.sx-clue{display:flex;align-items:center;gap:10px;text-align:left;min-height:44px;padding:8px 12px;border:1px dashed var(--accent);border-radius:3px;background:#f6ebd0;color:#2a1b10;cursor:pointer;font:inherit}
+.sx-dot{flex:0 0 12px;height:12px;border-radius:50%;border:2px solid var(--accent)}
+.sx-clue[aria-pressed="true"]{border-style:solid;border-color:var(--gilt-rule);color:#5e4630}
+.sx-clue[aria-pressed="true"] .sx-dot{background:var(--accent)}
+.sx-rev{margin-left:auto;font:400 13px var(--sc);color:var(--accent)}
+.sx-if{border:1px solid var(--gilt-rule);border-radius:3px;background:#f6ebd0}
+.sx-ifq{display:flex;gap:8px;width:100%;text-align:left;min-height:44px;padding:8px 12px;border:0;background:none;color:#2a1b10;cursor:pointer;font:inherit;font-weight:600}
+.sx-if p{margin:0;padding:0 12px 10px 30px}
+.sx-npc,.sx-foe{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1px solid var(--gilt-rule);border-radius:3px;background:#f6ebd0;font-size:15px}
+.sx-foe{border-color:var(--accent)}
+.sx-nh{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px}
+.sx-nn{border:0;background:none;padding:0;cursor:pointer;font:700 18px var(--body);color:#2a1b10;text-align:left;min-height:32px}
+.sx-nn span{font:400 13px var(--sc);color:var(--accent)}
+.sx-role{font:400 14px var(--sc);color:#5e4630}
+.sx-sec{color:var(--accent)}.sx-say{font-style:italic;color:#5e4630}.sx-stat{font-size:14px;color:#5e4630}
+.sx-att{display:flex;gap:3px;margin-top:4px;flex-wrap:wrap}
+.sx-att button{flex:1 1 0;min-width:56px;min-height:36px;border:1px solid #b08e52;border-radius:3px;background:#efe0be;color:#2a1b10;font:400 13px var(--sc);cursor:pointer}
+.sx-att button[aria-pressed="true"]{background:var(--accent);border-color:#5e140b;color:#f6e8c6}
+.sx-unpin{border:1px solid #b08e52;border-radius:999px;background:#efe0be;color:#5e4630;font-size:13px;padding:2px 10px;cursor:pointer;min-height:28px}
 .sx-other{display:flex;flex-wrap:wrap;gap:6px}
-.sx-next{align-self:flex-start;min-height:44px;margin-top:6px}
-.sx-dice{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-.sx-dice .btn{min-height:44px}
-.sx-rolls{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
-.sx-rolls li{display:flex;gap:10px;align-items:baseline}
-.sx-rolls li:first-child b{font-size:30px;color:var(--accent)}
-.sx-rolls b{font:700 20px var(--title);min-width:2.2em}
-.sx-rolls span{color:var(--muted);font-size:14px}
-.sx-logf{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px}
-.sx-logf input{grid-column:1/-1}
-.sx-log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:15px}
-.sx-log li{padding:4px 0;border-bottom:1px solid var(--line)}
-.sx-dcs{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 6px}
-.sx-conds{margin:0;display:flex;flex-direction:column;gap:6px;font-size:15px}
-.sx-conds dt{font-weight:700}
-.sx-conds dd{margin:0;color:var(--muted)}
-.sx-lang{margin:4px 0 0}
-.sx-travel{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
-.sx-tr{margin:4px 0}
-:root[data-skin="wood"] .sx-card{background:var(--surface2);border:0;margin:5px;box-shadow:var(--frame)}
-:root[data-skin="wood"] .sx-cur{background:var(--bg);box-shadow:var(--frame2)}
-:root[data-skin="wood"] .tablemode.sx-mode{background:var(--wood)}
-:root[data-skin="wood"] .sx-cur h2{font-family:var(--drop)}
-:root[data-skin="wood"] .sx-clue,:root[data-skin="wood"] .sx-npc,:root[data-skin="wood"] .sx-if{background:var(--paper)}
+.sx-box{background:#241811;border:1px solid #5a4220;border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:8px;color:#ead9b5}
+.sx-bh{font:400 19px var(--sc);color:var(--gold)}
+.sx-bhr{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.sx-bhr small{font-size:13px;font-style:italic;color:#b5a07e}
+.sx-roll{display:flex;align-items:center;gap:12px}
+.sx-big{min-width:72px;height:64px;display:flex;align-items:center;justify-content:center;border-radius:4px;background:#efe0be;color:var(--accent);font:700 34px var(--drop)}
+.sx-roll>div:last-child{display:flex;flex-direction:column;min-width:0}.sx-rl{font-weight:600}.sx-rh{font-size:13px;color:#b5a07e}
+.sx-dice{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.sx-dice button,.sx-kit button,.sx-tabs button,.sx-tags button{min-height:44px;padding:0 6px;border-radius:4px;border:1px solid var(--gilt-edge);background:#2e2015;color:#ead9b5;font:400 15px var(--sc);cursor:pointer}
+.sx-dice button:hover,.sx-kit button:hover{background:#3a291b}
+.sx-tabs,.sx-tags{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.sx-tabs button[aria-pressed="true"],.sx-tags button[aria-pressed="true"]{background:var(--accent);border-color:#5e140b;color:#f6e8c6}
+.sx-tags small{flex:1 1 140px;font-size:13px;color:#b5a07e}
+.sx-clock{display:flex;flex-direction:column;gap:4px}.sx-kh{display:flex;justify-content:space-between;font-size:15px}.sx-kh span:last-child{color:#b5a07e;font-size:14px}
+.sx-segs{display:flex;gap:3px}.sx-segs button{flex:1;height:26px;min-width:0;border:1px solid var(--gilt-edge);border-radius:2px;background:#3e2c1b;cursor:pointer;padding:0}
+.sx-segs button.on{background:var(--accent);border-color:#5e140b}
+.sx-logf{display:flex;gap:6px}.sx-logf input{flex:1;min-width:0;min-height:44px;padding:0 10px;border-radius:4px;border:1px solid var(--gilt-edge);background:#efe0be;color:#2a1b10;font:inherit}
+.sx-log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;font-size:15px}
+.sx-log li{display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #3e2c1b}.sx-lt{flex:0 0 62px;color:#b5a07e;font-size:13px}
+.sx-rules{display:flex;flex-direction:column;gap:6px;font-size:15px;line-height:1.4}.sx-rules b{color:var(--gold);font-weight:600}
+.sx-kit{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.sx-imp{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:3px;background:#efe0be;color:#2a1b10}
+.sx-ik{font:400 13px var(--sc);color:var(--accent)}.sx-imp b{font-size:17px}.sx-id2{font-size:15px;line-height:1.4}
+.sx-imp .btn{align-self:flex-start;background:#f6ebd0;color:#2a1b10;border:1px solid #b08e52;min-height:36px}
+.sx-mi{display:flex;align-items:center;gap:8px;font-size:15px}.sx-mi input{width:110px;min-height:40px;padding:0 8px;border-radius:4px;border:1px solid var(--gilt-edge);background:#efe0be;color:#2a1b10;font:inherit}
+.sx-box .sx-tr{margin:0;font-size:15px}.sx-box #sx-tr .btn{background:var(--accent);border:1px solid #5e140b;color:#f6e8c6;font:400 15px var(--sc)}
+.sx-board{align-self:flex-start}
+/* windows over the table */
+.sx-scrim{position:absolute;inset:0;z-index:10;background:rgba(10,6,4,.72);display:flex;align-items:flex-start;justify-content:center;padding:24px;overflow:auto}
+.sx-win{width:100%;max-width:960px;box-sizing:border-box;background:#efe0be;color:#2a1b10;border-radius:3px;box-shadow:var(--frame2),0 10px 40px rgba(0,0,0,.6);display:flex;flex-direction:column;margin:auto 0}
+.sx-wentry,.sx-wrecap{max-width:820px}.sx-wgen{max-width:1080px}
+.sx-wtabs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--gilt-rule)}
+.sx-wtabs button[aria-pressed]{min-height:40px;padding:0 12px;border:1px solid #b08e52;border-radius:3px;background:#f6ebd0;color:#2a1b10;font:400 15px var(--sc);cursor:pointer}
+.sx-wtabs button[aria-pressed="true"]{background:var(--accent);border-color:#5e140b;color:#f6e8c6}
+.sx-wt{font:400 18px var(--sc);color:var(--accent)}
+.sx-wtabs .grow{flex:1}
+.sx-x{min-width:44px;min-height:44px;border:0;background:none;font-size:26px;color:#5e4630;cursor:pointer}
+.sx-wb{padding:18px 26px 26px;display:flex;flex-direction:column;gap:12px}
+.sx-wb h2{margin:0;font:700 30px/1.15 var(--drop)}
+.sx-chips{display:flex;flex-wrap:wrap;gap:8px}.sx-chips>div{display:flex;flex-direction:column;align-items:center;min-width:76px;padding:6px 10px;border:1px solid var(--gilt-rule);border-radius:3px;background:#f6ebd0}
+.sx-chips b{font:700 20px var(--drop)}.sx-chips span{font:400 12px var(--sc);color:#5e4630}
+.sx-ro{font-size:14px;font-style:italic;color:#5e4630;margin:0}
+.sx-dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;padding:12px 14px;border:1px solid var(--gilt-rule);border-radius:3px;background:#f6ebd0}
+.sx-dl dt{font:400 14px var(--sc);color:#5e4630}.sx-dl dd{margin:2px 0 0;font-weight:600}
+.sx-rc{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.sx-wrecap h3{margin:8px 0 4px;font:400 18px var(--sc);color:var(--accent)}.sx-wrecap ul{margin:0;padding-left:20px}
+.sx-hooks{padding:12px 14px;border:1px dashed var(--accent);border-radius:3px;background:#f6ebd0}.sx-hooks small{color:#5e4630;font-style:italic}
+/* top-bar music (spotify.js) */
+.sp-top{position:relative;display:flex;align-items:center;gap:8px;min-width:0}
+.sp-pp{flex:0 0 40px;height:40px;border-radius:50%;border:1px solid var(--gold);background:#2e2015;color:var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.sp-now{display:flex;flex-direction:column;min-width:0;max-width:170px;line-height:1.2}.sp-now small{font-size:12px;color:#b5a07e}.sp-now b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-favs{display:flex;gap:4px;overflow-x:auto;min-width:0;flex:1 1 auto;scrollbar-width:none}.sp-favs::-webkit-scrollbar{display:none}
+.sp-favs button,.sp-all{flex:0 0 auto;min-height:36px;padding:0 10px;border-radius:999px;border:1px solid var(--gilt-edge);background:#2e2015;color:#ead9b5;font:400 14px var(--sc);cursor:pointer;white-space:nowrap}
+.sp-favs button[aria-pressed="true"]{background:var(--accent);border-color:#5e140b;color:#f6e8c6}
+.sp-pop{position:absolute;top:calc(100% + 8px);right:0;z-index:6;width:min(560px,90vw);background:#efe0be;color:#2a1b10;border-radius:3px;box-shadow:var(--frame),0 8px 24px rgba(0,0,0,.5);padding:12px;display:flex;flex-direction:column;gap:8px}
+.sp-poph{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.sp-poph small{color:#5e4630;font-size:13px}
+.sp-popg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.sp-pr{display:flex;gap:3px;margin-top:4px}.sp-pr button:first-child{flex:1;text-align:left;min-height:36px;padding:0 8px;border:1px solid #b08e52;border-radius:3px;background:#f6ebd0;color:#2a1b10;cursor:pointer;font:inherit;font-size:14px}
+.sp-star{min-width:36px;border:1px solid #b08e52;border-radius:3px;background:#f6ebd0;color:#b08e52;cursor:pointer}.sp-star[aria-pressed="true"]{color:var(--accent);border-color:var(--accent)}
+.sp-off{font-size:13px;color:#b5a07e}
 @media (max-width:640px){.lib-groups{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;position:static}.lib-groups::-webkit-scrollbar{display:none}.lib-g{flex:0 0 auto;min-height:44px}.lib-q{max-width:none;flex-basis:100%}}
 .reader .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font:500 14px var(--sc);letter-spacing:.04em;margin-bottom:6px}
 .prose{max-width:68ch;overflow-wrap:anywhere;margin-top:14px}
@@ -2734,8 +2825,7 @@ function tmTidy(){const board=document.querySelector("#tablemode .tm-board");if(
    It is what Table mode opens; the arranged board (panels, stickies, Arrange) is one tap away and remembered per device. */
 let TMV=(()=>{try{return localStorage.getItem("desk.tmview")||"session"}catch(_){return "session"}})();
 function setTMV(v){TMV=v;try{localStorage.setItem("desk.tmview",v)}catch(_){}renderTable()}
-const ST={scene:null,adv:"normal",rolls:[],undo:[],miles:"",pace:"normal",prevHide:false,open:new Set(["read","dc"])};
-const stLogHtml=n=>noteLines(rcNotesVal(n)).slice(-12).reverse().map(l=>`<li>${esc(l.replace(/^-\s*/,""))}</li>`).join("")||`<li class="vempty">Nothing logged yet. It goes into this session's notes for the recap.</li>`;
+const ST={scene:null,adv:"normal",rolls:[],undo:[],miles:"",pace:"normal",prevHide:false,open:new Set(["read"]),q:"",pins:[],resOpen:true,tag:"",rcat:"Conditions",improv:null,sheet:null,entry:null,gen:null,recap:false,hooksSent:false};
 document.addEventListener("toggle",e=>{const d=e.target;if(d.matches&&d.matches("#tablemode details[data-k]"))d.open?ST.open.add(d.dataset.k):ST.open.delete(d.dataset.k)},true);
 function stPlan(){const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));return plans.find(p=>p.id===U.planSel)||thNext()||null}
 // older or hand-edited scenes may be missing their lists, so fill them in before the Table reads them
@@ -2775,8 +2865,12 @@ async function stScenePatch(pid,fn){if(SCN.pid===pid&&SCN.dirty)await scnFlush()
 const stAtt=(n,x)=>((logFor(n)||{}).att||{})[x.id]||x.attitude||"";
 async function stSetAtt(n,id,v){const l=logFor(n)||{};const{id:_i,dmOnly:_d,secret:_s,...keep}=l;const att={...(keep.att||{})};const x=rec("characters",id);att[id]=stAtt(n,x||{id})===v?"":v;
   await save("logs","s"+n,{...keep,session:n,notes:keep.notes||"",open:keep.open||"",att});project();renderTable()}
-function stRoll(sides){const r=()=>1+Math.floor(Math.random()*sides);const a=r();let b=null,v=a;if(sides===20&&ST.adv!=="normal"){b=r();v=ST.adv==="adv"?Math.max(a,b):Math.min(a,b)}
-  ST.rolls.unshift({sides,v,a,b,adv:ST.adv});ST.rolls=ST.rolls.slice(0,8);stSay(`d${sides}: ${v}`);renderTable()}
+// secret dice: d4-d100, Adv and Dis (two d20s), 2d6; the newest roll shows big with a short history
+function stRoll(k){const r=s=>1+Math.floor(Math.random()*s);let o;
+  if(k==="adv"||k==="dis"){const a=r(20),b=r(20),v=k==="adv"?Math.max(a,b):Math.min(a,b);o={v,label:`d20 with ${k==="adv"?"advantage":"disadvantage"} · ${a} and ${b}`,short:k==="adv"?"Adv":"Dis"}}
+  else if(k==="2d6"){const a=r(6),b=r(6);o={v:a+b,label:`2d6 · ${a} + ${b}`,short:"2d6"}}
+  else{const s=num(k)||20,v=r(s);o={v,label:`d${s}`,short:`d${s}`}}
+  ST.rolls.unshift(o);ST.rolls=ST.rolls.slice(0,8);stSay(`${o.short}: ${o.v}`);renderTable()}
 // travel on foot uses the same speeds as the Travel sheet
 const stPace=()=>Object.fromEntries(Object.entries(TRAVEL_MODES.foot[1]).map(([k,mph])=>[k,[mph,`${CAP(k)} · ${mph} mph`]]));
 const ST_DAY_H=8,ST_MAX_MILES=5000;
@@ -2784,57 +2878,237 @@ function stTravelHtml(){const mi=Math.min(parseFloat(ST.miles),ST_MAX_MILES);if(
   const h=mi/(stPace()[ST.pace]||stPace().normal)[0],mins=Math.round(h*60),days=Math.ceil(h/ST_DAY_H),multi=h>ST_DAY_H;
   const lbl=h<1?mins+" minutes":(Math.round(h*10)/10)+" hours";
   return `<p class="sx-tr">About <b>${lbl}</b> on the road${multi?` · ${days} days of travel at ${ST_DAY_H} hours a day`:""}.</p><button type="button" class="btn sm" data-act="stTime" data-n="${multi?Math.min(days*1440,ST_MAX_ADD):mins}">Advance time by ${multi?(days*1440>ST_MAX_ADD?ST_MAX_ADD/1440+" days (the most at once)":days+" days"):lbl}</button>`}
+/* ===== Session Table, as in the design canvas (screen A) =====
+   Top bar: campaign and session clock, search with pins, in-game time, music, timed alerts, Prep & Library, End session.
+   Columns: path + party (dark) · the scene (parchment) · dice, clocks, log (dark) · rules, Oracle, travel (dark).
+   Windows inside the table: hero sheet (ST.sheet), NPC or foe (ST.entry), quick foe (ST.gen), recap (ST.recap). */
+const ST_ATT=[["hostile","Hostile"],["wary","Wary"],["neutral","Neutral"],["friendly","Friendly"],["ally","Ally"]];
+const ST_DICE=[["d4",4],["d6",6],["d8",8],["d10",10],["d12",12],["d20",20],["Adv","adv"],["Dis","dis"],["d100",100],["2d6","2d6"]];
+const ST_TAGS=["Loot","Milestone"];
+const ST_RCATS=()=>({
+  "Conditions":Object.entries(RULES).filter(([k])=>CONDS.includes(k)).map(([k,v])=>[k,v]),
+  "DCs & Cover":[["Very easy","DC 5"],["Easy","DC 10"],["Medium","DC 15"],["Hard","DC 20"],["Very hard","DC 25"],["Nearly impossible","DC 30"],["Half cover","+2 to AC and Dex saves"],["Three-quarters cover","+5 to AC and Dex saves"],["Total cover","Can't be targeted directly"]],
+  "Travel":[["Fast pace","4 miles an hour, 30 miles a day. Disadvantage on Perception."],["Normal pace","3 miles an hour, 24 miles a day."],["Slow pace","2 miles an hour, 18 miles a day. Can move stealthily."],["Light","Bright light: normal sight. Dim light: lightly obscured. Darkness: heavily obscured."]],
+  "Hazards":[["Falling","1d6 bludgeoning per 10 feet fallen, up to 20d6. Lands prone unless it takes no damage."],["Holding breath","1 + Con modifier minutes (at least 30 seconds), then suffocating."],["Resting","Short rest: 1 hour, spend Hit Dice. Long rest: 8 hours, regain all HP and lose one Exhaustion level."]]});
+/* Oracle tables: generic on purpose, so nothing here belongs to one campaign */
+const OR_NAMES=["Wenna Ashby","Corwin Thale","Isolde Marrow","Pip Underbough","Garrick Fenn","Ysolt Varn","Bram Holloway","Seren Duskmere","Tobin Reed","Ailsa Crane","Edric Moorcroft","Nell Barrow","Hesk Tallow","Mirela Voss","Dunstan Pike","Oona Fairweather"];
+const OR_RACES=["Human","Elf","Dwarf","Halfling","Gnome","Half-orc","Tiefling","Dragonborn","Half-elf","Goliath","Aasimar","Orc"];
+const OR_FEATURES=["a burn scar across one cheek","one milky, blind eye","two missing fingers on the left hand","a braided beard threaded with copper rings","faded tattoos up both arms","a limp and a carved walking stick","unnaturally bright green eyes","a voice like gravel","very tall and stooped","freckles and wild red hair","ink-stained fingers","a silver tooth that flashes when they smile"];
+const OR_QUIRKS=["hums off-key","counts coins while talking","won't make eye contact","laughs at the wrong moments","smells of smoke","answers questions with questions","fidgets with a lucky charm","speaks very slowly","repeats the last word you said","is always eating something"];
+const OR_WANTS=["to leave town before trouble finds them","news of a missing relative","a cure for a lingering cough","revenge on an old rival","to sell something they shouldn't have","a safe place to sleep","to be taken seriously","to pay off a debt quietly"];
+const OR_RUMORS=["A rider in black was seen at the river, but the horse cast no reflection.","The miller swears the dam was opened from the inside.","Someone has been buying up every lantern in town.","A child keeps singing a song nobody taught her.","The old watchtower had a light in it last night.","A merchant's caravan is three days late.","The temple's donation box was found full of foreign coins.","Wolves have been seen walking on the road in daylight."];
+const OR_COMPS=["Fog rolls in: heavily obscured beyond 30 feet.","A rotten floor gives way: DC 13 Dex save or fall 10 feet.","Someone spots the party and runs to raise the alarm.","A loud noise: everyone makes a DC 12 Wis save or is frightened for 1 minute.","The weather turns: rain douses every open flame.","A guard asks to see papers the party doesn't have.","An ally arrives with bad news.","A bridge, door or path they need is suddenly blocked."];
+const OR_WEATHER=[["Freezing fog until midday","Visibility 60 feet; heavily obscured beyond."],["Clear and bitter cold","Frost on everything. Breath steams."],["Light snow","Tracks are easy to follow today."],["Sleet from the north","Cold and wet; fires are hard to light."],["Grey drizzle","Sounds carry strangely."],["Bright and warm","A good day for travel."],["Strong winds","Ranged attacks past normal range have disadvantage."],["Thunderstorm by evening","Lightly obscured; loud enough to cover footsteps."]];
+const OR_SHOPS=["General store","Chandler","Apothecary","Pawnshop","Smithy","Bookbinder","Tailor"];
+const OR_GOODS=[["Potion of Healing","50 gp"],["Rope, 50 ft","1 gp"],["Torch","1 cp"],["Rations, 1 day","5 sp"],["Hooded lantern","5 gp"],["Oil flask","1 sp"],["Antitoxin","50 gp"],["Holy water","25 gp"],["Caltrops","1 gp"],["Climber's kit","25 gp"],["Healer's kit","5 gp"],["Manacles","2 gp"]];
+const OR_ODD=["a dented helm said to be blessed","a map with one road scratched out","a bottle of water that never warms","a silver bell the size of a thumb","a key that fits no lock in town","a portrait whose eyes have been cut out"];
+const OR_KIT=[["NPC","npc"],["Quick foe","foe"],["Rumor","rumor"],["Complication","comp"],["Weather","weather"],["Shop","shop"],["Who's targeted?","target"],["Who notices?","notice"]];
+const orPick=a=>a[Math.floor(Math.random()*a.length)];
+let ST_ALERTS_DONE=new Set();try{ST_ALERTS_DONE=new Set(JSON.parse(localStorage.getItem("desk.alerts.done")||"[]"))}catch(e){}
+const stAlertsSave=()=>{try{localStorage.setItem("desk.alerts.done",JSON.stringify([...ST_ALERTS_DONE].slice(-200)))}catch(e){}};
+// passives from the sheet when there is one, otherwise the Passive Perception field
+function stPass(p){const S2=p.sheet?parseSheet(p.sheet):null;const v=n=>{if(!S2)return null;const sk=S2.skills.find(s=>s.name===n);return sk?10+sk.bonus:10+S2.abil[SKILL_AB[n]].mod};return{pp:p.pp??v("Perception"),ins:v("Insight"),inv:v("Investigation")}}
+// spotlight moments tonight: a count per hero in the session log (spotN); the old yes/no list follows it
+const stSpotN=(n,id)=>{const l=logFor(n)||{};return num((l.spotN||{})[id])??((l.spotlight||[]).includes(id)?1:0)};
+async function stSpot(n,id,d){const l=logFor(n)||{};const{id:_i,dmOnly:_d,secret:_s,...keep}=l;const cnt={...(keep.spotN||{})};const v=Math.max(0,stSpotN(n,id)+d);cnt[id]=v;
+  const set=new Set(keep.spotlight||[]);v?set.add(id):set.delete(id);
+  await save("logs","s"+n,{...keep,session:n,notes:keep.notes||"",open:keep.open||"",spotN:cnt,spotlight:[...set]});project();renderTable()}
+// in-game minutes since the calendar's day 0, for timed alerts
+const stNowAbs=()=>{const c=cal();return toIdx(c,c.today)*1440+(stMin??igMin())};
+function stEvents(){const c=cal(),yl=yearLen(c),ti=toIdx(c,c.today);
+  return S.events.map(e=>{let i=e.yearly?toIdx(c,{y:c.today.y,m:e.m,d:e.d}):toIdx(c,{y:e.y,m:e.m,d:e.d});if(e.yearly&&i<ti-1)i+=yl;return{e,at:i*1440,key:e.id+"@"+i}}).filter(x=>isFinite(x.at)).sort((a,b)=>a.at-b.at)}
+function stAlerts(){const now=stNowAbs(),c=cal(),ev=stEvents();
+  // only events reached in the last two weeks of in-game time alert, so an old calendar doesn't flood the bar
+  const al=ev.filter(x=>x.at<=now&&now-x.at<14*1440&&!ST_ALERTS_DONE.has(x.key));
+  const nx=ev.find(x=>x.at>now);let next="No timed events coming up";
+  if(nx){const dm=nx.at-now,dd=Math.floor(dm/1440),hh=Math.floor(dm%1440/60),mn=dm%60;next=`Next in-world event in ${dd?dd+" d ":""}${hh?hh+" h ":""}${!dd&&mn?mn+" m":""}: ${nx.e.title||"Untitled"}`.replace(/\s+:/,":")}
+  return `${al.map(x=>`<span class="sx-alert" role="status"><span><b>${esc(shortDate(c,{y:x.e.y||c.today.y,m:x.e.m,d:x.e.d}))}:</b> ${esc(x.e.title||"Untitled")}</span><button type="button" class="btn sm" data-act="stAlertOk" data-k="${esc(x.key)}">Got it</button></span>`).join("")}<span class="sx-nexttr">${esc(next)}</span>`}
+// search results under the top bar's box; Pin adds the entry to Who's Here for tonight
+const ST_SEARCH_COLS=["characters","monsters","notes","quests","threads","loot","events","tables"];
+function stResults(){const q=String(ST.q||"").trim().toLowerCase();if(!q)return "";
+  const hits=[];for(const col of ST_SEARCH_COLS)for(const x of S[col]||[]){const t=titleOf(col,x)||"";if((t+" "+textOf(col,x)).toLowerCase().includes(q))hits.push({col,x,t});if(hits.length>=40)break}
+  hits.sort((a,b)=>(b.t.toLowerCase().startsWith(q)?1:0)-(a.t.toLowerCase().startsWith(q)?1:0));
+  const rule=Object.entries(ST_RCATS()).flatMap(([,l])=>l).filter(([k,v])=>(k+" "+v).toLowerCase().includes(q)).slice(0,3);
+  if(!hits.length&&!rule.length)return `<div class="sx-res"><span class="vempty">Nothing matches.</span></div>`;
+  return `<div class="sx-res" role="list">${hits.slice(0,8).map(({col,x,t})=>{const on=ST.pins.some(p=>p.col===col&&p.id===x.id);return `<div class="sx-ri" role="listitem"><span class="sx-ri-h"><b>${esc(t||"Untitled")}</b><small>${esc(libTag(col,x))}</small></span><span class="sx-ri-l">${esc(libBlurb(col,x))}</span>${x.secret?`<span class="sx-ri-s"><b>Secret:</b> ${esc(plain(String(x.secret)).slice(0,140))}</span>`:""}<button type="button" class="btn sm" data-act="stPin" data-col="${col}" data-id="${x.id}">${on?"Unpin":"Pin to Who's Here"}</button></div>`}).join("")}
+    ${rule.map(([k,v])=>`<div class="sx-ri"><span class="sx-ri-h"><b>${esc(k)}</b><small>Rule</small></span><span class="sx-ri-l">${esc(v)}</span></div>`).join("")}</div>`}
+const stRefreshResults=()=>{const r=document.getElementById("sx-results");if(r)r.innerHTML=stResults()};
+// tonight's log: newest first, time from the "- [7:42 PM] text" lines addSessionLine writes
+const stLogItems=n=>noteLines(rcNotesVal(n)).slice(-60).reverse().map(l=>{const s=l.replace(/^-\s*/,""),m=s.match(/^\[([^\]]+)\]\s*(.*)$/);return m&&/\d/.test(m[1])?{t:m[1],x:m[2]}:{t:"",x:s}});
+const stLogHtml=n=>{const it=stLogItems(n);return it.length?it.map(o=>`<li><span class="sx-lt">${esc(o.t)}</span><span>${esc(o.x)}</span></li>`).join(""):`<li class="vempty">Nothing logged yet. It goes into this session's notes for the recap.</li>`};
+function stMoon(){const c=cal(),mn=(c.moons||[]).find(x=>x&&x.cycle);if(!mn)return "";const st=moonStep(mn,toIdx(c,c.today));return `<span class="sx-moon" role="img" aria-label="${esc(mn.name)}: ${MOON_NAMES[st]}">${MOON_ICONS[st]}</span>`}
+function stHere(cur){const pl=cur&&cur.who.map(w=>w.col==="notes"&&rec("notes",w.id)).find(x=>x&&["location","shop"].includes(x.category));return pl?pl.title:""}
+function stImprov(k){const pcs=S.characters.filter(x=>x.kind==="pc"&&x.status!=="dead"),c=cal(),n=rcSession();
+  if(k==="npc")return{kind:"Quick NPC",title:orPick(OR_NAMES),detail:`Species: ${orPick(OR_RACES)}\nDefining feature: ${orPick(OR_FEATURES)}\nQuirk: ${orPick(OR_QUIRKS)}\nWants: ${orPick(OR_WANTS)}`};
+  if(k==="rumor")return{kind:"Rumor",title:"Overheard",detail:orPick(OR_RUMORS)};
+  if(k==="comp")return{kind:"Complication",title:"Things get worse",detail:orPick(OR_COMPS)};
+  if(k==="weather"){const w=orPick(OR_WEATHER);return{kind:"Weather · "+shortDate(c,c.today),title:w[0],detail:w[1]}}
+  if(k==="shop"){const g=OR_GOODS.slice().sort(()=>Math.random()-.5).slice(0,4);return{kind:"Shop",title:`${orPick(OR_SHOPS)} · kept by ${orPick(OR_NAMES)} (${orPick(OR_RACES)})`,detail:g.map(x=>x[0]+" · "+x[1]).join("\n")+`\nOne odd item: ${orPick(OR_ODD)}.`}}
+  if(!pcs.length)return{kind:OR_KIT.find(x=>x[1]===k)[0],title:"No heroes yet",detail:"Add the party on the Party screen first."};
+  if(k==="target"){const w=pcs.map(p=>1/(stSpotN(n,p.id)+1)),tot=w.reduce((a,b)=>a+b,0);let x=Math.random()*tot,i=0;for(;i<w.length-1;i++){x-=w[i];if(x<=0)break}
+    return{kind:"Who's targeted?",title:pcs[i].name||"Unnamed",detail:"Picked at random, favouring players with less spotlight tonight."}}
+  const roll=1+Math.floor(Math.random()*20),tot=roll+3,yes=pcs.filter(p=>(stPass(p).pp??10)>=tot),no=pcs.filter(p=>(stPass(p).pp??10)<tot);
+  return{kind:"Who notices?",title:`Stealth ${tot} (rolled ${roll} + 3)`,detail:`Notices: ${yes.map(p=>`${p.name} (${stPass(p).pp??10})`).join(", ")||"nobody"}\nMisses it: ${no.map(p=>p.name).join(", ")||"nobody"}`}}
+// a monster's tactics and breaking point come from lines in its notes ("Tactics: …", "Breaks when: …", "Says: …"), else its first line
+function stFoeInfo(x){const ls=String(x.notes||"").split("\n").map(l=>plain(l).trim()).filter(Boolean);const f=re=>{const l=ls.find(l=>re.test(l));return l?l.replace(re,"").trim():""};
+  return{fight:f(/^tactics?\s*[:.]\s*/i)||(ls[0]&&!/^(breaks?|flees?|morale|says?)\b/i.test(ls[0])?ls[0]:""),flee:f(/^(breaks? when|flees? when|flees?|morale)\s*[:.]\s*/i),say:f(/^says?\s*[:.]\s*/i)}}
+
 function renderSession(el){
   const c=cal(),plan=stPlan(),n=rcSession(),scenes=stScenes(plan),legacy=!!plan&&!Array.isArray(plan.scenes);
   const main=scenes.filter(s=>!s.reserve),res=scenes.filter(s=>s.reserve);
   const cur=scenes.find(s=>s.id===ST.scene)||main.find(s=>!s.done)||main[0]||res[0]||null;ST.scene=cur?cur.id:null;
   const pcs=S.characters.filter(x=>x.kind==="pc").sort((a,b)=>(a.name||"").localeCompare(b.name||""));
-  const lit=new Set((logFor(n)||{}).spotlight||[]);
   const keep=[...el.querySelectorAll(".sx-col")].map(x=>x.scrollTop),bodyY=el.querySelector(".sx-body")?.scrollTop||0,fsel=focusSel(document.activeElement,el);
-  const op=k=>ST.open.has(k)?"open":"";  // open/closed panels survive the redraw after every tap
-  const top=`<div class="tm-top sx-top"><b class="tm-title">${esc(S.settings.campaign?.name||"Campaign")}</b><span class="sx-sess">Session ${n}${plan&&plan.title?` · ${esc(plan.title)}`:""}</span>
-    <button class="btn sm" data-act="gsearch" title="Search (/)">Search</button>
-    <span class="sx-time" aria-label="In-game date and time"><b>${esc(fmtDate(c,c.today))}</b><b>${fmtMin(stMin??igMin())}</b></span>
-    <span class="sx-tb"><button class="btn sm" data-act="stTime" data-n="10">+10 min</button><button class="btn sm" data-act="stTime" data-n="60">+1 hour</button><button class="btn sm" data-act="stShort" title="An hour passes and the rest goes in this session's notes">Short rest</button><button class="btn sm" data-act="stLong" title="Next day at 8 am, logged in this session's notes">Long rest</button><button class="btn sm" data-act="stUndo" ${ST.undo.length?"":"disabled"} title="Undo the last time change">Undo</button></span>
-    <span class="grow"></span>${clockHtml()}<button class="btn sm" data-act="stView" data-v="board" title="Your arranged board with panels and stickies">Arranged board</button><button class="btn sm" data-act="wrapUp">End session</button><button class="btn sm primary" data-act="tmExit" title="Exit table mode (T)">Exit</button></div>`;
-  const sRow=(s,i)=>`<div class="sx-pr ${s.done?"done":""}">${legacy||s.reserve?"":`<label class="sx-chk"><input type="checkbox" data-stdone="${esc(s.id)}" ${s.done?"checked":""} aria-label="${esc(s.title||"Scene")} done"></label>`}<button type="button" class="scn-pb" data-act="stScene" data-id="${esc(s.id)}" aria-current="${!!cur&&s.id===cur.id}">${s.reserve?"":`<span class="scn-num">${i+1}</span>`}<span class="scn-pt">${esc(s.title||"Untitled scene")}</span></button></div>${s.reserve&&s.when?`<small class="sx-when">${esc(s.when)}</small>`:""}`;
-  const col1=`<section class="sx-col" aria-label="Path and party"><div class="sx-card"><h3>The Path Tonight</h3>${plan?(main.map(sRow).join("")||`<p class="vempty">No scenes yet.</p>`)+`<button type="button" class="btn sm" data-act="stEdit" data-id="${plan.id}">Edit scenes</button>`:`<p class="vempty">No session plan yet. Make one on the Prep tab.</p>`}</div>
-    ${res.length?`<div class="sx-card"><h3>In Reserve</h3>${res.map(x=>sRow(x)).join("")}</div>`:""}
-    <div class="sx-card"><h3>The Party</h3>${pcs.length?`<p class="pb-sub">${pcs.filter(p=>lit.has(p.id)).length} of ${pcs.length} have had a moment tonight</p>`+pcs.map(p=>`<div class="sx-pc"><button type="button" class="linkish" data-act="view" data-type="characters" data-id="${p.id}">${esc(p.name||"Unnamed")}</button><span class="sx-pcs">AC ${esc(p.ac??"–")} · HP ${esc(p.hp??p.hpMax??"–")}${p.hpMax?"/"+esc(p.hpMax):""} · Perception ${esc(p.pp??"–")}</span><label class="sx-spot"><input type="checkbox" data-spot="${esc(p.id)}|${n}" ${lit.has(p.id)?"checked":""}> Moment</label></div>`).join(""):`<p class="vempty">No heroes yet.</p>`}</div></section>`;
+  const ms=clockMs(),camp=S.settings.campaign?.name||"The Campaign";
+  // ---- top bar
+  const music=window.DeskSpotify&&DeskSpotify.bar?DeskSpotify.bar():"";
+  const top=`<header class="sx-top">
+    <div class="sx-id"><b class="sx-camp">${esc(camp)}</b><span class="sx-sess">Session ${n}${plan&&plan.title&&plan.title!==`Session ${n}`?` · ${esc(plan.title)}`:""} · <b id="sclock-t">${ms?fmtClock(ms):"0:00"}</b> <button type="button" class="sx-clk" data-clock="${CLOCK.running?"pause":"start"}" aria-label="${CLOCK.running?"Pause the session clock":ms?"Resume the session clock":"Start the session clock"}">${CLOCK.running?"❚❚":"▶"}</button></span></div>
+    <div class="sx-search"><label class="sx-q">${navIco("search")}<input id="sx-q" type="search" value="${esc(ST.q)}" placeholder="Search…" aria-label="Search NPCs, places, items and rules" autocomplete="off">${ST.q?`<button type="button" class="sx-qx" data-act="stQClear" aria-label="Clear search">×</button>`:""}</label><div id="sx-results">${stResults()}</div></div>
+    <div class="sx-time">${stMoon()}<span class="sx-dt"><b>${esc(fmtDate(c,c.today))}</b><span>${fmtMin(stMin??igMin())}</span></span>
+      <button type="button" class="btn sm" data-act="stTime" data-n="10">+10 min</button><button type="button" class="btn sm" data-act="stTime" data-n="60">+1 hour</button><button type="button" class="btn sm" data-act="stShort" title="An hour passes and the rest goes in this session's notes">Short rest</button><button type="button" class="btn sm" data-act="stLong" title="Next day at 8 am, logged in this session's notes">Long rest</button><button type="button" class="btn sm" data-act="stUndo" ${ST.undo.length?"":"disabled"} title="Undo the last time change" aria-label="Undo the last time change">↶ Undo</button></div>
+    ${music?`<div class="sx-music">${music}</div>`:""}
+    <div class="sx-alerts">${stAlerts()}</div>
+    <button type="button" class="btn sx-prep" data-act="stPrepLib">Prep &amp; Library</button><button type="button" class="btn primary sx-end" data-act="stRecap">End session</button></header>`;
+  // ---- column 1: the path and the party
+  const done=main.filter(s=>s.done).length;
+  const pRow=(s,i)=>{const open=!!cur&&s.id===cur.id;return `<div class="sx-pr ${s.done?"done":""} ${open?"open":""}">${legacy?"":`<button type="button" class="sx-tick" data-act="stDone" data-id="${esc(s.id)}" aria-pressed="${!!s.done}" aria-label="${esc(s.title||"Scene")}: ${s.done?"done, mark not done":"mark done"}">${s.done?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>':""}</button>`}<button type="button" class="sx-ps" data-act="stScene" data-id="${esc(s.id)}" aria-current="${open}"><span class="sx-pt">${s.reserve?"":`<span class="sx-pn">${i+1}</span>`}<span>${esc(s.title||"Untitled scene")}</span></span>${(s.reserve?s.when:open&&s.note)?`<small>${esc(s.reserve?s.when:s.note)}</small>`:""}</button></div>`};
+  const col1=`<nav class="sx-col sx-c1" aria-label="Tonight's scenes and party">
+    <div class="sx-ch"><h2>The Path Tonight</h2>${plan?`<button type="button" class="sx-link" data-act="stEdit" data-id="${plan.id}">${legacy?"Edit scenes":`${done} of ${main.length} done`} ›</button>`:""}</div>
+    <div class="sx-path">${plan?(main.map(pRow).join("")||`<p class="vempty">No scenes yet.</p>`):`<p class="vempty">No session plan yet. Make one in Prep.</p>`}
+      ${res.length?`<button type="button" class="sx-resb" data-act="stRes" aria-expanded="${ST.resOpen}"><span>In Reserve · if they stray</span><span>${res.length} ${ST.resOpen?"▴":"▾"}</span></button>${ST.resOpen?`<div class="sx-resl">${res.map(x=>pRow(x)).join("")}</div>`:""}`:""}</div>
+    <section class="sx-party" aria-label="Party cheat sheet"><div class="sx-ch"><h2>The Party</h2><small>tap a name for the sheet</small></div>
+      ${pcs.length?`<div class="sx-pg sx-pgh"><span>Passive</span><span title="Perception">Perc</span><span title="Insight">Ins</span><span title="Investigation">Inv</span><span title="Spotlight moments tonight">Spotlight</span></div>
+      ${pcs.map(p=>{const v=stPass(p),k=stSpotN(n,p.id);return `<div class="sx-pg"><button type="button" class="sx-pcn" data-act="stSheet" data-id="${p.id}" aria-label="Open ${esc(p.name||"hero")}'s sheet"><b>${esc(p.name||"Unnamed")}</b><small>${esc(p.cls||"")}</small></button><span>${v.pp??"–"}</span><span>${v.ins??"–"}</span><span>${v.inv??"–"}</span><span class="sx-spot"><button type="button" class="sx-sm" data-act="stSpot" data-id="${p.id}" data-n="-1" ${k?"":"disabled"} aria-label="One fewer spotlight moment for ${esc(p.name||"")}">−</button><button type="button" class="sx-sp ${k?"on":""}" data-act="stSpot" data-id="${p.id}" data-n="1" aria-label="Spotlight moment for ${esc(p.name||"")}, ${k} so far">★ ${k}</button></span></div>`}).join("")}`:`<p class="vempty">No heroes yet. Add them on the Party screen.</p>`}
+      ${(S.settings.party||{}).languages?`<p class="sx-lang"><b>Languages:</b> ${esc(S.settings.party.languages)}</p>`:""}</section></nav>`;
+  // ---- column 2: the scene
   const who=cur?cur.who.map(w=>({w,x:rec(w.col,w.id)})).filter(o=>o.x):[];
-  const ppl=who.filter(o=>o.w.col==="characters"),foes=who.filter(o=>o.w.col==="monsters"),other=who.filter(o=>o.w.col!=="characters"&&o.w.col!=="monsters");
-  const ltc=lastTimeCard(plan);
-  const col2=`<section class="sx-col sx-scene" aria-label="Current scene">
-    ${ltc?(ST.prevHide?`<button type="button" class="btn sm sx-prevb" data-act="stPrev">Show “last time”</button>`:`<div class="sx-prev">${ltc}<button type="button" class="btn sm" data-act="stPrev">Hide</button></div>`):""}
-    ${cur?`<div class="sx-card sx-cur"><span class="scn-kicker">${cur.reserve?"From reserve":`Scene ${main.indexOf(cur)+1} of ${main.length}`}</span><h2>${esc(cur.title||"Untitled scene")}</h2>${cur.note?`<p class="pb-sub">${esc(cur.note)}</p>`:""}
-      ${cur.read?`<details class="sx-read" data-k="read" ${op("read")}><summary>Read aloud</summary><div class="prose vprose">${rich(cur.read)}</div></details>`:""}
-      ${cur.clues.length?`<h3 class="sx-h">Secrets &amp; Clues <span class="pb-n">${cur.clues.filter(k=>k.found).length} of ${cur.clues.length} revealed</span></h3><div class="sx-clues">${cur.clues.map((k,i)=>`<button type="button" class="sx-clue" data-act="stClue" data-i="${i}" aria-pressed="${!!k.found}">${esc(k.t)}</button>`).join("")}</div>`:""}
-      ${cur.ifs.length?`<h3 class="sx-h">If They…</h3>${cur.ifs.map((k,j)=>`<details class="sx-if" data-k="if-${esc(cur.id)}-${j}" ${op("if-"+cur.id+"-"+j)}><summary>If they ${esc(k.if||"…")}</summary><p>${esc(k.then||"")}</p></details>`).join("")}`:""}
-      ${ppl.length?`<h3 class="sx-h">Who's Here</h3><div class="sx-who">${ppl.map(({x})=>{const a=stAtt(n,x),m=x.mon&&rec("monsters",x.mon);return `<div class="sx-npc">${avatar(x,40)}<div class="sx-npcb"><span class="sx-npch"><button type="button" class="linkish" data-act="view" data-type="characters" data-id="${x.id}"><b>${esc(x.name||"Unnamed")}</b></button>${m?`<button type="button" class="btn sm" data-act="open" data-type="monsters" data-id="${m.id}">Stat block</button>`:""}</span>${x.cls||x.voice?`<small>${esc([x.cls,x.voice].filter(Boolean).join(" · "))}</small>`:""}${x.wants?`<small><i>Wants</i> ${esc(x.wants)}</small>`:""}<div class="seg sx-att" role="group" aria-label="Attitude tonight">${[["friendly","Friendly"],["neutral","Neutral"],["hostile","Hostile"]].map(([k,l])=>`<button type="button" data-act="stAtt" data-id="${x.id}" data-v="${k}" aria-pressed="${a===k}">${l}</button>`).join("")}</div></div></div>`}).join("")}</div>`:""}
-      ${foes.length?`<h3 class="sx-h">Foes</h3>${foes.map(({x})=>`<div class="sx-foe"><div class="sx-foeh"><b>${esc(x.name||"Monster")}</b><span class="pb-n">${[x.cr&&"CR "+x.cr,x.ac&&"AC "+x.ac,x.hp&&"HP "+x.hp].filter(Boolean).map(esc).join(" · ")}</span><button type="button" class="btn sm" data-act="open" data-type="monsters" data-id="${x.id}">Stat block</button></div>${x.actions?`<div class="sx-foea">${blockLines(String(x.actions).split("\n").filter(l=>l.trim()).slice(0,3).join("\n"))}</div>`:""}${x.notes?`<p class="sx-tac"><b>Tactics.</b> ${esc(plain(x.notes).split("\n")[0])}</p>`:""}</div>`).join("")}`:""}
-      ${other.length?`<div class="sx-other">${other.map(({w,x})=>`<button type="button" class="chip" data-act="open" data-type="${esc(w.col)}" data-id="${esc(x.id)}">${esc(titleOf(w.col,x)||"Untitled")}</button>`).join("")}</div>`:""}
-      ${!legacy&&!cur.reserve?`<button type="button" class="btn primary sx-next" data-act="stNext">Scene done · next</button>`:""}
-      ${legacy?`<p class="scn-note">This plan has no scenes yet, so this shows its opener and reveals. Add scenes in Prep › Scenes.</p>`:""}
-    </div>`:`<div class="empty">No scenes for tonight. Add them in Prep › Scenes.</div>`}
-  </section>`;
-  const col3=`<section class="sx-col" aria-label="Dice, clocks and log"><div class="sx-card"><h3>Secret Dice</h3><div class="sx-dice">${[4,6,8,10,12,20,100].map(d=>`<button type="button" class="btn sm" data-act="stRoll" data-n="${d}">d${d}</button>`).join("")}</div>
-      <div class="seg sx-adv" role="group" aria-label="d20 rolls">${[["dis","Disadvantage"],["normal","Normal"],["adv","Advantage"]].map(([k,l])=>`<button type="button" data-act="stAdv" data-v="${k}" aria-pressed="${ST.adv===k}">${l}</button>`).join("")}</div>
-      <ol class="sx-rolls">${ST.rolls.map(r=>`<li><b>${r.v}</b><span>d${r.sides}${r.b!=null?` · ${r.a} and ${r.b}, ${r.adv==="adv"?"advantage":"disadvantage"}`:""}</span></li>`).join("")||`<li class="vempty">Only you see these.</li>`}</ol></div>
-    ${S.clocks.length?`<div class="sx-card"><h3>Clocks</h3><div class="clks compact">${S.clocks.map(k=>clockCard(k,true)).join("")}</div></div>`:""}
-    <div class="sx-card"><h3>Log a Moment</h3><form data-stlog class="sx-logf"><input class="scn-in" id="sx-log" placeholder="What just happened? Enter to log" aria-label="Log a moment" enterkeyhint="done"><select class="scn-in" id="sx-tag" aria-label="Tag"><option value="">No tag</option><option value="Loot">Loot</option><option value="Milestone">Milestone</option></select><button class="btn sm primary" type="submit">Log</button></form>
-      <ul class="sx-log">${stLogHtml(n)}</ul></div></section>`;
-  const langs=(S.settings.party||{}).languages;
-  const col4=`<section class="sx-col" aria-label="Rules and travel"><div class="sx-card"><h3>Rules at a Glance</h3>
-      <details class="sx-rule" data-k="dc" ${op("dc")}><summary>Typical DCs</summary><p class="sx-dcs">${[["Very easy",5],["Easy",10],["Medium",15],["Hard",20],["Very hard",25],["Nearly impossible",30]].map(([l,v])=>`<span>${l} <b>${v}</b></span>`).join("")}</p></details>
-      <details class="sx-rule" data-k="cond" ${op("cond")}><summary>Conditions</summary><dl class="sx-conds">${Object.entries(RULES).filter(([k])=>CONDS.includes(k)).map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl></details>
-      <details class="sx-rule" data-k="cover" ${op("cover")}><summary>Cover</summary><p>Half cover: +2 to AC and Dexterity saves. Three-quarters cover: +5. Total cover: can't be targeted directly.</p></details>
-      ${langs?`<p class="sx-lang"><b>Party languages.</b> ${esc(langs)}</p>`:""}</div>
-    ${S.tables.length?`<div class="sx-card"><h3>Roll Tables</h3><div class="tm-rolls">${S.tables.slice().sort((a,b)=>(a.title||"").localeCompare(b.title||"")).map(t=>{const r=(ROLLS[t.id]||[])[0];return `<div class="tm-roll"><button class="btn sm" data-act="tmRoll" data-id="${t.id}">${esc(t.title)}</button>${r?`<span><b class="mono">${r.n}</b> ${esc(r.text)}</span>`:""}</div>`}).join("")}</div></div>`:""}
-    <div class="sx-card"><h3>Travel</h3><div class="sx-travel"><label class="scn-f"><span class="label">Miles</span><input class="scn-in" id="sx-miles" type="number" min="0" max="5000" step="any" inputmode="decimal" value="${esc(ST.miles)}"></label><label class="scn-f"><span class="label">Pace</span><select class="scn-in" id="sx-pace">${Object.entries(stPace()).map(([k,[,l]])=>`<option value="${k}" ${ST.pace===k?"selected":""}>${l}</option>`).join("")}</select></label></div><div id="sx-tr">${stTravelHtml()}</div></div></section>`;
-  el.innerHTML=`${top}<div class="tm-body sx-body"><div class="sx-grid">${col1}${col2}${col3}${col4}</div></div>`;el.hidden=false;
+  const ppl=who.filter(o=>o.w.col==="characters"&&o.x.kind!=="pc"),foes=who.filter(o=>o.w.col==="monsters"),other=who.filter(o=>!["characters","monsters"].includes(o.w.col));
+  const pins=ST.pins.map(p=>({p,x:rec(p.col,p.id)})).filter(o=>o.x&&!who.some(w=>w.w.col===o.p.col&&w.w.id===o.p.id));
+  const r=lastRecap(),prevT=r?lastTimeText():"";
+  const rd=cur&&cur.read?plain(cur.read):"",readOpen=ST.open.has("read");
+  const clue=(k,i)=>`<button type="button" class="sx-clue" data-act="stClue" data-i="${i}" aria-pressed="${!!k.found}"><span class="sx-dot" aria-hidden="true"></span><span>${esc(k.t)}</span>${k.found?`<span class="sx-rev">revealed</span>`:""}</button>`;
+  const npcCard=({x})=>{const a=stAtt(n,x),m=x.mon&&rec("monsters",x.mon);return `<div class="sx-npc"><div class="sx-nh"><button type="button" class="sx-nn" data-act="stEntry" data-col="characters" data-id="${x.id}" aria-label="More about ${esc(x.name||"")}">${esc(x.name||"Unnamed")} <span>more ›</span></button><span class="sx-role">${esc(x.cls||"NPC")}</span></div>
+    ${x.voice?`<span><b>Voice:</b> ${esc(x.voice)}</span>`:""}${x.wants?`<span><b>Wants:</b> ${esc(x.wants)}</span>`:""}${x.secret?`<span class="sx-sec"><b>Secret:</b> ${esc(plain(String(x.secret)))}</span>`:""}${m?`<span><b>Stat block:</b> <button type="button" class="linkish" data-act="stEntry" data-col="characters" data-id="${x.id}" data-tab="block">${esc(m.name||"Monster")}</button></span>`:""}
+    <div class="sx-att" role="group" aria-label="Attitude of ${esc(x.name||"")}">${ST_ATT.map(([k,l])=>`<button type="button" data-act="stAtt" data-id="${x.id}" data-v="${k}" aria-pressed="${a===k}">${l}</button>`).join("")}</div></div>`};
+  const foeCard=({x})=>{const f=stFoeInfo(x);return `<div class="sx-foe"><div class="sx-nh"><button type="button" class="sx-nn" data-act="stEntry" data-col="monsters" data-id="${x.id}" aria-label="More about ${esc(x.name||"")}">${esc(x.name||"Monster")} <span>more ›</span></button><span class="sx-role">How they fight</span></div>
+    <span class="sx-stat">${[x.cr&&"CR "+x.cr,x.ac&&"AC "+x.ac,x.hp&&"HP "+x.hp].filter(Boolean).map(esc).join(" · ")}</span>${f.fight?`<span><b>Tactics:</b> ${esc(f.fight)}</span>`:""}${f.flee?`<span><b>Breaks when:</b> ${esc(f.flee)}</span>`:""}${f.say?`<span class="sx-say">“${esc(f.say)}”</span>`:""}</div>`};
+  const pinCard=({p,x})=>`<div class="sx-npc sx-pin"><div class="sx-nh"><button type="button" class="sx-nn" data-act="${p.col==="characters"||p.col==="monsters"?"stEntry":"open"}" data-col="${p.col}" data-type="${p.col}" data-id="${x.id}">${esc(titleOf(p.col,x)||"Untitled")} <span>more ›</span></button><button type="button" class="sx-unpin" data-act="stPin" data-col="${p.col}" data-id="${x.id}" aria-label="Unpin ${esc(titleOf(p.col,x)||"")}">Pinned · ${esc(libTag(p.col,x))} ×</button></div><span>${esc(libBlurb(p.col,x))}</span>${x.secret?`<span class="sx-sec"><b>Secret:</b> ${esc(plain(String(x.secret)).slice(0,200))}</span>`:""}</div>`;
+  const col2=`<main class="sx-col sx-scene" aria-label="Current scene">
+    ${cur?`<div class="sx-sh"><div class="sx-sht"><span class="sx-kick">${cur.reserve?"From reserve":`Scene ${main.indexOf(cur)+1} of ${main.length}`}</span><h1>${esc(cur.title||"Untitled scene")}</h1>${cur.note?`<span class="sx-note">${esc(cur.note)}</span>`:""}</div>
+      ${plan?`<button type="button" class="btn sx-edit" data-act="stEdit" data-id="${plan.id}" aria-label="Edit this scene in the Scene Editor">Edit</button>`:""}${!legacy&&!cur.reserve?`<button type="button" class="btn primary sx-next" data-act="stNext">Scene done · next ❯</button>`:""}</div>
+    ${prevT&&!ST.prevHide?`<section class="sx-prev" aria-label="Previously on"><div class="sx-ph"><span>Previously on ${esc(camp)}…</span><button type="button" class="btn sm" data-act="stPrev">Read it · hide</button></div><p>${esc(prevT.length>900?prevT.slice(0,900).replace(/\s+\S*$/,"")+"…":prevT)}</p><small>Written from the Session ${esc(String(r.session||"?"))} recap</small></section>`:prevT?`<button type="button" class="btn sm sx-prevb" data-act="stPrev">Show “Previously on”</button>`:""}
+    ${rd?`<section class="sx-read" aria-label="Read aloud"><div class="sx-ph"><span>Read aloud</span><button type="button" class="btn sm" data-act="stRead" aria-expanded="${readOpen}">${readOpen?"Hide":"Show"}</button></div>${readOpen?`<p><span class="sx-drop">${esc(rd.charAt(0))}</span>${esc(rd.slice(1))}</p>`:""}</section>`:""}
+    <div class="sx-two"><section class="sx-cl" aria-label="Secrets and clues"><h2>Secrets &amp; Clues${cur.clues.length?` <small>${cur.clues.filter(k=>k.found).length} of ${cur.clues.length}</small>`:""}</h2>${cur.clues.map(clue).join("")||`<p class="vempty">No clues for this scene.</p>`}
+        <h2>If They…</h2>${cur.ifs.map((k,j)=>{const key="if-"+cur.id+"-"+j,o=ST.open.has(key);return `<div class="sx-if"><button type="button" class="sx-ifq" data-act="stIf" data-k="${esc(key)}" aria-expanded="${o}"><span aria-hidden="true">${o?"▾":"▸"}</span><span>If they ${esc(k.if||"…")}</span></button>${o?`<p>${esc(k.then||"")}</p>`:""}</div>`}).join("")||`<p class="vempty">Nothing planned.</p>`}</section>
+      <section class="sx-wh" aria-label="Characters in this scene"><h2>Who's Here</h2>${pins.map(pinCard).join("")}${ppl.map(npcCard).join("")}${foes.map(foeCard).join("")}
+        ${other.length?`<div class="sx-other">${other.map(({w,x})=>`<button type="button" class="chip" data-act="open" data-type="${esc(w.col)}" data-id="${esc(x.id)}">${esc(titleOf(w.col,x)||"Untitled")}</button>`).join("")}</div>`:""}
+        ${!pins.length&&!ppl.length&&!foes.length&&!other.length?`<p class="vempty">Nobody added to this scene. Search above and pin someone.</p>`:""}</section></div>
+    ${legacy?`<p class="scn-note">This plan has no scenes yet, so this shows its opener and reveals. Add scenes in Prep › Scenes.</p>`:""}`
+    :`<div class="empty">No scenes for tonight. Add them in Prep › Scenes.</div>`}</main>`;
+  // ---- column 3: dice, clocks, log
+  const last=ST.rolls[0];
+  const col3=`<aside class="sx-col" aria-label="Dice, clocks and log">
+    <section class="sx-box" aria-label="Dice"><div class="sx-roll"><div class="sx-big" aria-live="polite">${last?last.v:"–"}</div><div><span class="sx-rl">${last?esc(last.label):"Secret dice · only you see these"}</span><span class="sx-rh">${ST.rolls.slice(1,6).map(r=>`${esc(r.short)} ${r.v}`).join(" · ")}</span></div></div>
+      <div class="sx-dice">${ST_DICE.map(([l,v])=>`<button type="button" data-act="stRoll" data-n="${v}">${l}</button>`).join("")}</div></section>
+    <section class="sx-box" aria-label="Clocks"><span class="sx-bh">Clocks</span>${S.clocks.length?S.clocks.map(k=>{const seg=Math.max(1,Math.min(24,num(k.segments)||4)),f=Math.min(seg,num(k.filled)||0);return `<div class="sx-clock"><div class="sx-kh"><span>${esc(k.name||k.title||"Clock")}</span><span>${f} of ${seg}</span></div><div class="sx-segs">${Array.from({length:seg},(_,i)=>`<button type="button" class="${i<f?"on":""}" data-act="stSeg" data-id="${k.id}" data-n="${i+1}" aria-label="${esc(k.name||"Clock")}: set to ${i+1===f?i:i+1} of ${seg}"></button>`).join("")}</div></div>`}).join(""):`<p class="vempty">No clocks yet. Add them in Prep.</p>`}</section>
+    <section class="sx-box" aria-label="Session log"><span class="sx-bh">Log a Moment</span><form data-stlog class="sx-logf"><input id="sx-log" placeholder="What happened? Press Enter" aria-label="What happened?" enterkeyhint="done"><button class="btn sm primary" type="submit">Log</button></form>
+      <div class="sx-tags">${ST_TAGS.map(t=>`<button type="button" data-act="stTag" data-v="${t}" aria-pressed="${ST.tag===t}">${t}</button>`).join("")}<small>Time is stamped for you. Loot and milestones also go to the recap.</small></div>
+      <ul class="sx-log">${stLogHtml(n)}</ul></section></aside>`;
+  // ---- column 4: rules, Oracle, travel
+  const RC=ST_RCATS();if(!RC[ST.rcat])ST.rcat="Conditions";
+  const im=ST.improv,here=stHere(cur),pace=stPace();
+  const col4=`<aside class="sx-col" aria-label="Rules and improv">
+    <section class="sx-box" aria-label="Rules at a glance"><div class="sx-bhr"><span class="sx-bh">Rules at a Glance</span><small>stays where you leave it</small></div>
+      <div class="sx-tabs" role="group" aria-label="Rule categories">${Object.keys(RC).map(k=>`<button type="button" data-act="stRcat" data-v="${esc(k)}" aria-pressed="${ST.rcat===k}">${esc(k)}</button>`).join("")}</div>
+      <div class="sx-rules">${RC[ST.rcat].map(([k,v])=>`<div><b>${esc(k)}.</b> ${esc(v)}</div>`).join("")}</div></section>
+    <section class="sx-box" aria-label="Oracle"><span class="sx-bh">The Oracle</span><div class="sx-kit">${OR_KIT.map(([l,k])=>`<button type="button" data-act="stOracle" data-v="${k}">${esc(l)}</button>`).join("")}${S.tables.slice().sort((a,b)=>(a.title||"").localeCompare(b.title||"")).map(t=>`<button type="button" data-act="stTable" data-id="${t.id}">${esc(t.title||"Roll table")}</button>`).join("")}</div>
+      ${im?`<div class="sx-imp"><span class="sx-ik">${esc(im.kind)}</span><b>${esc(im.title)}</b><span class="sx-id2">${esc(im.detail).replace(/\n/g,"<br>")}</span><button type="button" class="btn sm" data-act="stLogIt">Log it</button></div>`:""}</section>
+    <section class="sx-box" aria-label="Travel"><div class="sx-bhr"><span class="sx-bh">Travel</span><small>${here?`from ${esc(here)}`:"on foot"}</small></div>
+      <label class="sx-mi"><span>Miles to go</span><input id="sx-miles" type="number" min="0" max="5000" step="any" inputmode="decimal" value="${esc(ST.miles)}"></label>
+      <div class="sx-tabs" role="group" aria-label="Pace">${["slow","normal","fast"].filter(k=>pace[k]).map(k=>`<button type="button" data-act="stPace" data-v="${k}" aria-pressed="${ST.pace===k}">${CAP(k)}</button>`).join("")}</div>
+      <div id="sx-tr">${stTravelHtml()}</div></section>
+    <button type="button" class="sx-link sx-board" data-act="stView" data-v="board">Switch to your arranged board ›</button></aside>`;
+  el.innerHTML=`${top}<div class="tm-body sx-body"><div class="sx-grid">${col1}${col2}${col3}${col4}</div></div>${stWindow(n)}`;el.hidden=false;
   el.querySelectorAll(".sx-col").forEach((x,i)=>{if(keep[i])x.scrollTop=keep[i]});const b=el.querySelector(".sx-body");if(b)b.scrollTop=bodyY;
   focusAfter(el,fsel);
 }
+/* ---- windows over the Session Table ---- */
+function stWindow(n){
+  const close=`<button type="button" class="sx-x" data-act="stClose" aria-label="Close">×</button>`;
+  const wrap=(label,body,cls)=>`<div class="sx-scrim" data-act="stScrim"><section class="sx-win ${cls||""}" role="dialog" aria-modal="true" aria-label="${esc(label)}">${body}</section></div>`;
+  if(ST.sheet){const pcs=S.characters.filter(x=>x.kind==="pc").sort((a,b)=>(a.name||"").localeCompare(b.name||""));const x=pcs.find(p=>p.id===ST.sheet)||pcs[0];if(!x){ST.sheet=null;return ""}
+    const v=stPass(x),S2=x.sheet?parseSheet(x.sheet):null,init=S2?S2.abil.DEX.mod+(S2.alert?S2.pb:0):null;
+    const chips=[["AC",x.ac],["HP",x.hpMax?`${x.hp??x.hpMax}/${x.hpMax}`:x.hp],["Speed",S2&&S2.speed?S2.speed.replace(/\s*\(.*$/,""):""],["Initiative",init!=null?sgn(init):""],["Passive Perception",v.pp],["Insight",v.ins],["Investigation",v.inv]].filter(c=>c[1]!=null&&c[1]!=="");
+    return wrap("Character sheet",`<div class="sx-wtabs">${pcs.map(p=>`<button type="button" data-act="stSheet" data-id="${p.id}" aria-pressed="${p.id===x.id}">${esc(p.name||"Unnamed")}</button>`).join("")}<span class="grow"></span>${close}</div>
+      <div class="sx-wb"><span class="sx-kick">${esc([x.race,x.cls,x.level?"Level "+x.level:"",x.player?"played by "+x.player:""].filter(Boolean).join(" · "))}</span><h2>${esc(x.name||"Unnamed")}</h2>
+      ${chips.length?`<div class="sx-chips">${chips.map(([l,v])=>`<div><b>${esc(String(v))}</b><span>${l}</span></div>`).join("")}</div>`:""}
+      ${x.sheet?sheetPanel(x):`<p class="vempty">No character sheet yet. Paste one on the Party screen.</p>`}${x.notes?`<h3 class="cs-h">Notes</h3><div class="prose vprose">${rich(x.notes,"characters:"+x.id)}</div>`:""}
+      <p class="sx-ro">Read-only here. Edit heroes on the Party screen.</p></div>`,"sx-wsheet")}
+  if(ST.gen){const g=genMon(ST.gen.name,GEN,false),opt=(k,vals,lab)=>`<label class="scn-f"><span class="label">${lab}</span><select class="scn-in" data-gen="${k}">${vals.map(([v,l])=>`<option value="${v}" ${GEN[k]===v?"selected":""}>${esc(l)}</option>`).join("")}</select></label>`;
+    return wrap("Quick stat block",`<div class="sx-wtabs"><b class="sx-wt">Quick foe</b><span class="grow"></span>${close}</div><div class="sx-wb">
+      <label class="scn-f"><span class="label">Name</span><input class="scn-in" id="sx-genname" value="${esc(ST.gen.name)}"></label>
+      <div class="ppl-gen">${opt("cr",CRS.map(c=>[c,"CR "+c]),"Challenge")}${opt("role",Object.entries(GEN_ROLES),"Role")}${opt("type",GEN_TYPES.map(t=>[t,CAP(t)]),"Type")}${opt("dmg",GEN_DMG.map(t=>[t,CAP(t)]),"Damage")}</div>
+      <div class="ppl-acts"><button type="button" class="btn primary" data-act="stGenSave">Save to the Bestiary and add to this scene</button></div>${statBlock(g)}</div>`,"sx-wgen")}
+  if(ST.entry){const{col,id}=ST.entry,x=rec(col,id);if(!x){ST.entry=null;return ""}
+    const npc=col==="characters",m=npc?(x.mon&&rec("monsters",x.mon)):x,tab=ST.entry.tab||(npc?"notes":"block");
+    const tabs=[["notes","Notes"],["block","Stat block"]].map(([k,l])=>`<button type="button" data-act="stEntryTab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join("");
+    let body;
+    if(tab==="block")body=m?statBlock(m):`<p class="vempty">${esc(x.name||"This NPC")} has no stat block yet. Link or make one on the NPCs &amp; Enemies screen.</p>`;
+    else if(npc){const a=stAtt(n,x),att=ST_ATT.find(t=>t[0]===a);const sec=[["Attitude now",att?att[1]:""],["Role",x.cls],["Where",x.location],["Faction",x.faction],["Voice",x.voice],["Wants",x.wants]].filter(s=>s[1]);
+      body=`${sec.length?`<dl class="sx-dl">${sec.map(([l,v])=>`<div><dt>${l}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`:""}${x.notes?`<h3 class="cs-h">Notes</h3><div class="prose vprose">${rich(x.notes,"characters:"+x.id)}</div>`:""}${secretBox(x)}${backlinkBlock("characters",x.id)}`}
+    else{const f=stFoeInfo(x);body=`${f.fight||f.flee||f.say?`<dl class="sx-dl">${[["Tactics",f.fight],["Breaks when",f.flee],["Says",f.say]].filter(s=>s[1]).map(([l,v])=>`<div><dt>${l}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`:""}${x.notes?`<h3 class="cs-h">Notes</h3>${blockLines(x.notes)}`:`<p class="vempty">No notes yet.</p>`}`}
+    return wrap(x.name||"Entry",`<div class="sx-wtabs">${tabs}<span class="grow"></span><button type="button" class="btn sm" data-act="stFull" data-col="${col}" data-id="${x.id}">Full page</button>${close}</div>
+      <div class="sx-wb"><span class="sx-kick">${npc?esc(["NPC",x.cls].filter(Boolean).join(" · ")):`Foe${x.cr?" · CR "+esc(x.cr):""}`}</span><h2>${esc(x.name||"Unnamed")}</h2>${body}</div>`,"sx-wentry")}
+  if(ST.recap)return wrap("Session recap",stRecapHtml(n,close),"sx-wrecap");
+  return ""}
+function stRecapData(n){const plan=stPlan(),sc=stScenes(plan),items=stLogItems(n).reverse();
+  return{played:sc.filter(s=>s.done).map(s=>s.title||"Untitled scene"),clues:sc.flatMap(s=>s.clues.filter(k=>k.found).map(k=>k.t)),hooks:sc.flatMap(s=>s.clues.filter(k=>!k.found).map(k=>k.t)),
+    spot:S.characters.filter(x=>x.kind==="pc").map(p=>[p.name,stSpotN(n,p.id)]).filter(x=>x[1]),log:items.map(o=>o.x),tally:items.map(o=>o.x).filter(t=>/^\[(Loot|Milestone)\]/i.test(t)),
+    clocks:S.clocks.map(k=>`${k.name||k.title||"Clock"}: ${num(k.filled)||0} of ${num(k.segments)||0}`)}}
+function stRecapHtml(n,close){const d=stRecapData(n),li=(a,e)=>a.length?`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:`<p class="vempty">${e}</p>`;
+  return `<div class="sx-wtabs"><span class="sx-kick">Drafted from tonight's play</span><span class="grow"></span>${close}</div><div class="sx-wb"><h2>Recap · Session ${n}</h2>
+    <div class="sx-rc"><div><h3>Scenes played</h3>${li(d.played,"No scenes ticked done.")}<h3>Clues the party learned</h3>${li(d.clues,"None revealed.")}<h3>Spotlight tonight</h3><p>${d.spot.length?esc(d.spot.map(([a,b])=>`${a} ★${b}`).join(" · ")):"No moments marked."}</p></div>
+      <div><h3>From the log</h3>${li(d.log.slice(-12),"Nothing logged.")}<h3>Loot &amp; milestones</h3>${li(d.tally,"None tagged.")}<h3>Clocks</h3>${li(d.clocks,"No clocks.")}</div></div>
+    <div class="sx-hooks"><div class="sx-bhr"><h3>Hooks for next time</h3>${d.hooks.length?`<button type="button" class="btn sm" data-act="stHooks" ${ST.hooksSent?"disabled":""}>${ST.hooksSent?"Added to Threads":"Add them as threads"}</button>`:""}</div><small>Clues the party hasn't found yet, ready to become threads on the Prep Board</small>${li(d.hooks,"Every clue was found.")}</div>
+    <div class="foot"><button type="button" class="btn primary" data-act="stRecapNote">Save as the session recap note</button><button type="button" class="btn" data-act="wrapUp">Calendar, next game &amp; mark played…</button><span class="grow"></span><button type="button" class="btn" data-act="stClose">Close</button></div></div>`}
+// the Session Table's newer taps (design screen A); older ones stay in stAct
+async function stAct2(a,t){const n=rcSession(),plan=stPlan();
+  if(a==="stClose"){ST.sheet=null;ST.entry=null;ST.gen=null;ST.recap=false;return renderTable()}
+  if(a==="stSheet"){ST.sheet=t.dataset.id;return renderTable()}
+  if(a==="stEntry"){ST.entry={col:t.dataset.col,id:t.dataset.id,tab:t.dataset.tab||null};return renderTable()}
+  if(a==="stEntryTab"){if(ST.entry)ST.entry.tab=t.dataset.v;return renderTable()}
+  if(a==="stFull"){const{col,id}=t.dataset;ST.entry=null;renderTable();return openEntry(col,id)}
+  if(a==="stRecap"){if(CLOCK.running){CLOCK.acc=clockMs();CLOCK.running=false;CLOCK.start=null;clockSave()}ST.recap=true;ST.hooksSent=false;return renderTable()}
+  if(a==="stHooks"){const d=stRecapData(n);for(const h of d.hooks)await save("threads",uid(),{text:h,status:"open",notes:`From session ${n}: a clue the party didn't find.`});project();ST.hooksSent=true;toast(`${d.hooks.length} thread${d.hooks.length===1?"":"s"} added to the Prep Board`);return renderTable()}
+  if(a==="stRecapNote"){const d=stRecapData(n),sec=(h,l)=>l.length?`# ${h}\n${l.map(x=>"- "+x).join("\n")}\n\n`:"";ST.recap=false;renderTable();
+    return openForm("notes",null,{category:"session",session:n,title:`Session ${n}`,body:(sec("Scenes played",d.played)+sec("What the party learned",d.clues)+sec("Moments",d.log)+sec("Loot & milestones",d.tally)+sec("Threads for next time",d.hooks)).trim()})}
+  if(a==="stPrepLib"){closeTableMode();navGo("board");return}
+  if(a==="stQClear"){ST.q="";renderTable();document.getElementById("sx-q")?.focus();return}
+  if(a==="stPin"){const{col,id}=t.dataset,i=ST.pins.findIndex(p=>p.col===col&&p.id===id);i>=0?ST.pins.splice(i,1):ST.pins.push({col,id});
+    if(document.activeElement&&document.activeElement.id==="sx-q"){stRefreshResults();renderPending=true;return}return renderTable()}
+  if(a==="stAlertOk"){ST_ALERTS_DONE.add(t.dataset.k);stAlertsSave();return renderTable()}
+  if(a==="stRes"){ST.resOpen=!ST.resOpen;return renderTable()}
+  if(a==="stRead"){ST.open.has("read")?ST.open.delete("read"):ST.open.add("read");return renderTable()}
+  if(a==="stIf"){const k=t.dataset.k;ST.open.has(k)?ST.open.delete(k):ST.open.add(k);return renderTable()}
+  if(a==="stDone"){if(plan)return stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===t.dataset.id);if(s)s.done=!s.done});return}
+  if(a==="stSpot")return stSpot(n,t.dataset.id,num(t.dataset.n)||1);
+  if(a==="stSeg"){const k=rec("clocks",t.dataset.id);if(!k)return;const v=num(t.dataset.n),f=num(k.filled)||0;await patchRec("clocks",k.id,{filled:v===f?v-1:v});return renderTable()}
+  if(a==="stTag"){ST.tag=ST.tag===t.dataset.v?"":t.dataset.v;return renderTable()}
+  if(a==="stRcat"){ST.rcat=t.dataset.v;return renderTable()}
+  if(a==="stPace"){ST.pace=t.dataset.v;return renderTable()}
+  if(a==="stOracle"){if(t.dataset.v==="foe"){ST.gen={name:"Quick foe"};return renderTable()}ST.improv=stImprov(t.dataset.v);return renderTable()}
+  if(a==="stTable"){const tb=rec("tables",t.dataset.id);if(!tb)return;const rows=String(tb.rows||tb.entries||tb.body||"").split("\n").map(s=>s.replace(/^\s*(\d+(\s*[-–]\s*\d+)?[.):]?|[-*•])\s*/,"").trim()).filter(Boolean);
+    ST.improv={kind:"Roll table",title:tb.title||"Roll table",detail:rows.length?orPick(rows):"This table has no rows yet."};return renderTable()}
+  if(a==="stLogIt"){const im=ST.improv;if(!im)return;const ln=`${im.kind}: ${im.title}${im.detail?` (${im.detail.replace(/\n/g,"; ")})`:""}`;await addSessionLine(ln);toast("Logged");return renderTable()}
+  if(a==="stGenSave"){const nm=(document.getElementById("sx-genname")?.value||"").trim()||"Quick foe";const g=genMon(nm,GEN,false),id=uid();
+    if(!await save("monsters",id,{...g,name:nm}))return;project();ST.gen=null;
+    if(plan&&Array.isArray(plan.scenes)&&ST.scene)await stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===ST.scene);if(s){s.who=s.who||[];s.who.push({col:"monsters",id})}});
+    else ST.pins.push({col:"monsters",id});
+    toast(`${nm} saved to the Bestiary`);return renderTable()}}
+document.addEventListener("input",e=>{if(e.target.id!=="sx-q")return;ST.q=e.target.value;stRefreshResults()});
+document.addEventListener("click",e=>{const s=e.target.closest("[data-act=stScrim]");if(s&&e.target===s){e.stopPropagation();ST.sheet=null;ST.entry=null;ST.gen=null;ST.recap=false;renderTable()}},true);
+document.addEventListener("keydown",e=>{if(e.key!=="Escape"||!TM||!(ST.sheet||ST.entry||ST.gen||ST.recap))return;if(!document.getElementById("modal").hidden)return;e.stopPropagation();e.preventDefault();ST.sheet=null;ST.entry=null;ST.gen=null;ST.recap=false;renderTable()},true);
 async function stAct(a,t){const plan=stPlan(),n=rcSession(),i=num(t.dataset.i);
   if(a==="stView")return setTMV(t.dataset.v);
   if(a==="stTime")return stTime(num(t.dataset.n));
@@ -2844,7 +3118,7 @@ async function stAct(a,t){const plan=stPlan(),n=rcSession(),i=num(t.dataset.i);
   if(a==="stScene"){ST.scene=t.dataset.id;renderTable();document.querySelector("#tablemode .sx-scene")?.scrollTo({top:0});return}
   if(a==="stPrev"){ST.prevHide=!ST.prevHide;renderTable();return}
   if(a==="stAdv"){ST.adv=t.dataset.v;renderTable();return}
-  if(a==="stRoll")return stRoll(num(t.dataset.n));
+  if(a==="stRoll")return stRoll(t.dataset.n);
   if(a==="stAtt")return stSetAtt(n,t.dataset.id,t.dataset.v);
   if(a==="stEdit"){closeTableMode();U.planSel=t.dataset.id;U.prepTab="scenes";if(location.hash!=="#prep")location.hash="prep";else render();return}
   if(!plan)return;
@@ -2859,7 +3133,7 @@ document.addEventListener("change",e=>{const t=e.target;
 document.addEventListener("input",e=>{if(e.target.id!=="sx-miles")return;ST.miles=e.target.value;const r=document.getElementById("sx-tr");if(r)r.innerHTML=stTravelHtml()});
 document.addEventListener("submit",async e=>{const f=e.target.closest("[data-stlog]");if(!f)return;e.preventDefault();e.stopPropagation();const i=document.getElementById("sx-log"),v=i.value.trim();if(!v)return;
   // the box keeps focus, so a full redraw would wait; draw the new line straight into the list instead
-  const tag=document.getElementById("sx-tag").value;i.value="";const n=await addSessionLine((tag?`[${tag}] `:"")+v);const ul=document.querySelector("#tablemode .sx-log");if(ul)ul.innerHTML=stLogHtml(n);document.getElementById("sx-log")?.focus()});  // look it up again: a redraw may have replaced the box
+  const tag=ST.tag;ST.tag="";document.querySelectorAll("#tablemode .sx-tags [aria-pressed]").forEach(b=>b.setAttribute("aria-pressed","false"));i.value="";const n=await addSessionLine((tag?`[${tag}] `:"")+v);const ul=document.querySelector("#tablemode .sx-log");if(ul)ul.innerHTML=stLogHtml(n);document.getElementById("sx-log")?.focus()});  // look it up again: a redraw may have replaced the box
 function renderTable(){
   renderDock();if(!TM)return;const el=document.getElementById("tablemode");
   if(typingInTable()||TMD.drag){renderPending=true;return}
@@ -4682,6 +4956,7 @@ document.addEventListener("click",async e=>{
     case"planPlayed":{const pl=rec("plans",t.dataset.id);if(pl){const{id,...r}=pl;save("plans",id,{...r,status:pl.status==="played"?"planned":"played"})}break}
     case"pbPlan":U.planSel=t.dataset.id;U.prepTab="plan";render();window.scrollTo({top:0});break;
     case"scnSel":case"scnMove":case"scnDel":case"scnReserve":case"scnClueDel":case"scnIfAdd":case"scnIfDel":case"scnWhoAdd":case"scnWhoDel":scnAct(a,t);break;
+    case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stAlertOk":case"stRes":case"stRead":case"stIf":case"stDone":case"stSpot":case"stSeg":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
     case"stView":case"stTime":case"stShort":case"stLong":case"stUndo":case"stScene":case"stPrev":case"stAdv":case"stRoll":case"stAtt":case"stEdit":case"stClue":case"stNext":stAct(a,t);break;
     case"heroSel":case"heroTab":case"heroLvl":heroAct(a,t);break;
     case"pplSel":case"pplKind":case"pplTab":case"pplAtt":case"pplUnlink":case"genSave":case"genApply":pplAct(a,t);break;

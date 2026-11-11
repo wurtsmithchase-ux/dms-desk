@@ -153,13 +153,14 @@ function panel(){last=body();return `<section class="tm-s sp" id="sp-panel"><h3>
 /* updates only the panel, never the whole page, so typing in Session notes is not interrupted.
    Background updates wait while a slider or menu in the panel has focus; force=true (after a tap) redraws anyway. */
 function refresh(force){
+  refreshBar(force);
   const el=document.getElementById("sp-body");if(!el)return;
   const a=document.activeElement,busy=a&&el.contains(a)&&/^(INPUT|SELECT)$/.test(a.tagName);
   if(busy){if(!force)return;a.blur()}   /* after a tap, let go of focus so later updates are not blocked */
   const h=body();if(h===last&&el.innerHTML)return;el.innerHTML=last=h;
 }
 function onScreen(){
-  const p=document.getElementById("sp-panel");if(!p||document.hidden||!p.offsetParent)return false;
+  const p=document.getElementById("sp-panel")||document.getElementById("sp-top");if(!p||document.hidden||!p.offsetParent)return false;
   const r=p.getBoundingClientRect();return r.bottom>0&&r.top<innerHeight&&r.right>0&&r.left<innerWidth;
 }
 /* every 5 seconds while music plays, every 15 when idle, to save battery and data */
@@ -185,7 +186,9 @@ document.addEventListener("click",e=>{
   const a=t.dataset.sp,m=music();
   if(a==="connect")connect();
   else if(a==="disconnect"){disconnect();if(typeof campaignSheet==="function"&&!document.getElementById("modal").hidden)campaignSheet()}
-  else if(a==="setup")openSetup();
+  else if(a==="setup"){barOpen=false;openSetup()}
+  else if(a==="all"){barOpen=!barOpen;refreshBar(true)}
+  else if(a==="star")star(+t.dataset.i);
   else if(a==="play"){const x=m.items[+t.dataset.i];if(x)act(()=>playUri(x.uri))}
   else if(a==="toggle")act(()=>ST.state&&ST.state.is_playing?api("PUT","/me/player/pause"):playUri());
   else if(a==="next")act(()=>api("POST","/me/player/next"));
@@ -199,7 +202,7 @@ document.addEventListener("change",e=>{
 /* number keys 1 to 9 play the soundboard buttons while table mode is open */
 document.addEventListener("keydown",e=>{
   if(e.ctrlKey||e.metaKey||e.altKey||e.shiftKey||!/^[1-9]$/.test(e.key))return;
-  if(!document.getElementById("sp-panel")||!connected())return;
+  if(!(document.getElementById("sp-panel")||document.getElementById("sp-top"))||!connected())return;
   const tm=document.getElementById("tablemode"),md=document.getElementById("modal");
   if(!tm||tm.hidden||(md&&!md.hidden))return;
   const a=document.activeElement;if(a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)))return;
@@ -256,7 +259,7 @@ document.addEventListener("submit",async e=>{
   const f=e.target.closest("[data-spform]");if(!f)return;
   e.preventDefault();e.stopPropagation();
   if(!ED)return;
-  const items=ED.rows.filter(r=>r.on).map(r=>({id:r.id,uri:r.uri,label:(r.label||r.name).trim().slice(0,24),group:r.group}));
+  const was=music().items;const items=ED.rows.filter(r=>r.on).map(r=>({id:r.id,uri:r.uri,label:(r.label||r.name).trim().slice(0,24),group:r.group,...((was.find(x=>x.id===r.id)||{}).fav?{fav:true}:{})}));
   const def=items.some(x=>x.id===ED.def)?ED.def:"";
   try{await save("settings","music",{items,def,updated:Date.now()})}
   catch(_){say("Could not save the soundboard. Your choices are still on screen");return}
@@ -264,6 +267,28 @@ document.addEventListener("submit",async e=>{
   if(typeof TM!=="undefined"&&TM&&typeof renderTable==="function")renderTable();
 },true);
 
+/* ---------- the Session Table's top-bar music (design screen A) ----------
+   Play or pause, what's on, starred playlists in the bar, and All playlists with a star to keep one in the bar. Stars save in settings/music (item.fav). */
+let barOpen=false,lastBar="";
+const favs=()=>{const it=music().items.map((x,i)=>({x,i})),f=it.filter(o=>o.x.fav);return f.length?f:it.slice(0,5)};
+function barBody(){
+  if(!cid())return `<span class="sp-off">Music isn't set up (see SETUP.md)</span>`;
+  if(!connected())return `<button type="button" class="btn sm" data-sp="connect">Connect Spotify</button>`;
+  const m=music(),s=ST.state,it=s&&s.item,ctx=s&&s.context&&s.context.uri,on=!!(s&&s.is_playing);
+  const ico=on?'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>':'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg>';
+  const grp={};m.items.forEach((x,i)=>{const g=GROUPS.includes(x.group)?x.group:"Mood";(grp[g]=grp[g]||[]).push({x,i})});
+  return `<button type="button" class="sp-pp" data-sp="toggle" aria-label="${on?"Pause music":"Play music"}">${ico}</button>
+    <span class="sp-now"><small>${on?"Playing":s&&it?"Paused":"Nothing playing"}${label(ctx)?` · ${E(label(ctx))}`:""}</small><b>${it?E(it.name):"—"}</b></span>
+    <div class="sp-favs" aria-label="Favourite playlists, scroll sideways for more">${favs().map(o=>`<button type="button" data-sp="play" data-i="${o.i}" aria-pressed="${ctx===o.x.uri}">${E(o.x.label||"Playlist")}</button>`).join("")}</div>
+    <button type="button" class="sp-all" data-sp="all" aria-expanded="${barOpen}">All playlists ▾</button>
+    ${barOpen?`<div class="sp-pop"><div class="sp-poph"><b>All playlists</b><small>Tap to play · ★ to keep it in the top bar</small></div>${m.items.length?`<div class="sp-popg">${GROUPS.filter(g=>grp[g]).map(g=>`<div><span class="sp-gl">${g}</span>${grp[g].map(o=>`<div class="sp-pr"><button type="button" data-sp="play" data-i="${o.i}">${E(o.x.label||"Playlist")}</button><button type="button" class="sp-star" data-sp="star" data-i="${o.i}" aria-pressed="${!!o.x.fav}" aria-label="${o.x.fav?"Take out of":"Keep in"} the top bar: ${E(o.x.label||"Playlist")}">★</button></div>`).join("")}</div>`).join("")}</div>`:`<p class="vempty">No playlists chosen yet.</p>`}<div class="sp-bar"><button type="button" class="btn sm" data-sp="setup">Choose playlists</button></div></div>`:""}
+    ${ST.err?`<span class="sp-err">${E(ST.err)}</span>`:""}`;
+}
+function bar(){lastBar=barBody();return `<div id="sp-top" class="sp-top" role="group" aria-label="Music">${lastBar}</div>`}
+function refreshBar(force){const el=document.getElementById("sp-top");if(!el)return;if(!force&&el.contains(document.activeElement))return;const h=barBody();if(h===lastBar&&el.innerHTML)return;el.innerHTML=lastBar=h}
+async function star(i){const m=music(),items=m.items.map((x,j)=>j===i?{...x,fav:!x.fav}:x);
+  try{await save("settings","music",{items,def:m.def,updated:Date.now()})}catch(_){say("Could not save the star");return}
+  if(typeof project==="function")project();refreshBar(true)}
 /* ---------- styles for the panel and the page ---------- */
 const css=document.createElement("style");css.textContent=`
 .sp-np{font-size:18px;margin-bottom:8px;line-height:1.3}.sp-np small{color:var(--muted)}
@@ -287,6 +312,6 @@ const css=document.createElement("style");css.textContent=`
 `;
 document.head.appendChild(css);
 
-window.DeskSpotify={panel,menu,connect,disconnect,connected,poll,state:ST};
+window.DeskSpotify={panel,bar,menu,connect,disconnect,connected,poll,state:ST};
 handleReturn();watch();
 })();
