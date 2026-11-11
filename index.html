@@ -912,6 +912,30 @@ header.top .clock{display:none!important}
 :root[data-skin="feywild"]{--bg:#e6efe0;--paper:#f4f8ee;--surface:#fbfdf7;--surface2:#e2ecd8;--block:#f3f7ea;--ink:#1f2a1c;--muted:#56664d;--line:#c3d3b3;--stripe:#f2e1ea;--side:#ecf1e0;--accent:#8a2f6b;--accent-ink:#fbeef6;--accent-soft:#f1dbe8;--gold:#7e9a4e;--bar:#d77fb0;--blood:#a3243a;--blood-soft:#f5d7dc;--ok:#3c6e2f;--ok-soft:#dcebcf;--warn:#7d5a08;--warn-soft:#f2e5bf;--hdr:#1e3220;--hdr2:#2f4b2f;--hdr-ink:#f3e9c6;color-scheme:light}
 :root[data-skin="frost"]{--bg:#e4ebf1;--paper:#f3f7fa;--surface:#fbfdff;--surface2:#e1e9f0;--block:#eef4f9;--ink:#17222c;--muted:#4f6070;--line:#c2cfdb;--stripe:#dde8f1;--side:#e7eef5;--accent:#1f5a8a;--accent-ink:#eef6fc;--accent-soft:#d5e4f1;--gold:#7f9bb5;--bar:#5aa0d0;--blood:#a3262c;--blood-soft:#f4d7d8;--ok:#2f6b4f;--ok-soft:#d6eadf;--warn:#7a5908;--warn-soft:#efe3c2;--hdr:#142333;--hdr2:#243b53;--hdr-ink:#e3eef8;color-scheme:light}
 :root[data-skin="forge"]{--bg:#e3ded6;--paper:#f1eee8;--surface:#f8f6f2;--surface2:#e2ddd3;--block:#efebe3;--ink:#22201c;--muted:#5d574d;--line:#c9c1b2;--stripe:#e5e0d4;--side:#eae6dc;--accent:#2f4f5f;--accent-ink:#f1ece0;--accent-soft:#d7e0e2;--gold:#a07a32;--bar:#b5852f;--blood:#9b2a1c;--blood-soft:#f1d6cf;--ok:#3d6630;--ok-soft:#dde8d0;--warn:#7d5508;--warn-soft:#f0e2bd;--hdr:#23272b;--hdr2:#3b4148;--hdr-ink:#e8d29d;color-scheme:light}
+/* Wood & Wax skin: parchment pages on dark wood, wax red actions, gilt edges. At 1101px and wider the tabs become a side menu. */
+:root[data-skin="wood"]{--bg:#efe0be;--paper:#f6ebd0;--surface:#f6ebd0;--surface2:#e4cfa3;--block:#f3e5c4;--ink:#2a1b10;--muted:#5e4630;--line:#cdb383;--stripe:#e8d6ae;--side:#eddcb8;--accent:#8e1f12;--accent-ink:#f6e8c6;--accent-soft:#eed3c2;--gold:#c9a24e;--bar:#c9a24e;--blood:#8e1f12;--blood-soft:#f0d2c6;--hdr:#17100b;--hdr2:#2e2015;--hdr-ink:#ead9b5;--wood:#17100b;--wood2:#241811}
+:root[data-skin="wood"]:not([data-fonts]){--title:"Cinzel Decorative","Cinzel",Georgia,serif;--drop:"Cinzel Decorative","Cinzel",Georgia,serif;--display:"IM Fell English SC",Georgia,serif;--sc:"IM Fell English SC",Georgia,serif;--body:"EB Garamond",Georgia,serif;--ui:"EB Garamond",Georgia,serif}
+:root[data-skin="wood"] body{background:var(--wood);background-image:none}
+:root[data-skin="wood"] #app{background:var(--bg);border:1px solid #8a6a2c;border-radius:4px;margin-block:18px 28px;box-shadow:0 2px 14px rgba(0,0,0,.45)}
+.nav-brand,.nav-sess,.nav-h{display:none}
+@media (max-width:640px){:root[data-skin="wood"] #app{margin:0;border:0;border-radius:0;box-shadow:none}}
+@media (min-width:1101px){
+  :root[data-skin="wood"] body{padding-left:232px}
+  :root[data-skin="wood"] nav.tabs{position:fixed;left:0;top:0;bottom:0;width:232px;z-index:6;flex-direction:column;gap:3px;overflow-y:auto;background:var(--wood2);border-right:2px solid var(--gold);padding:max(24px,env(safe-area-inset-top,0px)) 14px 24px}
+  :root[data-skin="wood"] nav.tabs a,:root[data-skin="wood"] .nav-sess{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:0 12px;margin:0;border:0;border-radius:3px;background:none;color:var(--hdr-ink);opacity:1;font:400 18px var(--sc);letter-spacing:.02em;text-align:left;cursor:pointer;order:5}
+  :root[data-skin="wood"] nav.tabs a:hover,:root[data-skin="wood"] .nav-sess:hover{background:rgba(201,162,78,.14)}
+  :root[data-skin="wood"] nav.tabs a[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+  :root[data-skin="wood"] nav.tabs a .n{font:400 14px var(--body);opacity:.75;margin:0}
+  :root[data-skin="wood"] .nav-brand{display:block;order:0;font:700 24px/1.2 var(--drop);color:var(--gold);padding:0 10px 18px}
+  :root[data-skin="wood"] .nav-sess{order:1}
+  :root[data-skin="wood"] nav.tabs a[href="#prep"]{order:2}
+  :root[data-skin="wood"] nav.tabs a[href="#party"],:root[data-skin="wood"] nav.tabs a[href="#home"]{order:3}
+  :root[data-skin="wood"] .nav-h{display:block;order:4;font:400 16px var(--sc);color:var(--gold);padding:18px 12px 6px}
+  :root[data-skin="wood"] .brand small{display:none}
+  :root[data-skin="wood"] #pindock{left:232px}
+  :root[data-skin="wood"] body.docked{padding-left:632px}
+  :root[data-skin="wood"] body.docked .scrim{padding-left:656px}
+}
 :root[data-fonts="storybook"]{--title:"IM Fell English SC",Georgia,serif;--display:"IM Fell English SC",Georgia,serif;--drop:"IM Fell English SC",Georgia,serif;--body:"IM Fell English",Georgia,serif}
 :root[data-fonts="elvish"]{--title:"Uncial Antiqua",Georgia,serif;--display:"Alegreya SC",Georgia,serif;--drop:"Uncial Antiqua",Georgia,serif;--body:"Alegreya",Georgia,serif}
 :root[data-fonts="gothic"]{--title:"UnifrakturCook",Georgia,serif;--display:"Pirata One",Georgia,serif;--drop:"UnifrakturCook",Georgia,serif;--body:"EB Garamond",Georgia,serif}
@@ -2430,8 +2454,10 @@ const SKINS=[
   {id:"shadowfell",name:"Shadowfell",note:"Drained of color",top:"#0b0b0c",ink:"#d4d6db",bg:"#191a1c",h:"#a9bed3",line:"#3a3c42",dots:["#a9bed3","#5d6b7a","#8d8f96"]},
   {id:"feywild",name:"Feywild",note:"Moss and blossom",top:"#1e3220",ink:"#f3e9c6",bg:"#f4f8ee",h:"#8a2f6b",line:"#c3d3b3",dots:["#8a2f6b","#d77fb0","#7e9a4e"]},
   {id:"frost",name:"Frostmaiden",note:"Ice and steel blue",top:"#142333",ink:"#e3eef8",bg:"#f3f7fa",h:"#1f5a8a",line:"#c2cfdb",dots:["#1f5a8a","#5aa0d0","#7f9bb5"]},
-  {id:"forge",name:"Dwarven Forge",note:"Slate and brass",top:"#23272b",ink:"#e8d29d",bg:"#f1eee8",h:"#2f4f5f",line:"#c9c1b2",dots:["#2f4f5f","#b5852f","#a07a32"]}];
-const SKIN_MODE={parchment:"light",candlelit:"dark",arcane:"dark",infernal:"dark",shadowfell:"dark",feywild:"light",frost:"light",forge:"light"};
+  {id:"forge",name:"Dwarven Forge",note:"Slate and brass",top:"#23272b",ink:"#e8d29d",bg:"#f1eee8",h:"#2f4f5f",line:"#c9c1b2",dots:["#2f4f5f","#b5852f","#a07a32"]},
+  {id:"wood",name:"Wood & Wax",note:"Dark wood, wax red and gilt, with a side menu",top:"#17100b",ink:"#ead9b5",bg:"#efe0be",h:"#8e1f12",line:"#c9a24e",dots:["#8e1f12","#c9a24e","#241811"]}];
+const SKIN_MODE={parchment:"light",candlelit:"dark",arcane:"dark",infernal:"dark",shadowfell:"dark",feywild:"light",frost:"light",forge:"light",wood:"light"};
+const SKIN_FONTS={wood:"Cinzel+Decorative:wght@700&family=IM+Fell+English+SC&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400"};
 const FONTSETS=[
   {id:"classic",name:"Classic",t:"Cinzel",b:"Spectral",css:null},
   {id:"storybook",name:"Storybook",t:"IM Fell English SC",b:"IM Fell English",css:"IM+Fell+English+SC&family=IM+Fell+English:ital@0;1"},
@@ -2442,7 +2468,7 @@ const FONTSETS=[
 const SIZES=[["0.9","Small"],["1","Normal"],["1.1","Large"],["1.2","Extra large"]];
 
 const TEXTURES=[["theme","Theme default"],["parchment","Parchment"],["leather","Leather"],["linen","Linen"],["stone","Stone"],["wood","Wood grain"],["stars","Starfield"],["embers","Embers"],["frost","Frost"],["none","None"]];
-const THEME_TEX={auto:"parchment",parchment:"parchment",candlelit:"leather",arcane:"stars",infernal:"embers",shadowfell:"stone",feywild:"linen",frost:"frost",forge:"stone"};
+const THEME_TEX={wood:"none",auto:"parchment",parchment:"parchment",candlelit:"leather",arcane:"stars",infernal:"embers",shadowfell:"stone",feywild:"linen",frost:"frost",forge:"stone"};
 const TEX_STRENGTH=[["0.5","Subtle"],["0.8","Medium"],["1","Bold"]];
 function rgbOf(hex){hex=(hex||"#000").trim().replace("#","");if(hex.length===3)hex=hex.split("").map(c=>c+c).join("");const n=parseInt(hex,16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]}
 function noiseUri(o,rgb){const{size=240,freq=".8",oct=3,type="fractalNoise",a=1.2,b=-.45,k=1,seed=7}=o;const[r,g,bl]=rgb.map(v=>v.toFixed(3));
@@ -2477,6 +2503,7 @@ function loadFontSet(id){const f=FONTSETS.find(x=>x.id===id);if(!f||!f.css||docu
 function applyStyle(){const r=document.documentElement;
   if(STYLE.skin==="auto"){r.removeAttribute("data-theme");r.removeAttribute("data-skin")}
   else{r.setAttribute("data-theme",SKIN_MODE[STYLE.skin]||"light");if(["parchment","candlelit"].includes(STYLE.skin))r.removeAttribute("data-skin");else r.setAttribute("data-skin",STYLE.skin)}
+  if(SKIN_FONTS[STYLE.skin]&&!document.getElementById("font-skin-"+STYLE.skin)){const l=document.createElement("link");l.id="font-skin-"+STYLE.skin;l.rel="stylesheet";l.href="https://fonts.googleapis.com/css2?family="+SKIN_FONTS[STYLE.skin]+"&display=swap";document.body.appendChild(l)}
   if(STYLE.fonts&&STYLE.fonts!=="classic"){loadFontSet(STYLE.fonts);r.setAttribute("data-fonts",STYLE.fonts)}else r.removeAttribute("data-fonts");
   r.style.setProperty("--zoom",STYLE.size||"1");
   if(STYLE.plain&&!STYLE.texture)STYLE.texture="none";
@@ -3282,7 +3309,8 @@ function render(){
   if(document.getElementById("modal").hidden&&!TM)document.documentElement.classList.remove("locked");
   if(U.tab==="prep"&&!isDM())U.tab="home";if(U.tab==="home"&&isDM())U.tab="party";
   const counts={party:S.characters.length,notes:S.notes.length,calendar:S.events.length,quests:S.quests.filter(q=>q.status==="active").length,world:S.maps.length,prep:S.threads.filter(t=>t.status!=="resolved").length};
-  document.getElementById("tabs").innerHTML=TABS.filter(([k])=>((k!=="prep")||isDM())&&(k!=="home"||!isDM())).map(([k,l,sh])=>`<a href="#${k}" ${U.tab===k?'aria-current="page"':""}><span class="full">${l}</span><span class="short">${sh}</span><span class="n">${counts[k]||""}</span></a>`).join("");
+  document.getElementById("tabs").innerHTML=TABS.filter(([k])=>((k!=="prep")||isDM())&&(k!=="home"||!isDM())).map(([k,l,sh])=>`<a href="#${k}" ${U.tab===k?'aria-current="page"':""}><span class="full">${l}</span><span class="short">${sh}</span><span class="n">${counts[k]||""}</span></a>`).join("")
+    +`<span class="nav-brand" aria-hidden="true">DM's Desk</span>${isDM()?`<button type="button" class="nav-sess" data-act="tmOpen" title="A big-text screen for running the session (T)">Session</button>`:""}<span class="nav-h">The Library</span>`;
   const banner=(S.live?"":`<div class="banner">Saving isn't available in this view, so changes last only until you close the page.</div>`)+(U.preview?`<div class="preview-bar"><span>Previewing what your players see.</span><button class="btn sm" data-act="previewToggle">Stop previewing</button></div>`:"");
   const views={home:vHome,party:vParty,notes:vNotes,calendar:vCalendar,quests:vQuests,world:vWorld,prep:vPrep};
   const y=window.scrollY,ta=aid&&ae.tagName==="TEXTAREA"?ae.scrollTop:0;
