@@ -249,6 +249,17 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 .ppl-acts{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
 .ppl-gen{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:8px 0}
 .ppl .statblock{max-width:640px}
+/* Party */
+.hero-i{flex-direction:row;align-items:center;gap:10px}
+.hero-i > span{display:flex;flex-direction:column;min-width:0}
+.hero-lv{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.hero-lv > span:first-child{display:flex;flex-direction:column}
+.hero-lvb{display:flex;gap:6px}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 8px}
+.hero-stats > div{display:flex;flex-direction:column;align-items:center;min-width:76px;padding:8px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.hero-stats b{font:700 24px var(--title)}
+.hero-stats span{font:400 13px var(--sc);color:var(--muted)}
+:root[data-skin="wood"] .hero-stats > div{background:var(--paper);border-color:#c9a86a}
 @media (max-width:640px){.lib-groups{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.lib-groups::-webkit-scrollbar{display:none}.lib-g{flex:0 0 auto;min-height:40px}.lib-q{max-width:none;flex-basis:100%}}
 .reader .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font:500 14px var(--sc);letter-spacing:.04em;margin-bottom:6px}
 .prose{max-width:68ch;overflow-wrap:anywhere;margin-top:14px}
@@ -2755,6 +2766,45 @@ document.addEventListener("submit",async e=>{const f=e.target.closest("[data-ppl
   const foe=document.getElementById("ppl-addk").value==="foe",id=uid();
   if(foe)await save("monsters",id,{name:v,cr:"1"});else await save("characters",id,{name:v,kind:"npc",status:"alive"});
   U.pplSel={col:foe?"monsters":"characters",id};U.pplTab=foe?"gen":"notes";U.pplQ="";U.noteReading=true;project();render()});
+/* Party: player characters with their sheet and story, whole-party level, and the party's languages */
+function vHeroes(){
+  const pcs=S.characters.filter(x=>x.kind==="pc").sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  if(!pcs.some(p=>p.id===U.heroSel))U.heroSel=pcs[0]?.id||null;
+  const x=pcs.find(p=>p.id===U.heroSel),tab=U.heroTab||"sheet";
+  const lv=[...new Set(pcs.map(p=>num(p.level)||0))].sort((a,b)=>a-b),lvTxt=!pcs.length?"":lv.length===1?(lv[0]?`Level ${lv[0]}`:"No level set"):`Levels ${lv.filter(Boolean).join(", ")}`;
+  const langs=(S.settings.party||{}).languages||"";
+  const row=p=>`<button class="nitem hero-i" data-act="heroSel" data-id="${p.id}" aria-current="${p.id===U.heroSel}">${avatar(p,32)}<span><b>${esc(p.name||"Unnamed")}</b><small>${esc([p.cls,p.level?"Lv "+p.level:""].filter(Boolean).join(" · ")||"Player character")}${p.player?` · ${esc(p.player)}`:""}</small></span></button>`;
+  const left=`<div class="nlist"><div class="ppl-tools">
+    <div class="hero-lv"><span><span class="label">Whole party</span><b>${lvTxt||"No heroes yet"}</b></span><span class="dm-only hero-lvb"><button type="button" class="btn icon" data-act="heroLvl" data-n="-1" aria-label="Every hero down one level" ${pcs.length?"":"disabled"}>−</button><button type="button" class="btn sm" data-act="heroLvl" data-n="1" ${pcs.length?"":"disabled"}>Level up</button></span></div>
+    <label class="scn-f"><span class="label">Party languages</span><input class="search" id="party-lang" value="${esc(langs)}" placeholder="e.g. Common, Elvish, Dwarvish" aria-describedby="party-lang-h"></label><small id="party-lang-h" class="muted">Saves when you leave the box. The Session Table cheat sheet shows it.</small>
+    <form data-heroadd class="tq dm-only"><input id="hero-add" placeholder="Add a hero by name" aria-label="Name of a new hero"><button class="btn sm primary" type="submit">Add</button></form></div>
+    <div class="lib-lh"><h3>The Party</h3><span>${pcs.length}</span></div>${pcs.length?pcs.map(row).join(""):`<div class="empty">No heroes yet. Add one by name.</div>`}</div>`;
+  if(!x)return `<div class="notes lib ppl hero ${U.noteReading?"reading":""}">${left}<div class="empty lib-pick">Pick a hero to see their sheet and story.</div></div>`;
+  const max=x.hpMax||0,hp=x.hp??max;
+  const stats=`<div class="hero-stats"><div><b>${x.ac??"–"}</b><span>AC</span></div><div><b>${max?hp:"–"}</b><span>HP${max?` / ${max}`:""}</span></div><div><b>${x.level||"–"}</b><span>Level</span></div></div>${passiveLine(x)}`;
+  const tabs=`<div class="seg ppl-tabs">${[["sheet","Character sheet"],["story","Story & hooks"]].map(([k,l])=>`<button type="button" data-act="heroTab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join("")}</div>`;
+  let body;
+  if(tab==="sheet")body=x.sheet?sheetPanel(x):`<p class="vempty">No character sheet yet. Use Edit and paste it into Character sheet.</p>`;
+  else{const arcs=S.quests.filter(q=>q.pc===x.id);
+    body=`<div class="le-cols"><div class="le-main">
+      <section><h4 class="le-h">Backstory</h4>${x.backstory?`<div class="prose vprose">${rich(x.backstory,"characters:"+x.id)}</div>`:`<p class="vempty">No backstory yet.</p>`}</section>
+      <section><h4 class="le-h">Hooks & notes</h4>${x.notes?`<div class="prose vprose">${rich(x.notes,"characters:"+x.id)}</div>`:`<p class="vempty">No notes yet.</p>`}</section>
+      <section><h4 class="le-h">Personal arcs</h4>${arcs.length?arcs.map(q=>{const bs=beatList(q),d=bs.filter(b=>b.done).length;return `<button class="pb-row" data-act="open" data-type="quests" data-id="${q.id}"><b>${esc(q.title||"Untitled quest")}</b><small>${esc(QSTAT[q.status]||q.status||"")}${bs.length?` · ${d} of ${bs.length} story beats`:""}</small></button>`}).join(""):`<p class="vempty">No quests set as this hero's personal arc. Set "Personal arc of" on a quest.</p>`}</section></div>
+      <div class="le-side">${secretBox(x)}${backlinkBlock("characters",x.id)}</div></div>`}
+  return `<div class="notes lib ppl hero ${U.noteReading?"reading":""}">${left}<article class="reader lib-entry"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ Back to the list</button></div>
+    <div class="le-head"><div class="le-t"><span class="le-crumb">${esc(["Player character",x.player?"Played by "+x.player:""].filter(Boolean).join(" · "))}</span><h3 class="t">${esc(x.name||"Unnamed")}</h3><span class="pb-sub">${esc([x.race,x.cls].filter(Boolean).join(" · "))}</span></div><span class="dm-only acts-r"><button type="button" class="btn sm" data-act="view" data-type="characters" data-id="${x.id}">Full page</button><button type="button" class="btn sm" data-act="edit" data-type="characters" data-id="${x.id}">Edit</button></span></div>
+    ${stats}${tabs}${body}</article></div>`;
+}
+async function heroAct(a,t){
+  if(a==="heroSel"){U.heroSel=t.dataset.id;U.noteReading=true;render();if(isPhone())window.scrollTo({top:0});return}
+  if(a==="heroTab"){U.heroTab=t.dataset.v;render();return}
+  if(a==="heroLvl"){const n=num(t.dataset.n);const pcs=S.characters.filter(x=>x.kind==="pc");let changed=0;
+    for(const p of pcs){const cur=num(p.level)||0;if(!cur&&n<0)continue;const nx=cur?Math.max(1,Math.min(20,cur+n)):1;if(nx!==cur){await charPatch(p.id,{level:nx});changed++}}
+    if(changed)toast(n>0?"Every hero went up a level":"Every hero went down a level");}}
+document.addEventListener("change",e=>{if(e.target.id!=="party-lang")return;const v=e.target.value.trim();if(v===((S.settings.party||{}).languages||""))return;save("settings","party",{...(S.settings.party||{}),languages:v}).then(()=>toast("Party languages saved"))});
+document.addEventListener("submit",async e=>{const f=e.target.closest("[data-heroadd]");if(!f)return;e.preventDefault();e.stopPropagation();const i=document.getElementById("hero-add"),v=i.value.trim();if(!v)return;
+  const id=uid(),lv=[...new Set(S.characters.filter(x=>x.kind==="pc").map(x=>num(x.level)).filter(Boolean))];
+  await save("characters",id,{name:v,kind:"pc",status:"alive",...(lv.length===1?{level:lv[0]}:{})});U.heroSel=id;U.heroTab="sheet";U.noteReading=true;project();render()});
 function vBestiary(){
   const list=S.monsters.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||""));
   return `<div class="sub-bar"><p class="tool-d">Your own stat blocks. Names link everywhere, encounters can pull them in, and table mode shows them when a plan mentions them.</p><button class="btn primary" data-act="new" data-type="monsters">New stat block</button></div>
@@ -3696,6 +3746,7 @@ function vParty(){
     <button class="btn primary dm-only" data-act="new" data-type="characters">Add character</button></div>`;
   h+=whatsNew();
   if(f==="npc")return h+vPeople();
+  if(f==="pc")return h+vHeroes()+treasury();
   if(f!=="npc"){
     h+=`<h3 class="section-h">The Adventuring Party · ${pcs.length}</h3>`;
     h+=pcs.length?`<div class="pcs">${pcs.map(pcCard).join("")}</div>`:`<div class="empty" style="margin-bottom:28px">No player characters yet.${isDM()?" Use <b>Add character</b> and set the type to Player character.":""}</div>`;
@@ -4216,6 +4267,7 @@ document.addEventListener("click",async e=>{
     case"planPlayed":{const pl=rec("plans",t.dataset.id);if(pl){const{id,...r}=pl;save("plans",id,{...r,status:pl.status==="played"?"planned":"played"})}break}
     case"pbPlan":U.planSel=t.dataset.id;U.prepTab="plan";render();window.scrollTo({top:0});break;
     case"scnSel":case"scnMove":case"scnDel":case"scnReserve":case"scnClueDel":case"scnIfAdd":case"scnIfDel":case"scnWhoAdd":case"scnWhoDel":scnAct(a,t);break;
+    case"heroSel":case"heroTab":case"heroLvl":heroAct(a,t);break;
     case"pplSel":case"pplKind":case"pplTab":case"pplAtt":case"pplUnlink":case"genSave":case"genApply":pplAct(a,t);break;
     case"scnOpen":U.planSel=t.dataset.id;U.prepTab="scenes";render();window.scrollTo({top:0});break;
     case"pbWorld":U.worldTab=t.dataset.v;if(location.hash!=="#world")location.hash="world";else render();break;
