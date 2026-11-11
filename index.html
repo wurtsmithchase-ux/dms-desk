@@ -115,7 +115,8 @@ input.search{width:230px;max-width:100%}
 .pc h3{margin:0;font:700 22px/1.15 var(--display);color:var(--accent);cursor:pointer;min-width:0;overflow-wrap:anywhere}
 .pc h3:hover{text-decoration:underline;text-decoration-thickness:1px}
 .pc .sub{font-style:italic;color:var(--ink);font-size:15px;line-height:1.3}
-.taper{height:5px;background:var(--accent);clip-path:polygon(0 50%,0 0,100% 50%,0 100%);margin:2px 0;clear:both} /* clear:both keeps a divider below a floated drop cap instead of beside it */
+.taper{height:5px;background:var(--accent);clip-path:polygon(0 50%,0 0,100% 50%,0 100%);margin:2px 0}
+.prose::after{content:"";display:table;clear:both} /* the text box holds its own floated drop cap, so a divider after short text sits below it, not beside it */
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;text-align:center}
 .stat b{display:block;font:500 21px/1.15 var(--ui);font-variant-numeric:lining-nums tabular-nums;color:var(--ink)}
 .stat span{font:800 12px var(--sc);letter-spacing:.08em;color:var(--accent)}
@@ -231,7 +232,8 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 .scn-acts{display:flex;flex-wrap:wrap;gap:6px}
 .scn-sec{display:flex;flex-direction:column;gap:8px}
 .scn-sec h4{margin:0;font:400 20px var(--display);color:var(--accent)}
-.scn-li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center}
+.scn-found{width:22px;height:22px;margin:0;accent-color:var(--accent)}
+.scn-li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px;align-items:center}
 .scn-if{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:end;padding:10px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
 .scn-if label{display:flex;flex-direction:column;gap:3px;min-width:0}
 @media (max-width:640px){.scn-if{grid-template-columns:minmax(0,1fr) auto}.scn-if label:nth-child(2){grid-column:1}.scn-if .btn{grid-row:1;grid-column:2}}
@@ -259,20 +261,24 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 .hero-stats > div{display:flex;flex-direction:column;align-items:center;min-width:76px;padding:8px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
 .hero-stats b{font:700 24px var(--title)}
 .hero-stats span{font:400 13px var(--sc);color:var(--muted)}
-:root[data-skin="wood"] .hero-stats > div{background:var(--paper);border-color:#c9a86a}
+:root[data-skin="wood"] .hero-stats > div{background:var(--paper);border-color:var(--gilt-rule)}
 /* Session Table */
 .tablemode.sx-mode{background:var(--bg)}
 .sx-top .btn{background:transparent;color:var(--hdr-ink);border-color:rgba(214,179,106,.5)}
 .sx-top .btn:hover{border-color:var(--gold);background:rgba(214,179,106,.15)}
 .sx-top .btn:disabled{opacity:.45}
+.sx-top .btn.primary{background:var(--gold);color:#17100b;border-color:var(--gold)}
 .sx-sess{color:var(--gold);font:400 16px var(--sc)}
 .sx-time{display:inline-flex;gap:10px;align-items:baseline;padding:4px 10px;border:1px solid var(--gold);border-radius:2px;background:rgba(0,0,0,.25);font-family:var(--title)}
 .sx-tb{display:inline-flex;flex-wrap:wrap;gap:6px}
+/* the grid carries the padding (with the safe-area insets), so the body itself has none and never scrolls twice */
 .sx-body{flex:1;min-height:0;overflow:auto}
-.sx-grid{display:grid;grid-template-columns:minmax(240px,.8fr) minmax(0,1.6fr) minmax(240px,.9fr) minmax(240px,.9fr);gap:16px;padding:16px;height:100%;box-sizing:border-box}
-.sx-col{min-height:0;overflow:auto;display:flex;flex-direction:column;gap:14px;padding:4px}
-@media (max-width:1499px){.sx-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);height:auto}.sx-col{overflow:visible}}
-@media (max-width:900px){.sx-grid{grid-template-columns:minmax(0,1fr);padding:12px}.sx-scene{order:-1}.sx-time,.sx-tb{flex:0 0 auto;white-space:nowrap}.sx-tb{flex-wrap:nowrap}}
+.tm-body.sx-body{padding:0}
+.sx-grid{display:grid;grid-template-columns:minmax(240px,.8fr) minmax(0,1.6fr) minmax(240px,.9fr) minmax(240px,.9fr);gap:16px;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));height:100%;box-sizing:border-box}
+.sx-col{min-height:0;overflow:auto;display:flex;flex-direction:column;gap:14px;padding:4px 4px 80px}
+/* tablet: the scene on the left, everything else stacked on the right so dice and log stay near the top */
+@media (max-width:1499px){.sx-grid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);height:auto;align-items:start;grid-auto-flow:row dense;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}.sx-col{overflow:visible;padding:4px}.sx-scene{grid-column:1;grid-row:1/span 3}.sx-col:not(.sx-scene){grid-column:2}}
+@media (max-width:900px){.sx-grid{grid-template-columns:minmax(0,1fr);padding:12px 12px calc(96px + env(safe-area-inset-bottom,0px))}.sx-scene,.sx-col:not(.sx-scene){grid-column:auto;grid-row:auto}.sx-scene{order:-1}.sx-time,.sx-tb{flex:0 0 auto;white-space:nowrap}.sx-tb{flex-wrap:nowrap}}
 .sx-att{display:flex;flex-wrap:wrap}
 .sx-npc,.sx-npcb,.sx-card{min-width:0}
 .sx-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
@@ -280,6 +286,7 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 .sx-cur h2{margin:0;font:700 30px/1.15 var(--title)}
 .sx-h{margin:6px 0 0;font:400 19px var(--display);color:var(--accent)}
 .sx-pr{display:flex;align-items:center;gap:8px}
+.sx-chk{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;margin:0 -12px;cursor:pointer}
 .sx-pr input{width:20px;height:20px;flex:0 0 20px;accent-color:var(--accent)}
 .sx-pr .scn-pb{flex:1}
 .sx-pr.done .scn-pt{text-decoration:line-through;opacity:.7}
@@ -328,12 +335,12 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 .sx-lang{margin:4px 0 0}
 .sx-travel{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
 .sx-tr{margin:4px 0}
-:root[data-skin="wood"] .sx-card{background:var(--surface2);border:0;margin:5px;box-shadow:0 0 0 1px #8a6a2c,0 0 0 4px var(--wood2),0 0 0 5px var(--gold)}
-:root[data-skin="wood"] .sx-cur{background:var(--bg);box-shadow:0 0 0 1px #8a6a2c,0 0 0 5px var(--wood2),0 0 0 6px var(--gold)}
+:root[data-skin="wood"] .sx-card{background:var(--surface2);border:0;margin:5px;box-shadow:var(--frame)}
+:root[data-skin="wood"] .sx-cur{background:var(--bg);box-shadow:var(--frame2)}
 :root[data-skin="wood"] .tablemode.sx-mode{background:var(--wood)}
 :root[data-skin="wood"] .sx-cur h2{font-family:var(--drop)}
 :root[data-skin="wood"] .sx-clue,:root[data-skin="wood"] .sx-npc,:root[data-skin="wood"] .sx-if{background:var(--paper)}
-@media (max-width:640px){.lib-groups{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.lib-groups::-webkit-scrollbar{display:none}.lib-g{flex:0 0 auto;min-height:40px}.lib-q{max-width:none;flex-basis:100%}}
+@media (max-width:640px){.lib-groups{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;position:static}.lib-groups::-webkit-scrollbar{display:none}.lib-g{flex:0 0 auto;min-height:44px}.lib-q{max-width:none;flex-basis:100%}}
 .reader .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font:500 14px var(--sc);letter-spacing:.04em;margin-bottom:6px}
 .prose{max-width:68ch;overflow-wrap:anywhere;margin-top:14px}
 .prose > p:first-child::first-letter{font:700 3.3em/.85 var(--drop);color:var(--accent);float:left;margin:.06em .08em 0 0}
@@ -392,6 +399,7 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 .vempty{color:var(--muted);font-style:italic;margin:0}
 .props{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 16px}
 .prop.none{color:var(--muted)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .vh{margin:2px 0 0;font:700 19px var(--display);color:var(--accent)}
 .vblock .stat b{font-size:19px}
 @media (max-width:420px){.props{grid-template-columns:minmax(0,1fr)}}
@@ -1104,38 +1112,38 @@ header.top .clock{display:none!important}
 :root[data-skin="frost"]{--bg:#e4ebf1;--paper:#f3f7fa;--surface:#fbfdff;--surface2:#e1e9f0;--block:#eef4f9;--ink:#17222c;--muted:#4f6070;--line:#c2cfdb;--stripe:#dde8f1;--side:#e7eef5;--accent:#1f5a8a;--accent-ink:#eef6fc;--accent-soft:#d5e4f1;--gold:#7f9bb5;--bar:#5aa0d0;--blood:#a3262c;--blood-soft:#f4d7d8;--ok:#2f6b4f;--ok-soft:#d6eadf;--warn:#7a5908;--warn-soft:#efe3c2;--hdr:#142333;--hdr2:#243b53;--hdr-ink:#e3eef8;color-scheme:light}
 :root[data-skin="forge"]{--bg:#e3ded6;--paper:#f1eee8;--surface:#f8f6f2;--surface2:#e2ddd3;--block:#efebe3;--ink:#22201c;--muted:#5d574d;--line:#c9c1b2;--stripe:#e5e0d4;--side:#eae6dc;--accent:#2f4f5f;--accent-ink:#f1ece0;--accent-soft:#d7e0e2;--gold:#a07a32;--bar:#b5852f;--blood:#9b2a1c;--blood-soft:#f1d6cf;--ok:#3d6630;--ok-soft:#dde8d0;--warn:#7d5508;--warn-soft:#f0e2bd;--hdr:#23272b;--hdr2:#3b4148;--hdr-ink:#e8d29d;color-scheme:light}
 /* Wood & Wax skin: parchment pages on dark wood, wax red actions, gilt edges. At 1101px and wider the tabs become a side menu. */
-:root[data-skin="wood"]{--bg:#efe0be;--paper:#f6ebd0;--surface:#f6ebd0;--surface2:#e4cfa3;--block:#f3e5c4;--ink:#2a1b10;--muted:#5e4630;--line:#cdb383;--stripe:#e8d6ae;--side:#eddcb8;--accent:#8e1f12;--accent-ink:#f6e8c6;--accent-soft:#eed3c2;--gold:#c9a24e;--bar:#c9a24e;--blood:#8e1f12;--blood-soft:#f0d2c6;--ok:#3d6630;--ok-soft:#dfe4c4;--warn:#7d5508;--warn-soft:#f0deb0;--hdr:#17100b;--hdr2:#2e2015;--hdr-ink:#ead9b5;--wood:#17100b;--wood2:#241811}
+:root[data-skin="wood"]{--bg:#efe0be;--paper:#f6ebd0;--surface:#f6ebd0;--surface2:#e4cfa3;--block:#f3e5c4;--ink:#2a1b10;--muted:#5e4630;--line:#cdb383;--stripe:#e8d6ae;--side:#eddcb8;--accent:#8e1f12;--accent-ink:#f6e8c6;--accent-soft:#eed3c2;--gold:#c9a24e;--bar:#c9a24e;--blood:#8e1f12;--blood-soft:#f0d2c6;--ok:#3d6630;--ok-soft:#dfe4c4;--warn:#7d5508;--warn-soft:#f0deb0;--hdr:#17100b;--hdr2:#2e2015;--hdr-ink:#ead9b5;--wood:#17100b;--wood2:#241811;--gilt-edge:#8a6a2c;--gilt-rule:#c9a86a;--frame:0 0 0 1px var(--gilt-edge),0 0 0 4px var(--wood2),0 0 0 5px var(--gold);--frame2:0 0 0 1px var(--gilt-edge),0 0 0 5px var(--wood2),0 0 0 6px var(--gold);color-scheme:light}
 :root[data-skin="wood"]:not([data-fonts]){--title:"Cinzel Decorative","Cinzel",Georgia,serif;--drop:"Cinzel Decorative","Cinzel",Georgia,serif;--display:"IM Fell English SC",Georgia,serif;--sc:"IM Fell English SC",Georgia,serif;--body:"EB Garamond",Georgia,serif;--ui:"EB Garamond",Georgia,serif}
 :root[data-skin="wood"] body{background:var(--wood);background-image:none}
-:root[data-skin="wood"] #app{background:var(--bg);border:1px solid #8a6a2c;border-radius:4px;margin-block:18px 28px;box-shadow:0 2px 14px rgba(0,0,0,.45)}
+:root[data-skin="wood"] #app{background:var(--bg);border:1px solid var(--gilt-edge);border-radius:4px;margin-block:18px 28px;box-shadow:0 2px 14px rgba(0,0,0,.45)}
 .nav-brand,.nav-sess,.nav-h{display:none}
-:root[data-skin="wood"] .notes.lib .nlist{background:var(--surface2);border:0;margin:5px;box-shadow:0 0 0 1px #8a6a2c,0 0 0 4px var(--wood2),0 0 0 5px var(--gold)}
-:root[data-skin="wood"] .notes.lib .lib-groups{background:var(--surface2);border-bottom-color:#c9a86a}
-:root[data-skin="wood"] .notes.lib .nitem,:root[data-skin="wood"] .notes.lib .lib-lh{border-bottom-color:#c9a86a}
-:root[data-skin="wood"] .lib-entry{background:var(--bg);border:0;margin:5px;box-shadow:0 0 0 1px #8a6a2c,0 0 0 5px var(--wood2),0 0 0 6px var(--gold)}
+:root[data-skin="wood"] .notes.lib .nlist{background:var(--surface2);border:0;margin:5px;box-shadow:var(--frame)}
+:root[data-skin="wood"] .notes.lib .lib-groups{background:var(--surface2);border-bottom-color:var(--gilt-rule)}
+:root[data-skin="wood"] .notes.lib .nitem,:root[data-skin="wood"] .notes.lib .lib-lh{border-bottom-color:var(--gilt-rule)}
+:root[data-skin="wood"] .lib-entry{background:var(--bg);border:0;margin:6px;box-shadow:var(--frame2)}
 :root[data-skin="wood"] .lib-entry h3.t{font:700 34px/1.15 var(--drop);color:var(--ink);border-bottom:0;padding-bottom:0}
-:root[data-skin="wood"] .lib-entry .le-fields{background:var(--paper);border-color:#c9a86a}
+:root[data-skin="wood"] .lib-entry .le-fields{background:var(--paper);border-color:var(--gilt-rule)}
 :root[data-skin="wood"] .lib-entry .secret{background:var(--wood2);color:var(--hdr-ink);border:0;box-shadow:inset 0 0 0 1px var(--gold)}
 :root[data-skin="wood"] .lib-entry .secret-h{color:var(--gold);font:400 18px var(--sc);letter-spacing:0}
 :root[data-skin="wood"] .lib-entry .secret a{color:#f0c987}
-:root[data-skin="wood"] .pb-card{background:var(--surface2);border:0;margin:5px;box-shadow:0 0 0 1px #8a6a2c,0 0 0 4px var(--wood2),0 0 0 5px var(--gold)}
+:root[data-skin="wood"] .pb-card{background:var(--surface2);border:0;margin:5px;box-shadow:var(--frame)}
 :root[data-skin="wood"] .pb-next{background:var(--bg)}
-:root[data-skin="wood"] .pb-row{background:var(--paper);border-color:#c9a86a}
+:root[data-skin="wood"] .pb-row{background:var(--paper);border-color:var(--gilt-rule)}
 :root[data-skin="wood"] .pb-title{font-family:var(--drop)}
-:root[data-skin="wood"] .scn-box{background:var(--surface2);border:0;margin:5px;box-shadow:0 0 0 1px #8a6a2c,0 0 0 4px var(--wood2),0 0 0 5px var(--gold)}
-:root[data-skin="wood"] .scn-ed{background:var(--bg);border:0;margin:5px;box-shadow:0 0 0 1px #8a6a2c,0 0 0 5px var(--wood2),0 0 0 6px var(--gold)}
+:root[data-skin="wood"] .scn-box{background:var(--surface2);border:0;margin:5px;box-shadow:var(--frame)}
+:root[data-skin="wood"] .scn-ed{background:var(--bg);border:0;margin:6px;box-shadow:var(--frame2)}
 :root[data-skin="wood"] .scn-in{background:var(--paper);border-color:#b08e52}
 :root[data-skin="wood"] .scn-title{font-family:var(--drop)}
-:root[data-skin="wood"] .scn-pb{background:var(--paper);border-color:#c9a86a}
+:root[data-skin="wood"] .scn-pb{background:var(--paper);border-color:var(--gilt-rule)}
 :root[data-skin="wood"] .scn-pb[aria-current="true"]{background:var(--accent);border-color:var(--accent)}
-:root[data-skin="wood"] .scn-if{background:var(--paper);border-color:#c9a86a}
+:root[data-skin="wood"] .scn-if{background:var(--paper);border-color:var(--gilt-rule)}
 @media (max-width:640px){:root[data-skin="wood"] .lib-entry h3.t{font-size:28px}}
 @media (max-width:640px){:root[data-skin="wood"] body{background:var(--bg)}:root[data-skin="wood"] #app{margin:0;border:0;border-radius:0;box-shadow:none}}
 @media (min-width:1101px){
   /* --navw is the side menu width; 400px and 424px match the normal #pindock width and scrim padding */
   :root[data-skin="wood"]{--navw:232px}
   :root[data-skin="wood"] body{padding-left:var(--navw)}
-  :root[data-skin="wood"] nav.tabs{position:fixed;left:0;top:0;bottom:0;width:var(--navw);z-index:6;flex-direction:column;gap:3px;overflow-y:auto;background:var(--wood2);border-right:2px solid var(--gold);padding:max(24px,env(safe-area-inset-top,0px)) 14px 24px}
+  :root[data-skin="wood"] nav.tabs{position:fixed;left:0;top:0;bottom:0;width:var(--navw);z-index:6;flex-direction:column;gap:3px;overflow-y:auto;background:var(--wood2);border-right:2px solid var(--gold);padding:24px 14px}
   :root[data-skin="wood"] nav.tabs a,:root[data-skin="wood"] .nav-sess{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:0 12px;margin:0;border:0;border-radius:3px;background:none;color:var(--hdr-ink);opacity:1;font:400 18px var(--sc);letter-spacing:.02em;text-align:left;cursor:pointer}
   :root[data-skin="wood"] nav.tabs a:hover,:root[data-skin="wood"] .nav-sess:hover{background:rgba(201,162,78,.14)}
   :root[data-skin="wood"] nav.tabs a[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
@@ -1571,6 +1579,10 @@ const isPhone=()=>window.matchMedia("(max-width:640px)").matches;
 // Wood & Wax turns the tabs into a side menu at 1101px and wider (matches the CSS media query)
 const SIDE_MQ=window.matchMedia("(min-width:1101px)");
 const sideMenu=()=>STYLE.skin==="wood"&&SIDE_MQ.matches;
+// the tabs this viewer has, in the order the menu shows them (the side menu puts Prep, Session and Party first)
+const SIDE_TOP=["prep","home","party"];
+const visibleTabs=()=>{const v=TABS.filter(([k])=>(k!=="prep"||isDM())&&(k!=="home"||!isDM()));if(!sideMenu())return v;
+  return [...SIDE_TOP.map(k=>v.find(t=>t[0]===k)).filter(Boolean),...v.filter(t=>!SIDE_TOP.includes(t[0]))]};
 try{SIDE_MQ.addEventListener("change",()=>{if(STYLE.skin==="wood")render()})}catch(e){}
 let db=null;
 
@@ -1653,7 +1665,7 @@ function subscribe(){
   db.collection("settings").onSnapshot(snap=>{const o={};snap.docs.forEach(d=>o[d.id]=d.data());S.settings=o;S.loaded=true;bootSeen("settings");queueRender()},()=>bootSeen("settings"));
 }
 async function save(col,id,data,opts){
-  if(col==="settings"){data.updated=Date.now();try{await db.collection("settings").doc(id).set(data)}catch(e){toast(saveErr(e))}return}
+  if(col==="settings"){data.updated=Date.now();try{await db.collection("settings").doc(id).set(data);return true}catch(e){toast(saveErr(e));return false}}
   const {secret,dmOnly:want,id:_i,...pub}=data;pub.updated=(opts&&opts.keepDate&&pub.updated)||Date.now();
   const dmOnly=ALWAYS_DM.has(col)||RAW[col].dm.has(id)||!!want;
   const r=RAW[col];
@@ -1666,7 +1678,8 @@ async function save(col,id,data,opts){
     const s=(secret||"").trim();
     if(s)await db.collection(SECRET+"/x_"+col).doc(id).set({secret:s});
     else if(r.x.has(id))await db.collection(SECRET+"/x_"+col).doc(id).delete();
-  }catch(e){toast(saveErr(e))}
+    return true;
+  }catch(e){toast(saveErr(e));return false}
 }
 function saveErr(e){return e&&e.code==="quota_exceeded"?"Storage is full. Delete some old entries.":e&&e.code==="invalid_argument"?"You can view this campaign but not change it.":"Couldn't save. Try again."}
 async function remove(col,id){
@@ -1904,19 +1917,19 @@ function planBullets(text,key){
     else plSentences(l).forEach(x=>{out+=`<li>${plInline(x,key)}</li>`});
   });close();return out}
 /* Prep Board: one page that gathers the next session, the path, quests, threads, spotlight, clocks, factions and to-dos */
+const PB_PATH_MAX=10;
 const PB_SECS=[["opener","Scene opener"],["encounters","Encounters & scenes"],["cast","NPCs & places"],["loot","Loot to hand out"],["threads","Threads to pull"],["reveals","Reveals"]];
 function vPrepBoard(c){
-  const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));
-  const cur=plans.find(p=>p.status!=="played")||null,n=cur?(cur.session||"?"):nextSession();
+  const cur=thNext(),n=cur?(cur.session||"?"):nextSession();
   const filled=cur?PB_SECS.filter(([k])=>String(cur[k]||"").trim()):[],pct=Math.round(filled.length/PB_SECS.length*100);
-  const path=cur&&Array.isArray(cur.scenes)&&cur.scenes.some(x=>!x.reserve)?cur.scenes.filter(x=>!x.reserve).map(x=>x.title||"Untitled scene").slice(0,10):cur?String(cur.encounters||"").split("\n").map(l=>l.trim()).filter(l=>l&&!/^#/.test(l)).map(l=>plain(l.replace(/^[-*•]\s+/,""))).slice(0,8):[];
+  const path=(cur&&Array.isArray(cur.scenes)&&cur.scenes.some(x=>!x.reserve)?cur.scenes.filter(x=>!x.reserve).map(x=>x.title||"Untitled scene"):cur?String(cur.encounters||"").split("\n").map(l=>l.trim()).filter(l=>l&&!/^#/.test(l)).map(l=>l.replace(/^[-*•]\s+/,"")):[]).map(plain).slice(0,PB_PATH_MAX);
   const card=(title,count,go,body,cls)=>`<section class="pb-card ${cls||""}"><div class="pb-h"><h3>${title}${count!=null?` <span class="pb-n">${count}</span>`:""}</h3>${go||""}</div>${body}</section>`;
   const goTab=(v,l)=>`<button class="btn sm" data-act="prepTab" data-v="${v}">${l}</button>`;
   const ng=nextGameText();
   const next=card(`Session ${n}`,null,cur?`<button class="btn sm primary" data-act="pbPlan" data-id="${cur.id}">Open plan</button>`:`<button class="btn sm primary" data-act="newPlan">Plan session ${n}</button>`,
     `${cur?`<p class="pb-title">${esc(cur.title||`Session ${n}`)}</p>`:`<p class="vempty">No plan for the next session yet.</p>`}${ng?`<p class="pb-sub">${esc(ng)}</p>`:""}
     ${cur?`<div class="pb-prog" role="progressbar" aria-valuemin="0" aria-valuemax="${PB_SECS.length}" aria-valuenow="${filled.length}" aria-label="Plan sections filled"><span style="width:${pct}%"></span></div>
-    <ul class="pb-check">${PB_SECS.map(([k,l])=>`<li class="${String(cur[k]||"").trim()?"done":""}">${l}</li>`).join("")}</ul>`:""}`,"pb-next");
+    <ul class="pb-check" aria-label="Plan sections">${PB_SECS.map(([k,l])=>{const d=!!String(cur[k]||"").trim();return `<li class="${d?"done":""}">${l}<span class="sr-only">${d?" (filled)":" (empty)"}</span></li>`}).join("")}</ul>`:""}`,"pb-next");
   const pathC=card(`The path${cur?` for session ${n}`:""}`,null,cur?`<button class="btn sm" data-act="scnOpen" data-id="${cur.id}">Edit scenes</button>`:"",path.length?`<ol class="pb-path">${path.map(l=>`<li>${linkify(esc(l),"")}</li>`).join("")}</ol>`:`<p class="vempty">${cur?"Add scenes in the Scenes tab, or lines in the plan's Encounters & scenes.":"Plan the next session to see its path here."}</p>`,"pb-pathc");
   const quests=S.quests.filter(q=>q.status==="active").sort((a,b)=>(b.updated||0)-(a.updated||0));
   const qC=card("Active quests",quests.length,`<a class="btn sm" href="#quests">All quests</a>`,quests.length?quests.slice(0,8).map(q=>{const bs=beatList(q),d=bs.filter(b=>b.done).length;return `<button class="pb-row" data-act="open" data-type="quests" data-id="${q.id}"><b>${esc(q.title||"Untitled quest")}</b>${bs.length?`<small>${d} of ${bs.length} story beats</small>`:q.giver?`<small>From ${esc(q.giver)}</small>`:""}</button>`}).join(""):`<p class="vempty">No active quests.</p>`);
@@ -1926,13 +1939,15 @@ function vPrepBoard(c){
   const ss=spotSessions(),last=ss[ss.length-1]||0;
   const since=pc=>{const lit=ss.filter(s=>(logFor(s)?.spotlight||[]).includes(pc));return lit.length?last-lit[lit.length-1]:null};
   const sC=card("Spotlight",null,goTab("spotlight","Spotlight"),pcs.length?`<div class="pb-spot">${pcs.map(p=>{const d=since(p.id);return `<div class="pb-sp ${d===null||d>=2?"warn":""}">${avatar(p,24)}<b>${esc(p.name)}</b><small>${d===null?"No moment yet":d===0?"Moment last session":`No moment for ${d} sessions`}</small></div>`}).join("")}</div>`:`<p class="vempty">Add party members to track the spotlight.</p>`);
-  const clocks=S.clocks.slice().sort((a,b)=>((num(b.filled)||0)/(num(b.segments)||1))-((num(a.filled)||0)/(num(a.segments)||1)));
+  // clocks closest to filling first; full ones have already happened, so leave them off the board
+  const clkR=k=>(num(k.filled)||0)/Math.max(1,num(k.segments)||0);
+  const clocks=S.clocks.filter(k=>clkR(k)<1).sort((a,b)=>clkR(b)-clkR(a));
   const kC=card("Clocks",clocks.length,goTab("clocks","All clocks"),clocks.length?`<div class="clks pb-clks">${clocks.slice(0,6).map(k=>clockCard(k,true)).join("")}</div>`:`<p class="vempty">No clocks yet.</p>`);
   const facs=S.notes.filter(x=>x.category==="faction").sort((a,b)=>(a.title||"").localeCompare(b.title||""));
   const fC=card("Factions",facs.length,`<button class="btn sm" data-act="pbWorld" data-v="rel">Relationships</button>`,facs.length?facs.map(f=>`<button class="pb-row" data-act="open" data-type="notes" data-id="${f.id}"><b>${esc(f.title||"Untitled")}</b>${f.leader||f.base?`<small>${esc([f.leader&&"Led by "+f.leader,f.base&&"Based in "+f.base].filter(Boolean).join(" · "))}</small>`:""}</button>`).join(""):`<p class="vempty">No faction notes yet. Add a note with the Faction category.</p>`);
   const todos=S.todos.filter(t=>t.kind!=="goal"&&!t.done).sort((a,b)=>(a.due||"9999").localeCompare(b.due||"9999")||(a.updated||0)-(b.updated||0));
-  const dC=card("Prep to-dos",todos.length,goTab("todos","All to-dos"),`<form data-form="todoQuick" data-kind="todo" class="tq"><input id="tq-todo" placeholder="Add a to-do" aria-label="New to-do"><button class="btn sm primary" type="submit">Add</button></form>
-    ${todos.length?todos.slice(0,8).map(t=>`<div class="th"><input type="checkbox" data-todo="${t.id}" aria-label="Done"><button class="th-t" data-act="edit" data-type="todos" data-id="${t.id}"><span>${linkify(esc(t.text||""),"")}</span>${t.due?`<small>Due ${esc(t.due)}</small>`:""}</button></div>`).join(""):`<p class="vempty">Nothing on the list.</p>`}`);
+  const dC=card("Prep to-dos",todos.length,goTab("todos","All to-dos"),`<form data-form="todoQuick" data-kind="todo" class="tq"><input id="tq-todo-pb" placeholder="Add a to-do" aria-label="New to-do"><button class="btn sm primary" type="submit">Add</button></form>
+    ${todos.length?todos.slice(0,8).map(todoRow).join(""):`<p class="vempty">Nothing on the list.</p>`}`);
   return `<div class="pboard">${next}${pathC}${qC}${tC}${sC}${kC}${fC}${dC}</div>`;
 }
 /* Scene Editor: scenes live in the plan record as plan.scenes [{id,title,note,read,clues:[{t,found}],ifs:[{if,then}],who:[{col,id}],reserve,when}].
@@ -1943,28 +1958,43 @@ function scnLegacy(p){
   const clues=revealItems(p).map(r=>({t:r.text,found:r.done}));
   const who=[...new Map(backlinksFrom(textOf("plans",p)).filter(o=>["characters","monsters","notes","quests"].includes(o.type)).map(o=>[o.type+o.id,{col:o.type,id:o.id}])).values()];
   return [scnNew({title:"Session overview",read:p.opener||"",clues,who})]}
-function scnPlan(){const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));return plans.find(p=>p.id===U.planSel)||plans.find(p=>p.status!=="played")||plans[0]||null}
+function scnPlan(){const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));return plans.find(p=>p.id===U.planSel)||thNext()||plans[0]||null}
 function scnLoad(p){
   if(SCN.pid&&SCN.pid!==p.id&&SCN.dirty)scnFlush();
-  if(SCN.pid!==p.id||!SCN.dirty){const has=Array.isArray(p.scenes);SCN.d=has?JSON.parse(JSON.stringify(p.scenes)):scnLegacy(p);SCN.legacy=!has;
+  // reload the draft only when the plan changed or a newer copy arrived, and never over unsaved edits
+  if(SCN.pid!==p.id||(!SCN.dirty&&(SCN.ver!==p.updated||!SCN.d))){const has=Array.isArray(p.scenes);SCN.d=(has?JSON.parse(JSON.stringify(p.scenes)):scnLegacy(p)).map(s=>scnNew({...s,clues:s.clues||[],ifs:s.ifs||[],who:s.who||[]}));SCN.legacy=!has;SCN.ver=p.updated;
     if(SCN.pid!==p.id){SCN.sel=null;SCN.arm=null;SCN.state="";SCN.dirty=false}SCN.pid=p.id}
   if(!SCN.d.find(s=>s.id===SCN.sel))SCN.sel=SCN.d[0]?.id||null}
 const scnCur=()=>SCN.d&&SCN.d.find(s=>s.id===SCN.sel);
 function scnStatus(){const el=document.getElementById("scn-state");if(el)el.textContent=SCN.state}
 function scnTouch(redraw){SCN.dirty=true;SCN.state="Not saved yet";clearTimeout(SCN.timer);SCN.timer=setTimeout(scnFlush,1200);if(redraw)render();else scnStatus()}
-async function scnFlush(){
-  clearTimeout(SCN.timer);if(!SCN.dirty||!SCN.pid||!SCN.d)return;
-  const pid=SCN.pid,snap=JSON.stringify(SCN.d),p=rec("plans",pid);if(!p)return;
-  SCN.state="Saving…";scnStatus();const{id:_,...keep}=p;
-  try{await save("plans",pid,{...JSON.parse(JSON.stringify(keep)),scenes:JSON.parse(snap)});
-    if(SCN.pid===pid&&JSON.stringify(SCN.d)===snap){SCN.dirty=false;SCN.legacy=false;SCN.state="Saved"}}
-  catch(err){SCN.state="Couldn't save. Your changes are still here and will try again."}
+/* Saves run one at a time. The draft is copied when the save is asked for, so switching plans mid-save keeps the old plan's edits.
+   save() returns false when the write failed: the draft then stays unsaved and tries again. */
+let scnQ=Promise.resolve(),scnSent=null;
+function scnFlush(){
+  clearTimeout(SCN.timer);if(!SCN.dirty||!SCN.pid||!SCN.d)return scnQ;
+  const pid=SCN.pid,snap=JSON.stringify(SCN.d);if(scnSent===pid+"|"+snap)return scnQ;scnSent=pid+"|"+snap;
+  SCN.state="Saving…";scnStatus();
+  return scnQ=scnQ.then(()=>scnWrite(pid,snap))}
+async function scnWrite(pid,snap){
+  const p=rec("plans",pid);scnSent=null;
+  if(!p){if(SCN.pid===pid){SCN.dirty=false;SCN.state="This plan was deleted, so the scenes weren't saved."}scnStatus();return}
+  const{id:_,...keep}=JSON.parse(JSON.stringify(p));
+  const ok=await save("plans",pid,{...keep,scenes:JSON.parse(snap)});
+  if(!ok){
+    if(SCN.pid===pid){SCN.state="Couldn't save. Your changes are still here and will try again.";clearTimeout(SCN.timer);SCN.timer=setTimeout(scnFlush,5000)}
+    else setTimeout(()=>{scnQ=scnQ.then(()=>SCN.pid===pid?null:scnWrite(pid,snap))},5000);
+    scnStatus();return}
+  if(SCN.pid===pid&&JSON.stringify(SCN.d)===snap){SCN.dirty=false;SCN.legacy=false;SCN.state="Saved";SCN.ver=rec("plans",pid)?.updated}
   scnStatus()}
 document.addEventListener("visibilitychange",()=>{if(document.hidden)scnFlush()});
+window.addEventListener("pagehide",()=>{scnFlush()});
 function scnLibHtml(){const q=SCN.q.trim();if(!q)return `<p class="vempty">Type to find people, places, quests and stat blocks.</p>`;const r=tmSearch(q);
   return r.length?r.map(([t,x])=>`<div class="scn-lr"><span class="scn-lrt"><b>${esc(titleOf(t,x)||"Untitled")}</b><small>${esc(libTag(t,x))}</small></span><button type="button" class="btn sm" data-act="open" data-type="${t}" data-id="${x.id}">Open</button><button type="button" class="btn sm primary" data-act="scnWhoAdd" data-type="${t}" data-id="${x.id}" ${scnCur()?"":"disabled"} aria-label="Add ${esc(titleOf(t,x)||"")} to Who's Here">Add</button></div>`).join(""):`<p class="vempty">Nothing matches.</p>`}
 function scnMove(id,n){const s=SCN.d.find(x=>x.id===id);if(!s)return;const same=SCN.d.filter(x=>!!x.reserve===!!s.reserve),j=same.indexOf(s)+n;if(j<0||j>=same.length)return;
-  const a=SCN.d.indexOf(s),b=SCN.d.indexOf(same[j]);[SCN.d[a],SCN.d[b]]=[SCN.d[b],SCN.d[a]];scnTouch(true)}
+  const a=SCN.d.indexOf(s),b=SCN.d.indexOf(same[j]);[SCN.d[a],SCN.d[b]]=[SCN.d[b],SCN.d[a]];
+  // keep focus on the moved scene; the arrow at the end of the list turns off, so fall back to the scene's name
+  const end=j===0||j===same.length-1;FOCUS_NEXT=end?`[data-scsel="${CSS.escape(id)}"] .scn-pb`:`[data-scsel="${CSS.escape(id)}"] [data-n="${n}"]`;scnTouch(true)}
 function vScenes(){
   const p=scnPlan();
   if(!p)return `<div class="empty">No session plan yet. Scenes belong to a plan.<br><button class="btn primary" data-act="newPlan" style="margin-top:10px">Plan session ${nextSession()}</button></div>`;
@@ -1985,41 +2015,41 @@ function vScenes(){
     <label class="scn-f"><span class="label">Where and what's going on</span><input class="scn-in" id="scf-note" data-scf="note" value="${esc(s.note)}" placeholder="One line, e.g. a ruined tower at dusk"></label>
     ${s.reserve?`<label class="scn-f"><span class="label">When to pull it in</span><input class="scn-in" id="scf-when" data-scf="when" value="${esc(s.when)}" placeholder="e.g. if the party leaves town early"></label>`:""}
     <label class="scn-f"><span class="label">Read aloud</span><textarea class="scn-in" id="scf-read" data-scf="read" rows="4" placeholder="What the players see and hear as the scene opens">${esc(s.read)}</textarea></label>
-    <section class="scn-sec"><h4>Secrets &amp; Clues</h4>${s.clues.map((k,i)=>`<div class="scn-li"><input class="scn-in" id="scf-clue-${i}" data-scf="clue" data-i="${i}" value="${esc(k.t)}" aria-label="Clue ${i+1}"><button type="button" class="btn icon" data-act="scnClueDel" data-i="${i}" aria-label="Remove clue ${i+1}">×</button></div>`).join("")}
+    <section class="scn-sec"><h4>Secrets &amp; Clues</h4>${s.clues.map((k,i)=>`<div class="scn-li"><input type="checkbox" class="scn-found" data-scf="found" data-i="${i}" ${k.found?"checked":""} aria-label="Clue ${i+1} revealed" title="Revealed to the players"><input class="scn-in" id="scf-clue-${i}" data-scf="clue" data-i="${i}" value="${esc(k.t)}" aria-label="Clue ${i+1}"><button type="button" class="btn icon" data-act="scnClueDel" data-i="${i}" aria-label="Remove clue ${i+1}">×</button></div>`).join("")}
       <form data-scadd="clue" class="scn-add"><input class="scn-in" id="scn-clue-add" placeholder="+ Add a clue, Enter" aria-label="New clue" enterkeyhint="done"></form></section>
     <section class="scn-sec"><h4>If They…</h4>${s.ifs.map((k,i)=>`<div class="scn-if"><label><span class="label">If they</span><input class="scn-in" id="scf-if-${i}" data-scf="if" data-i="${i}" value="${esc(k.if)}" placeholder="refuse the bargain"></label><label><span class="label">Then</span><input class="scn-in" id="scf-then-${i}" data-scf="then" data-i="${i}" value="${esc(k.then)}" placeholder="the merchant offers a lesser price"></label><button type="button" class="btn icon" data-act="scnIfDel" data-i="${i}" aria-label="Remove card ${i+1}">×</button></div>`).join("")}<button type="button" class="btn sm" data-act="scnIfAdd">Add card</button></section>
     <section class="scn-sec"><h4>Who's Here</h4>${s.who.length?`<div class="scn-whos">${s.who.map((w,i)=>{const x=rec(w.col,w.id);return x?`<span class="scn-who"><button type="button" class="linkish" data-act="open" data-type="${w.col}" data-id="${w.id}">${esc(titleOf(w.col,x)||"Untitled")}</button><small>${esc(libTag(w.col,x))}</small><button type="button" class="btn icon" data-act="scnWhoDel" data-i="${i}" aria-label="Remove ${esc(titleOf(w.col,x)||"entry")}">×</button></span>`:""}).join("")}</div>`:`<p class="vempty">Add people, places and stat blocks with the library search.</p>`}</section>
   </article>`:`<div class="empty">Add a scene to start.</div>`;
-  return `<div class="scn-top"><label class="scn-f scn-plan"><span class="label">Session plan</span><select class="scn-in" id="scn-plan">${plans.map(x=>`<option value="${x.id}" ${x.id===p.id?"selected":""}>Session ${x.session||"?"} · ${esc(x.title||"Untitled")}${x.status==="played"?" (played)":""}</option>`).join("")}</select></label><span id="scn-state" class="scn-state" role="status">${esc(SCN.state)}</span></div>
+  return `<div class="scn-top"><label class="scn-f scn-plan"><span class="label">Session plan</span><select class="scn-in" id="scn-plan">${plans.map(x=>`<option value="${x.id}" ${x.id===p.id?"selected":""}>Session ${x.session||"?"} · ${esc(x.title||"Untitled")}${x.status==="played"?" (played)":""}</option>`).join("")}</select></label><span id="scn-state" class="scn-state" role="status" aria-live="polite">${esc(SCN.state)}</span></div>
   ${SCN.legacy?`<p class="scn-note">This plan had no scenes, so the first one starts from its opener and reveals. Nothing changes in the plan until you edit a scene.</p>`:""}
   <div class="scn">${left}${ed}</div>`;
 }
 document.addEventListener("input",e=>{const t=e.target;if(!t.dataset)return;
-  if(t.dataset.scq!=null){SCN.q=t.value;const el=document.getElementById("scn-lib-r");if(el)el.innerHTML=scnLibHtml();return}
+  if(t.dataset.scq!=null){SCN.q=t.value;clearTimeout(SCN.qt);SCN.qt=setTimeout(()=>{const el=document.getElementById("scn-lib-r");if(el)el.innerHTML=scnLibHtml()},120);return}
   const f=t.dataset.scf;if(f==null)return;const s=scnCur();if(!s)return;const i=num(t.dataset.i);
-  if(f==="clue"){if(s.clues[i])s.clues[i].t=t.value}else if(f==="if"||f==="then"){if(s.ifs[i])s.ifs[i][f]=t.value}else s[f]=t.value;
+  if(f==="found"){if(s.clues[i])s.clues[i].found=t.checked}else if(f==="clue"){if(s.clues[i])s.clues[i].t=t.value}else if(f==="if"||f==="then"){if(s.ifs[i])s.ifs[i][f]=t.value}else s[f]=t.value;
   if(f==="title"){const el=document.querySelector(`[data-scsel="${s.id}"] .scn-pt`);if(el)el.textContent=t.value||"Untitled scene"}
   scnTouch(false)});
-document.addEventListener("submit",e=>{const f=e.target.closest("[data-scadd]");if(!f)return;e.preventDefault();e.stopPropagation();const i=f.querySelector("input"),v=i.value.trim();if(!v||!SCN.d)return;
+document.addEventListener("submit",e=>{const f=e.target.closest("[data-scadd]");if(!f)return;e.preventDefault();e.stopImmediatePropagation();const i=f.querySelector("input"),v=i.value.trim();if(!v||!SCN.d)return;
   if(f.dataset.scadd==="clue"){const s=scnCur();if(!s)return;s.clues.push({t:v,found:false})}
   else{const s=scnNew({title:v,reserve:f.dataset.scadd==="reserve"});SCN.d.push(s);SCN.sel=s.id;SCN.arm=null}
-  i.value="";scnTouch(true)});
+  i.value="";scnTouch(true)},true);
 document.addEventListener("change",e=>{if(e.target.id!=="scn-plan")return;scnFlush();U.planSel=e.target.value;render()});
 function scnAct(a,t){const s=scnCur(),i=num(t.dataset.i);
   if(a==="scnSel"){SCN.sel=t.dataset.id;SCN.arm=null;render();if(isPhone())document.querySelector(".scn-ed")?.scrollIntoView({block:"start"});return}
   if(a==="scnMove")return scnMove(t.dataset.id,num(t.dataset.n));
   if(a==="scnDel"){if(SCN.arm!==t.dataset.id){SCN.arm=t.dataset.id;render();return}SCN.d=SCN.d.filter(x=>x.id!==t.dataset.id);SCN.arm=null;SCN.sel=null;return scnTouch(true)}
   if(!s)return;
-  if(a==="scnReserve")s.reserve=!s.reserve;
+  if(a==="scnReserve"){s.reserve=!s.reserve;SCN.d=[...SCN.d.filter(x=>x!==s),s]}  // lands at the end of the other list
   else if(a==="scnClueDel")s.clues.splice(i,1);
-  else if(a==="scnIfAdd")s.ifs.push({if:"",then:""});
+  else if(a==="scnIfAdd"){s.ifs.push({if:"",then:""});FOCUS_NEXT="#scf-if-"+(s.ifs.length-1)}
   else if(a==="scnIfDel")s.ifs.splice(i,1);
   else if(a==="scnWhoAdd"){if(!s.who.some(w=>w.col===t.dataset.type&&w.id===t.dataset.id))s.who.push({col:t.dataset.type,id:t.dataset.id})}
   else if(a==="scnWhoDel")s.who.splice(i,1);
   scnTouch(true)}
 function vPrepPlan(c,tabs){
   const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));
-  const cur=plans.find(p=>p.id===U.planSel)||plans.find(p=>p.status!=="played")||plans[0];
+  const cur=plans.find(p=>p.id===U.planSel)||thNext()||plans[0];
   const open=S.threads.filter(t=>t.status!=="resolved").sort((a,b)=>(b.updated||0)-(a.updated||0));
   const done=S.threads.filter(t=>t.status==="resolved");
   const sec=(label,v)=>v?`<section class="pl-s"><h4>${label}</h4><div class="prose vprose">${label==="Scene opener"?rich(v,"plans:"+cur.id):planBullets(v,"plans:"+cur.id)}</div></section>`:"";
@@ -2214,7 +2244,7 @@ async function encSave(addToPlan){
   const id=ENC.id||uid();const data={title:ENC.title,monsters:ENC.monsters.filter(m=>m.name||num(m.count)),notes:ENC.notes,partyOverride:ENC.partyOverride||null,results:ENC.results||[]};
   await save("encounters",id,data);ENC.id=id;
   if(addToPlan){
-    const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));const cur=plans.find(p=>p.id===U.planSel)||plans.find(p=>p.status!=="played");
+    const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));const cur=plans.find(p=>p.id===U.planSel)||thNext();
     const line="- "+encLine({...data});
     if(cur){const{id:pid,...keep}=cur;await save("plans",pid,{...keep,encounters:((keep.encounters||"").trim()?keep.encounters.trim()+"\n":"")+line});toast(`Added to ${cur.title||"the session plan"}`)}
     else{const n=nextSession(),pid=uid();await save("plans",pid,{title:`Session ${n}`,session:n,status:"planned",encounters:line});U.planSel=pid;toast(`Started a plan for session ${n}`)}
@@ -2550,81 +2580,99 @@ function tmTidy(){const board=document.querySelector("#tablemode .tm-board");if(
    It is what Table mode opens; the arranged board (panels, stickies, Arrange) is one tap away and remembered per device. */
 let TMV=(()=>{try{return localStorage.getItem("desk.tmview")||"session"}catch(_){return "session"}})();
 function setTMV(v){TMV=v;try{localStorage.setItem("desk.tmview",v)}catch(_){}renderTable()}
-const ST={scene:null,adv:"normal",rolls:[],undo:[],miles:"",pace:"normal",prevHide:false};
-function stPlan(){const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));return plans.find(p=>p.id===U.planSel)||plans.find(p=>p.status!=="played")||null}
-const stScenes=p=>p?(Array.isArray(p.scenes)?p.scenes:scnLegacy(p)):[];
+const ST={scene:null,adv:"normal",rolls:[],undo:[],miles:"",pace:"normal",prevHide:false,open:new Set(["read","dc"])};
+const stLogHtml=n=>noteLines(rcNotesVal(n)).slice(-12).reverse().map(l=>`<li>${esc(l.replace(/^-\s*/,""))}</li>`).join("")||`<li class="vempty">Nothing logged yet. It goes into this session's notes for the recap.</li>`;
+document.addEventListener("toggle",e=>{const d=e.target;if(d.matches&&d.matches("#tablemode details[data-k]"))d.open?ST.open.add(d.dataset.k):ST.open.delete(d.dataset.k)},true);
+function stPlan(){const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));return plans.find(p=>p.id===U.planSel)||thNext()||null}
+// older or hand-edited scenes may be missing their lists, so fill them in before the Table reads them
+const stScenes=p=>p?(Array.isArray(p.scenes)?p.scenes:scnLegacy(p)).map(s=>({...s,clues:s.clues||[],ifs:s.ifs||[],who:s.who||[]})):[];
 /* in-game time of day: minutes after midnight in settings/igtime; crossing midnight moves the date quietly */
 const igMin=()=>{const m=num((S.settings.igtime||{}).min);return m==null?480:m};
 const fmtMin=m=>{m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mm=m%60;return `${(h%12)||12}:${String(mm).padStart(2,"0")} ${h<12?"am":"pm"}`};
-async function stTime(add,long){const cur=igMin();let nx=cur+add,days=0;while(nx>=1440){nx-=1440;days++}
+/* Time taps run one after another, so two quick taps both count. stMin holds the time just written until the queue is empty. */
+const ST_MAX_ADD=60*1440;  // never jump more than 60 days in one tap
+let stQ=Promise.resolve(),stPend=0,stMin=null;
+function stQueue(fn){stPend++;return stQ=stQ.then(fn).catch(e=>console.error(e)).finally(()=>{if(!--stPend)stMin=null;renderTable()})}
+function stSay(t){let a=document.getElementById("sx-say");if(!a){a=document.createElement("div");a.id="sx-say";a.className="sr-only";a.setAttribute("aria-live","polite");document.body.append(a)}a.textContent=t}
+function stTime(add,long,line){return stQueue(async()=>{
+  add=Math.max(0,Math.min(num(add)||0,ST_MAX_ADD));const cur=stMin??igMin(),total=cur+add;let nx=total%1440,days=Math.floor(total/1440);
   if(long){nx=480;days=1}
-  ST.undo.push({min:cur,days});if(ST.undo.length>20)ST.undo.shift();
-  if(days)await dayStep(days,!long);await save("settings","igtime",{min:nx});renderTable()}
-async function stUndo(){const u=ST.undo.pop();if(!u)return;if(u.days)await dayStep(-u.days,true);await save("settings","igtime",{min:u.min});renderTable()}
+  ST.undo.push({min:cur,days,long:!!long});if(ST.undo.length>20)ST.undo.shift();
+  if(days)await dayStep(days,!long);stMin=nx;await save("settings","igtime",{min:nx});
+  if(line)await addSessionLine(line);
+  stSay("It is now "+fmtMin(nx))})}
+function stUndo(){return stQueue(async()=>{const u=ST.undo.pop();if(!u)return;
+  if(!u.long)LAST_TIME_LINE=null;  // only a long rest wrote a notes line for dayStep to take back
+  if(u.days)await dayStep(-u.days,true);stMin=u.min;await save("settings","igtime",{min:u.min});stSay("Time set back to "+fmtMin(u.min))})}
 async function stScenePatch(pid,fn){if(SCN.pid===pid&&SCN.dirty)await scnFlush();const p=rec("plans",pid);if(!p||!Array.isArray(p.scenes))return;
   const{id:_,...keep}=JSON.parse(JSON.stringify(p));fn(keep.scenes);await save("plans",pid,keep);if(SCN.pid===pid)SCN.dirty=false;project();renderTable()}
 const stAtt=(n,x)=>((logFor(n)||{}).att||{})[x.id]||x.attitude||"";
 async function stSetAtt(n,id,v){const l=logFor(n)||{};const{id:_i,dmOnly:_d,secret:_s,...keep}=l;const att={...(keep.att||{})};const x=rec("characters",id);att[id]=stAtt(n,x||{id})===v?"":v;
   await save("logs","s"+n,{...keep,session:n,notes:keep.notes||"",open:keep.open||"",att});project();renderTable()}
 function stRoll(sides){const r=()=>1+Math.floor(Math.random()*sides);const a=r();let b=null,v=a;if(sides===20&&ST.adv!=="normal"){b=r();v=ST.adv==="adv"?Math.max(a,b):Math.min(a,b)}
-  ST.rolls.unshift({sides,v,a,b,adv:ST.adv});ST.rolls=ST.rolls.slice(0,8);renderTable()}
-const ST_PACE={fast:[4,"Fast · 4 mph"],normal:[3,"Normal · 3 mph"],slow:[2,"Slow · 2 mph"]};
-function stTravelHtml(){const mi=parseFloat(ST.miles);if(!(mi>0))return `<p class="vempty">Enter a distance to see how long it takes.</p>`;
-  const h=mi/ST_PACE[ST.pace][0],mins=Math.round(h*60),days=Math.ceil(h/8);
-  return `<p class="sx-tr">About <b>${h<1?mins+" minutes":(Math.round(h*10)/10)+" hours"}</b> on the road${h>8?` · ${days} days of travel at 8 hours a day`:""}.</p><button type="button" class="btn sm" data-act="stTravel" data-n="${h>8?days*1440:mins}">Advance time by ${h>8?days+" days":h<1?mins+" minutes":(Math.round(h*10)/10)+" hours"}</button>`}
+  ST.rolls.unshift({sides,v,a,b,adv:ST.adv});ST.rolls=ST.rolls.slice(0,8);stSay(`d${sides}: ${v}`);renderTable()}
+// travel on foot uses the same speeds as the Travel sheet
+const stPace=()=>Object.fromEntries(Object.entries(TRAVEL_MODES.foot[1]).map(([k,mph])=>[k,[mph,`${CAP(k)} · ${mph} mph`]]));
+const ST_DAY_H=8,ST_MAX_MILES=5000;
+function stTravelHtml(){const mi=Math.min(parseFloat(ST.miles),ST_MAX_MILES);if(!(mi>0)||!isFinite(mi))return `<p class="vempty">Enter a distance to see how long it takes.</p>`;
+  const h=mi/(stPace()[ST.pace]||stPace().normal)[0],mins=Math.round(h*60),days=Math.ceil(h/ST_DAY_H),multi=h>ST_DAY_H;
+  const lbl=h<1?mins+" minutes":(Math.round(h*10)/10)+" hours";
+  return `<p class="sx-tr">About <b>${lbl}</b> on the road${multi?` · ${days} days of travel at ${ST_DAY_H} hours a day`:""}.</p><button type="button" class="btn sm" data-act="stTime" data-n="${multi?Math.min(days*1440,ST_MAX_ADD):mins}">Advance time by ${multi?(days*1440>ST_MAX_ADD?ST_MAX_ADD/1440+" days (the most at once)":days+" days"):lbl}</button>`}
 function renderSession(el){
   const c=cal(),plan=stPlan(),n=rcSession(),scenes=stScenes(plan),legacy=!!plan&&!Array.isArray(plan.scenes);
   const main=scenes.filter(s=>!s.reserve),res=scenes.filter(s=>s.reserve);
   const cur=scenes.find(s=>s.id===ST.scene)||main.find(s=>!s.done)||main[0]||res[0]||null;ST.scene=cur?cur.id:null;
   const pcs=S.characters.filter(x=>x.kind==="pc").sort((a,b)=>(a.name||"").localeCompare(b.name||""));
   const lit=new Set((logFor(n)||{}).spotlight||[]);
-  const keep=[...el.querySelectorAll(".sx-col")].map(x=>x.scrollTop),bodyY=el.querySelector(".sx-body")?.scrollTop||0;
+  const keep=[...el.querySelectorAll(".sx-col")].map(x=>x.scrollTop),bodyY=el.querySelector(".sx-body")?.scrollTop||0,fsel=focusSel(document.activeElement,el);
+  const op=k=>ST.open.has(k)?"open":"";  // open/closed panels survive the redraw after every tap
   const top=`<div class="tm-top sx-top"><b class="tm-title">${esc(S.settings.campaign?.name||"Campaign")}</b><span class="sx-sess">Session ${n}${plan&&plan.title?` · ${esc(plan.title)}`:""}</span>
     <button class="btn sm" data-act="gsearch" title="Search (/)">Search</button>
-    <span class="sx-time" role="status" aria-label="In-game date and time"><b>${esc(fmtDate(c,c.today))}</b><b>${fmtMin(igMin())}</b></span>
-    <span class="sx-tb"><button class="btn sm" data-act="stTime" data-n="10">+10 min</button><button class="btn sm" data-act="stTime" data-n="60">+1 hour</button><button class="btn sm" data-act="stTime" data-n="60" title="A short rest takes an hour">Short rest</button><button class="btn sm" data-act="stLong" title="Next day at 8 am, logged in this session's notes">Long rest</button><button class="btn sm" data-act="stUndo" ${ST.undo.length?"":"disabled"} title="Undo the last time change">Undo</button></span>
-    <span class="grow"></span>${clockHtml()}<button class="btn sm" data-act="stView" data-v="board" title="Your arranged board with panels and stickies">Arranged board</button><button class="btn sm" data-act="wrapUp">End session</button><button class="btn sm" data-act="tmExit" title="Exit table mode (T)">Exit</button></div>`;
-  const sRow=(s,i)=>`<div class="sx-pr ${s.done?"done":""}">${legacy||s.reserve?"":`<input type="checkbox" data-stdone="${s.id}" ${s.done?"checked":""} aria-label="${esc(s.title||"Scene")} done">`}<button type="button" class="scn-pb" data-act="stScene" data-id="${s.id}" aria-current="${!!cur&&s.id===cur.id}">${s.reserve?"":`<span class="scn-num">${i+1}</span>`}<span class="scn-pt">${esc(s.title||"Untitled scene")}</span></button></div>${s.reserve&&s.when?`<small class="sx-when">${esc(s.when)}</small>`:""}`;
+    <span class="sx-time" aria-label="In-game date and time"><b>${esc(fmtDate(c,c.today))}</b><b>${fmtMin(stMin??igMin())}</b></span>
+    <span class="sx-tb"><button class="btn sm" data-act="stTime" data-n="10">+10 min</button><button class="btn sm" data-act="stTime" data-n="60">+1 hour</button><button class="btn sm" data-act="stShort" title="An hour passes and the rest goes in this session's notes">Short rest</button><button class="btn sm" data-act="stLong" title="Next day at 8 am, logged in this session's notes">Long rest</button><button class="btn sm" data-act="stUndo" ${ST.undo.length?"":"disabled"} title="Undo the last time change">Undo</button></span>
+    <span class="grow"></span>${clockHtml()}<button class="btn sm" data-act="stView" data-v="board" title="Your arranged board with panels and stickies">Arranged board</button><button class="btn sm" data-act="wrapUp">End session</button><button class="btn sm primary" data-act="tmExit" title="Exit table mode (T)">Exit</button></div>`;
+  const sRow=(s,i)=>`<div class="sx-pr ${s.done?"done":""}">${legacy||s.reserve?"":`<label class="sx-chk"><input type="checkbox" data-stdone="${esc(s.id)}" ${s.done?"checked":""} aria-label="${esc(s.title||"Scene")} done"></label>`}<button type="button" class="scn-pb" data-act="stScene" data-id="${esc(s.id)}" aria-current="${!!cur&&s.id===cur.id}">${s.reserve?"":`<span class="scn-num">${i+1}</span>`}<span class="scn-pt">${esc(s.title||"Untitled scene")}</span></button></div>${s.reserve&&s.when?`<small class="sx-when">${esc(s.when)}</small>`:""}`;
   const col1=`<section class="sx-col" aria-label="Path and party"><div class="sx-card"><h3>The Path Tonight</h3>${plan?(main.map(sRow).join("")||`<p class="vempty">No scenes yet.</p>`)+`<button type="button" class="btn sm" data-act="stEdit" data-id="${plan.id}">Edit scenes</button>`:`<p class="vempty">No session plan yet. Make one on the Prep tab.</p>`}</div>
     ${res.length?`<div class="sx-card"><h3>In Reserve</h3>${res.map(x=>sRow(x)).join("")}</div>`:""}
-    <div class="sx-card"><h3>The Party</h3>${pcs.length?`<p class="pb-sub">${pcs.filter(p=>lit.has(p.id)).length} of ${pcs.length} have had a moment tonight</p>`+pcs.map(p=>`<div class="sx-pc"><button type="button" class="linkish" data-act="view" data-type="characters" data-id="${p.id}">${esc(p.name||"Unnamed")}</button><span class="sx-pcs">AC ${p.ac??"–"} · HP ${p.hp??p.hpMax??"–"}${p.hpMax?"/"+p.hpMax:""} · Perception ${p.pp??"–"}</span><label class="sx-spot"><input type="checkbox" data-spot="${p.id}|${n}" ${lit.has(p.id)?"checked":""}> Moment</label></div>`).join(""):`<p class="vempty">No heroes yet.</p>`}</div></section>`;
+    <div class="sx-card"><h3>The Party</h3>${pcs.length?`<p class="pb-sub">${pcs.filter(p=>lit.has(p.id)).length} of ${pcs.length} have had a moment tonight</p>`+pcs.map(p=>`<div class="sx-pc"><button type="button" class="linkish" data-act="view" data-type="characters" data-id="${p.id}">${esc(p.name||"Unnamed")}</button><span class="sx-pcs">AC ${esc(p.ac??"–")} · HP ${esc(p.hp??p.hpMax??"–")}${p.hpMax?"/"+esc(p.hpMax):""} · Perception ${esc(p.pp??"–")}</span><label class="sx-spot"><input type="checkbox" data-spot="${esc(p.id)}|${n}" ${lit.has(p.id)?"checked":""}> Moment</label></div>`).join(""):`<p class="vempty">No heroes yet.</p>`}</div></section>`;
   const who=cur?cur.who.map(w=>({w,x:rec(w.col,w.id)})).filter(o=>o.x):[];
   const ppl=who.filter(o=>o.w.col==="characters"),foes=who.filter(o=>o.w.col==="monsters"),other=who.filter(o=>o.w.col!=="characters"&&o.w.col!=="monsters");
   const ltc=lastTimeCard(plan);
   const col2=`<section class="sx-col sx-scene" aria-label="Current scene">
     ${ltc?(ST.prevHide?`<button type="button" class="btn sm sx-prevb" data-act="stPrev">Show “last time”</button>`:`<div class="sx-prev">${ltc}<button type="button" class="btn sm" data-act="stPrev">Hide</button></div>`):""}
     ${cur?`<div class="sx-card sx-cur"><span class="scn-kicker">${cur.reserve?"From reserve":`Scene ${main.indexOf(cur)+1} of ${main.length}`}</span><h2>${esc(cur.title||"Untitled scene")}</h2>${cur.note?`<p class="pb-sub">${esc(cur.note)}</p>`:""}
-      ${cur.read?`<details class="sx-read" open><summary>Read aloud</summary><div class="prose vprose">${rich(cur.read)}</div></details>`:""}
+      ${cur.read?`<details class="sx-read" data-k="read" ${op("read")}><summary>Read aloud</summary><div class="prose vprose">${rich(cur.read)}</div></details>`:""}
       ${cur.clues.length?`<h3 class="sx-h">Secrets &amp; Clues <span class="pb-n">${cur.clues.filter(k=>k.found).length} of ${cur.clues.length} revealed</span></h3><div class="sx-clues">${cur.clues.map((k,i)=>`<button type="button" class="sx-clue" data-act="stClue" data-i="${i}" aria-pressed="${!!k.found}">${esc(k.t)}</button>`).join("")}</div>`:""}
-      ${cur.ifs.length?`<h3 class="sx-h">If They…</h3>${cur.ifs.map(k=>`<details class="sx-if"><summary>If they ${esc(k.if||"…")}</summary><p>${esc(k.then||"")}</p></details>`).join("")}`:""}
+      ${cur.ifs.length?`<h3 class="sx-h">If They…</h3>${cur.ifs.map((k,j)=>`<details class="sx-if" data-k="if-${esc(cur.id)}-${j}" ${op("if-"+cur.id+"-"+j)}><summary>If they ${esc(k.if||"…")}</summary><p>${esc(k.then||"")}</p></details>`).join("")}`:""}
       ${ppl.length?`<h3 class="sx-h">Who's Here</h3><div class="sx-who">${ppl.map(({x})=>{const a=stAtt(n,x),m=x.mon&&rec("monsters",x.mon);return `<div class="sx-npc">${avatar(x,40)}<div class="sx-npcb"><span class="sx-npch"><button type="button" class="linkish" data-act="view" data-type="characters" data-id="${x.id}"><b>${esc(x.name||"Unnamed")}</b></button>${m?`<button type="button" class="btn sm" data-act="open" data-type="monsters" data-id="${m.id}">Stat block</button>`:""}</span>${x.cls||x.voice?`<small>${esc([x.cls,x.voice].filter(Boolean).join(" · "))}</small>`:""}${x.wants?`<small><i>Wants</i> ${esc(x.wants)}</small>`:""}<div class="seg sx-att" role="group" aria-label="Attitude tonight">${[["friendly","Friendly"],["neutral","Neutral"],["hostile","Hostile"]].map(([k,l])=>`<button type="button" data-act="stAtt" data-id="${x.id}" data-v="${k}" aria-pressed="${a===k}">${l}</button>`).join("")}</div></div></div>`}).join("")}</div>`:""}
       ${foes.length?`<h3 class="sx-h">Foes</h3>${foes.map(({x})=>`<div class="sx-foe"><div class="sx-foeh"><b>${esc(x.name||"Monster")}</b><span class="pb-n">${[x.cr&&"CR "+x.cr,x.ac&&"AC "+x.ac,x.hp&&"HP "+x.hp].filter(Boolean).map(esc).join(" · ")}</span><button type="button" class="btn sm" data-act="open" data-type="monsters" data-id="${x.id}">Stat block</button></div>${x.actions?`<div class="sx-foea">${blockLines(String(x.actions).split("\n").filter(l=>l.trim()).slice(0,3).join("\n"))}</div>`:""}${x.notes?`<p class="sx-tac"><b>Tactics.</b> ${esc(plain(x.notes).split("\n")[0])}</p>`:""}</div>`).join("")}`:""}
-      ${other.length?`<div class="sx-other">${other.map(({w,x})=>`<button type="button" class="chip" data-act="open" data-type="${w.col}" data-id="${x.id}">${esc(titleOf(w.col,x)||"Untitled")}</button>`).join("")}</div>`:""}
+      ${other.length?`<div class="sx-other">${other.map(({w,x})=>`<button type="button" class="chip" data-act="open" data-type="${esc(w.col)}" data-id="${esc(x.id)}">${esc(titleOf(w.col,x)||"Untitled")}</button>`).join("")}</div>`:""}
       ${!legacy&&!cur.reserve?`<button type="button" class="btn primary sx-next" data-act="stNext">Scene done · next</button>`:""}
       ${legacy?`<p class="scn-note">This plan has no scenes yet, so this shows its opener and reveals. Add scenes in Prep › Scenes.</p>`:""}
     </div>`:`<div class="empty">No scenes for tonight. Add them in Prep › Scenes.</div>`}
   </section>`;
   const col3=`<section class="sx-col" aria-label="Dice, clocks and log"><div class="sx-card"><h3>Secret Dice</h3><div class="sx-dice">${[4,6,8,10,12,20,100].map(d=>`<button type="button" class="btn sm" data-act="stRoll" data-n="${d}">d${d}</button>`).join("")}</div>
       <div class="seg sx-adv" role="group" aria-label="d20 rolls">${[["dis","Disadvantage"],["normal","Normal"],["adv","Advantage"]].map(([k,l])=>`<button type="button" data-act="stAdv" data-v="${k}" aria-pressed="${ST.adv===k}">${l}</button>`).join("")}</div>
-      <ol class="sx-rolls" aria-live="polite">${ST.rolls.map(r=>`<li><b>${r.v}</b><span>d${r.sides}${r.b!=null?` · ${r.a} and ${r.b}, ${r.adv==="adv"?"advantage":"disadvantage"}`:""}</span></li>`).join("")||`<li class="vempty">Only you see these.</li>`}</ol></div>
+      <ol class="sx-rolls">${ST.rolls.map(r=>`<li><b>${r.v}</b><span>d${r.sides}${r.b!=null?` · ${r.a} and ${r.b}, ${r.adv==="adv"?"advantage":"disadvantage"}`:""}</span></li>`).join("")||`<li class="vempty">Only you see these.</li>`}</ol></div>
     ${S.clocks.length?`<div class="sx-card"><h3>Clocks</h3><div class="clks compact">${S.clocks.map(k=>clockCard(k,true)).join("")}</div></div>`:""}
     <div class="sx-card"><h3>Log a Moment</h3><form data-stlog class="sx-logf"><input class="scn-in" id="sx-log" placeholder="What just happened? Enter to log" aria-label="Log a moment" enterkeyhint="done"><select class="scn-in" id="sx-tag" aria-label="Tag"><option value="">No tag</option><option value="Loot">Loot</option><option value="Milestone">Milestone</option></select><button class="btn sm primary" type="submit">Log</button></form>
-      <ul class="sx-log">${noteLines(rcNotesVal(n)).slice(-12).reverse().map(l=>`<li>${esc(l.replace(/^-\s*/,""))}</li>`).join("")||`<li class="vempty">Nothing logged yet. It goes into this session's notes for the recap.</li>`}</ul></div></section>`;
+      <ul class="sx-log">${stLogHtml(n)}</ul></div></section>`;
   const langs=(S.settings.party||{}).languages;
   const col4=`<section class="sx-col" aria-label="Rules and travel"><div class="sx-card"><h3>Rules at a Glance</h3>
-      <details class="sx-rule" open><summary>Typical DCs</summary><p class="sx-dcs">${[["Very easy",5],["Easy",10],["Medium",15],["Hard",20],["Very hard",25],["Nearly impossible",30]].map(([l,v])=>`<span>${l} <b>${v}</b></span>`).join("")}</p></details>
-      <details class="sx-rule"><summary>Conditions</summary><dl class="sx-conds">${Object.entries(RULES).filter(([k])=>CONDS.includes(k)||k==="Exhaustion").map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl></details>
-      <details class="sx-rule"><summary>Cover</summary><p>Half cover: +2 to AC and Dexterity saves. Three-quarters cover: +5. Total cover: can't be targeted directly.</p></details>
+      <details class="sx-rule" data-k="dc" ${op("dc")}><summary>Typical DCs</summary><p class="sx-dcs">${[["Very easy",5],["Easy",10],["Medium",15],["Hard",20],["Very hard",25],["Nearly impossible",30]].map(([l,v])=>`<span>${l} <b>${v}</b></span>`).join("")}</p></details>
+      <details class="sx-rule" data-k="cond" ${op("cond")}><summary>Conditions</summary><dl class="sx-conds">${Object.entries(RULES).filter(([k])=>CONDS.includes(k)).map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl></details>
+      <details class="sx-rule" data-k="cover" ${op("cover")}><summary>Cover</summary><p>Half cover: +2 to AC and Dexterity saves. Three-quarters cover: +5. Total cover: can't be targeted directly.</p></details>
       ${langs?`<p class="sx-lang"><b>Party languages.</b> ${esc(langs)}</p>`:""}</div>
     ${S.tables.length?`<div class="sx-card"><h3>Roll Tables</h3><div class="tm-rolls">${S.tables.slice().sort((a,b)=>(a.title||"").localeCompare(b.title||"")).map(t=>{const r=(ROLLS[t.id]||[])[0];return `<div class="tm-roll"><button class="btn sm" data-act="tmRoll" data-id="${t.id}">${esc(t.title)}</button>${r?`<span><b class="mono">${r.n}</b> ${esc(r.text)}</span>`:""}</div>`}).join("")}</div></div>`:""}
-    <div class="sx-card"><h3>Travel</h3><div class="sx-travel"><label class="scn-f"><span class="label">Miles</span><input class="scn-in" id="sx-miles" type="number" min="0" step="any" inputmode="decimal" value="${esc(ST.miles)}"></label><label class="scn-f"><span class="label">Pace</span><select class="scn-in" id="sx-pace">${Object.entries(ST_PACE).map(([k,[,l]])=>`<option value="${k}" ${ST.pace===k?"selected":""}>${l}</option>`).join("")}</select></label></div><div id="sx-tr">${stTravelHtml()}</div></div></section>`;
+    <div class="sx-card"><h3>Travel</h3><div class="sx-travel"><label class="scn-f"><span class="label">Miles</span><input class="scn-in" id="sx-miles" type="number" min="0" max="5000" step="any" inputmode="decimal" value="${esc(ST.miles)}"></label><label class="scn-f"><span class="label">Pace</span><select class="scn-in" id="sx-pace">${Object.entries(stPace()).map(([k,[,l]])=>`<option value="${k}" ${ST.pace===k?"selected":""}>${l}</option>`).join("")}</select></label></div><div id="sx-tr">${stTravelHtml()}</div></div></section>`;
   el.innerHTML=`${top}<div class="tm-body sx-body"><div class="sx-grid">${col1}${col2}${col3}${col4}</div></div>`;el.hidden=false;
   el.querySelectorAll(".sx-col").forEach((x,i)=>{if(keep[i])x.scrollTop=keep[i]});const b=el.querySelector(".sx-body");if(b)b.scrollTop=bodyY;
+  focusAfter(el,fsel);
 }
 async function stAct(a,t){const plan=stPlan(),n=rcSession(),i=num(t.dataset.i);
   if(a==="stView")return setTMV(t.dataset.v);
   if(a==="stTime")return stTime(num(t.dataset.n));
-  if(a==="stTravel")return stTime(num(t.dataset.n));
+  if(a==="stShort")return stTime(60,false,"Short rest.");
   if(a==="stLong")return stTime(0,true);
   if(a==="stUndo")return stUndo();
   if(a==="stScene"){ST.scene=t.dataset.id;renderTable();document.querySelector("#tablemode .sx-scene")?.scrollTo({top:0});return}
@@ -2636,7 +2684,7 @@ async function stAct(a,t){const plan=stPlan(),n=rcSession(),i=num(t.dataset.i);
   if(!plan)return;
   if(a==="stClue"){const sc0=stScenes(plan),cur=sc0.find(s=>s.id===ST.scene)||(Array.isArray(plan.scenes)?null:sc0[0]);if(!cur||!cur.clues[i])return;
     if(!Array.isArray(plan.scenes))return toggleReveal(plan.id,i,!cur.clues[i].found).then(()=>{project();renderTable()});
-    return stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===ST.scene);if(s&&s.clues[i])s.clues[i].found=!s.clues[i].found})}
+    return stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===ST.scene);if(s&&s.clues&&s.clues[i])s.clues[i].found=!s.clues[i].found})}
   if(a==="stNext"){const main=stScenes(plan).filter(s=>!s.reserve),k=main.findIndex(s=>s.id===ST.scene),nx=main.slice(k+1).find(s=>!s.done)||main.find((s,j)=>j!==k&&!s.done);
     await stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===ST.scene);if(s)s.done=true});ST.scene=nx?nx.id:ST.scene;renderTable();if(!nx)toast("That was the last scene on tonight's path.");}}
 document.addEventListener("change",e=>{const t=e.target;
@@ -2644,14 +2692,15 @@ document.addEventListener("change",e=>{const t=e.target;
   if(t.id==="sx-pace"){ST.pace=t.value;const r=document.getElementById("sx-tr");if(r)r.innerHTML=stTravelHtml()}});
 document.addEventListener("input",e=>{if(e.target.id!=="sx-miles")return;ST.miles=e.target.value;const r=document.getElementById("sx-tr");if(r)r.innerHTML=stTravelHtml()});
 document.addEventListener("submit",async e=>{const f=e.target.closest("[data-stlog]");if(!f)return;e.preventDefault();e.stopPropagation();const i=document.getElementById("sx-log"),v=i.value.trim();if(!v)return;
-  const tag=document.getElementById("sx-tag").value;i.value="";await addSessionLine((tag?`[${tag}] `:"")+v);renderTable();document.getElementById("sx-log")?.focus()});
+  // the box keeps focus, so a full redraw would wait; draw the new line straight into the list instead
+  const tag=document.getElementById("sx-tag").value;i.value="";const n=await addSessionLine((tag?`[${tag}] `:"")+v);const ul=document.querySelector("#tablemode .sx-log");if(ul)ul.innerHTML=stLogHtml(n);i.focus()});
 function renderTable(){
   renderDock();if(!TM)return;const el=document.getElementById("tablemode");
   if(typingInTable()||TMD.drag){renderPending=true;return}
   if(TMV!=="board"){el.className="tablemode sx-mode";renderSession(el);return}
   el.classList.remove("sx-mode");
   const c=cal(),plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));
-  const plan=plans.find(p=>p.id===U.planSel)||plans.find(p=>p.status!=="played")||null;
+  const plan=plans.find(p=>p.id===U.planSel)||thNext()||null;
   const n=rcSession();
   const cast=plan?[...new Map(backlinksFrom(textOf("plans",plan)).filter(o=>o.type==="characters").map(o=>[o.id,rec("characters",o.id)])).values()].filter(Boolean):[];
   const threads=S.threads.filter(t=>t.status!=="resolved").slice(0,10);
@@ -2853,13 +2902,15 @@ function genMon(name,o){
   let ac=12+half,hp=low>=0?[3,7,13,22][low]:Math.round(20*n),dpr=low>=0?[1,3,5,7][low]:Math.round(7*n);
   const adj={brute:[-1,1.25,1.15],skirmisher:[1,.85,1],caster:[-1,.8,1.1],defender:[2,1.2,.8]}[R];
   ac=Math.min(22,Math.max(10,ac+adj[0]));hp=Math.max(2,Math.round(hp*adj[1]));dpr=Math.max(1,Math.round(dpr*adj[2]));
-  const atk=3+half,dc=12+half,prof=n<1?2:2+Math.floor((n-1)/4),pm=Math.min(7,2+Math.floor(n/4));
+  const dc=12+half,prof=n<1?2:2+Math.floor((n-1)/4),pm=Math.min(7,2+Math.floor(n/4)),atk=pm+prof;  // to-hit matches the ability scores below
   const mindless=["beast","ooze","plant"].includes(type);
   const prim=R==="brute"||R==="defender"?"str":R==="skirmisher"?"dex":["fiend","fey","celestial","dragon"].includes(type)?"cha":["undead","aberration","construct"].includes(type)?"int":"wis";
   const ab={str:10,dex:12,con:10+2*Math.max(1,pm-1),int:mindless?3:10,wis:10,cha:mindless?5:10};ab[prim]=10+2*pm;
   const conM=Math.floor((ab.con-10)/2),large=["giant","dragon"].includes(type)||(R==="brute"&&n>=5),die=large?5.5:4.5;
   const hd=Math.max(1,Math.round(hp/(die+conM)));hp=Math.max(1,Math.floor(hd*die)+hd*conM);
-  const who="the "+String(name||"creature").toLowerCase(),Who="The "+String(name||"creature").toLowerCase();
+  // a named NPC reads as "Mira moves", a kind of creature as "the goblin moves"
+  const nm=String(name||"creature").trim()||"creature",proper=/^[A-Z]/.test(nm)&&!/^(the|a|an)\s/i.test(nm);
+  const who=proper?nm:"the "+nm.replace(/^(the|a|an)\s+/i,"").toLowerCase(),Who=who.charAt(0).toUpperCase()+who.slice(1);
   const count=n>=11?3:n>=3?2:1,per=dpr/count,dd=R==="skirmisher"?3.5:R==="caster"?5.5:4.5,dn=R==="skirmisher"?"d6":R==="caster"?"d10":"d8";
   const nd=Math.max(1,Math.round((per-pm)/dd)),avg=Math.max(1,Math.floor(nd*dd)+pm);
   const phys={slashing:"Slash",piercing:"Stab",bludgeoning:"Slam"}[dmg],aName=phys||`${CAP(dmg)} Lash`;
@@ -2884,28 +2935,29 @@ function genMon(name,o){
 const GEN={cr:"1",role:"brute",type:"humanoid",dmg:"slashing"};
 
 /* NPCs & Enemies: NPCs (characters, kind npc) and stat blocks (monsters) in one list */
-function pplItems(){const q=String(U.pplQ||"").trim().toLowerCase(),k=U.pplKind||"all",out=[];
+function pplItems(){const q=String(U.pplQ||"").trim().toLowerCase(),k=isDM()?(U.pplKind||"all"):"all",out=[];
   if(k!=="foe")S.characters.filter(x=>x.kind!=="pc").forEach(x=>out.push({col:"characters",x}));
   if(k!=="npc")S.monsters.forEach(x=>out.push({col:"monsters",x}));
   return out.filter(({col,x})=>!q||((x.name||"")+" "+textOf(col,x)).toLowerCase().includes(q)).sort((a,b)=>(a.x.name||"").localeCompare(b.x.name||""))}
 function vPeople(){
   const list=pplItems();let sel=U.pplSel&&rec(U.pplSel.col,U.pplSel.id)?U.pplSel:null;
   if(!sel||!list.some(i=>i.col===sel.col&&i.x.id===sel.id))sel=list[0]?{col:list[0].col,id:list[0].x.id}:null;U.pplSel=sel;
-  const x=sel&&rec(sel.col,sel.id),npc=sel&&sel.col==="characters",tab=U.pplTab||"notes";
-  const kinds=`<div class="seg">${[["all","All"],["npc","NPCs"],["foe","Foes"]].map(([k,l])=>`<button type="button" data-act="pplKind" data-v="${k}" aria-pressed="${(U.pplKind||"all")===k}">${l}</button>`).join("")}</div>`;
+  // stat blocks are DM-only, so players get the notes tab and no Foes filter
+  const dm=isDM(),x=sel&&rec(sel.col,sel.id),npc=sel&&sel.col==="characters",tab=dm?(U.pplTab||"notes"):"notes";
+  const kinds=!dm?"":`<div class="seg">${[["all","All"],["npc","NPCs"],["foe","Foes"]].map(([k,l])=>`<button type="button" data-act="pplKind" data-v="${k}" aria-pressed="${(U.pplKind||"all")===k}">${l}</button>`).join("")}</div>`;
   const row=({col,x:r})=>`<button class="nitem" data-act="pplSel" data-col="${col}" data-id="${r.id}" aria-current="${!!sel&&sel.col===col&&sel.id===r.id}"><b>${esc(r.name||"Unnamed")}</b><small>${col==="characters"?["NPC",r.cls,r.location].filter(Boolean).map(esc).join(" · "):`Foe${r.cr?" · CR "+esc(r.cr):""}${r.meta?" · "+esc(r.meta):""}`}</small></button>`;
   const left=`<div class="nlist"><div class="ppl-tools"><input class="search" id="pplq" data-in="pplQ" type="search" placeholder="Search NPCs and foes" aria-label="Search NPCs and foes" value="${esc(U.pplQ||"")}">${kinds}
     <form data-ppladd class="tq dm-only"><input id="ppl-add" placeholder="Add by name" aria-label="Name of a new NPC or foe"><select id="ppl-addk" aria-label="Add as"><option value="npc" ${U.pplKind==="foe"?"":"selected"}>NPC</option><option value="foe" ${U.pplKind==="foe"?"selected":""}>Foe</option></select><button class="btn sm primary" type="submit">Add</button></form></div>
     <div class="lib-lh"><h3>${{all:"NPCs & Enemies",npc:"NPCs",foe:"Foes"}[U.pplKind||"all"]}</h3><span>${list.length}</span></div>${list.length?list.map(row).join(""):`<div class="empty">${U.pplQ?"Nothing matches that search.":"No one here yet. Add someone by name."}</div>`}</div>`;
   if(!x)return `<div class="notes lib ppl ${U.noteReading?"reading":""}">${left}<div class="empty lib-pick">Pick someone to see their notes and stat block.</div></div>`;
   const m=npc?(x.mon&&rec("monsters",x.mon)):x;
-  const tabs=`<div class="seg ppl-tabs">${[["notes","Notes"],["block","Stat block"],["gen","Quick stat block"]].map(([k,l])=>`<button type="button" data-act="pplTab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join("")}</div>`;
+  const tabs=!dm?"":`<div class="seg ppl-tabs">${[["notes","Notes"],["block","Stat block"],["gen","Quick stat block"]].map(([k,l])=>`<button type="button" data-act="pplTab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join("")}</div>`;
   let body="";
   if(tab==="notes"&&npc){
     const fl=[["Role",x.cls],["Where",x.location],["Faction",x.faction],["Voice",x.voice],["Status",x.status&&x.status!=="alive"?CAP(x.status):""]].filter(f=>f[1]);
     body=`${fl.length?`<dl class="le-fields">${fl.map(([l,v])=>`<div><dt>${l}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`:""}
-      <div class="ppl-att"><span class="label">Starting attitude</span><div class="seg dm-only">${[["friendly","Friendly"],["neutral","Neutral"],["hostile","Hostile"]].map(([k,l])=>`<button type="button" data-act="pplAtt" data-v="${k}" aria-pressed="${x.attitude===k}">${l}</button>`).join("")}</div></div>
-      <div class="le-cols"><div class="le-main">${x.wants?`<section><h4 class="le-h">What they want</h4><p class="ppl-wants">${linkify(esc(x.wants),"characters:"+x.id)}</p></section>`:""}<section><h4 class="le-h">Notes</h4>${x.notes?`<div class="prose vprose">${rich(x.notes,"characters:"+x.id)}</div>`:`<p class="vempty">No notes yet. Use Edit to add them.</p>`}</section></div>
+      ${dm?`<div class="ppl-att"><span class="label">Starting attitude</span><div class="seg">${[["friendly","Friendly"],["neutral","Neutral"],["hostile","Hostile"]].map(([k,l])=>`<button type="button" data-act="pplAtt" data-v="${k}" aria-pressed="${x.attitude===k}">${l}</button>`).join("")}</div></div>`:""}
+      <div class="le-cols"><div class="le-main">${dm&&x.wants?`<section><h4 class="le-h">What they want</h4><p class="ppl-wants">${linkify(esc(x.wants),"characters:"+x.id)}</p></section>`:""}<section><h4 class="le-h">Notes</h4>${x.notes?`<div class="prose vprose">${rich(x.notes,"characters:"+x.id)}</div>`:`<p class="vempty">No notes yet. Use Edit to add them.</p>`}</section></div>
       <div class="le-side">${secretBox(x)}${backlinkBlock("characters",x.id)}</div></div>`}
   else if(tab==="notes"){
     body=`<div class="le-cols"><div class="le-main"><section><h4 class="le-h">Phases & notes</h4>${x.notes?blockLines(x.notes):`<p class="vempty">Nothing yet. Edit the stat block to add phases or tactics.</p>`}</section></div><div class="le-side">${backlinkBlock("monsters",x.id)}</div></div>`}
@@ -2916,49 +2968,54 @@ function vPeople(){
     const g=genMon(x.name,GEN),opt=(k,vals,lab)=>`<label class="scn-f"><span class="label">${lab}</span><select class="scn-in" data-gen="${k}">${vals.map(([v,l])=>`<option value="${v}" ${GEN[k]===v?"selected":""}>${esc(l)}</option>`).join("")}</select></label>`;
     body=`<p class="pb-sub">Numbers come from simple rules of thumb for the CR. Adjust anything after saving.</p>
       <div class="ppl-gen">${opt("cr",CRS.map(c=>[c,"CR "+c]),"Challenge")}${opt("role",Object.entries(GEN_ROLES),"Role")}${opt("type",GEN_TYPES.map(t=>[t,CAP(t)]),"Type")}${opt("dmg",GEN_DMG.map(t=>[t,CAP(t)]),"Damage")}</div>
-      <div class="ppl-acts dm-only">${npc?`<button type="button" class="btn primary" data-act="genSave">${m?"Save as a new stat block and link it":"Save and link to "+esc(x.name||"this NPC")}</button>`:`<button type="button" class="btn danger ${U.genArm===x.id?"armed":""}" data-act="genApply">${U.genArm===x.id?"Yes, replace the numbers":"Replace this stat block's numbers"}</button><button type="button" class="btn" data-act="genSave">Save as a new stat block</button>`}</div>
+      <div class="ppl-acts dm-only">${npc?`<button type="button" class="btn primary" data-act="genSave">${m?"Save as a new stat block and link it":"Save and link to "+esc(x.name||"this NPC")}</button>`:`<button type="button" class="btn danger ${U.genArm===x.id?"armed":""}" data-act="genApply">${U.genArm===x.id?"Yes, replace numbers and abilities":"Replace numbers and abilities"}</button><button type="button" class="btn" data-act="genSave">Save as a new stat block</button>`}</div>
       ${statBlock(g)}`}
-  const crumb=npc?["NPC",x.attitude?CAP(x.attitude):""].filter(Boolean).join(" · "):`Foe${x.cr?" · CR "+esc(x.cr):""}`;
+  const crumb=npc?esc(["NPC",dm&&x.attitude?CAP(x.attitude):""].filter(Boolean).join(" · ")):`Foe${x.cr?" · CR "+esc(x.cr):""}`;
   return `<div class="notes lib ppl ${U.noteReading?"reading":""}">${left}<article class="reader lib-entry"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ Back to the list</button></div>
     <div class="le-head"><div class="le-t"><span class="le-crumb">${crumb}</span><h3 class="t">${esc(x.name||"Unnamed")}</h3></div><span class="dm-only acts-r"><button type="button" class="btn sm" data-act="${npc?"view":"open"}" data-type="${sel.col}" data-id="${x.id}">Full page</button><button type="button" class="btn sm" data-act="edit" data-type="${sel.col}" data-id="${x.id}">Edit</button></span></div>
     ${tabs}${body}</article></div>`;
 }
-async function pplPatch(col,id,patch){const r=rec(col,id);if(!r)return;const{id:_,...keep}=r;await save(col,id,{...JSON.parse(JSON.stringify(keep)),...patch})}
+// one helper for small field changes; project() right after so a quick second tap reads the new values
+async function patchRec(col,id,patch){const r=rec(col,id);if(!r)return false;const{id:_,...keep}=r;const ok=await save(col,id,{...keep,...patch});project();return ok}
 async function pplAct(a,t){const sel=U.pplSel,x=sel&&rec(sel.col,sel.id);
   if(a==="pplSel"){U.pplSel={col:t.dataset.col,id:t.dataset.id};U.genArm=null;U.noteReading=true;render();if(isPhone())window.scrollTo({top:0});return}
   if(a==="pplKind"){U.pplKind=t.dataset.v;U.noteReading=false;render();return}
   if(a==="pplTab"){U.pplTab=t.dataset.v;U.genArm=null;render();return}
   if(!x)return;
-  if(a==="pplAtt"){await pplPatch("characters",x.id,{attitude:x.attitude===t.dataset.v?"":t.dataset.v});return}
-  if(a==="pplUnlink"){await pplPatch("characters",x.id,{mon:""});return}
-  if(a==="genSave"){const id=uid(),g=genMon(x.name,GEN);await save("monsters",id,g);if(sel.col==="characters")await pplPatch("characters",x.id,{mon:id});else U.pplSel={col:"monsters",id};U.pplTab="block";toast(`Saved a CR ${g.cr} stat block for ${g.name}`);project();render();return}
-  if(a==="genApply"){if(U.genArm!==x.id){U.genArm=x.id;render();return}U.genArm=null;const{name:_,...g}=genMon(x.name,GEN);await pplPatch("monsters",x.id,g);U.pplTab="block";toast("Stat block numbers replaced");render()}}
+  if(a==="pplAtt"){await patchRec("characters",x.id,{attitude:x.attitude===t.dataset.v?"":t.dataset.v});return}
+  if(a==="pplUnlink"){await patchRec("characters",x.id,{mon:""});return}
+  if(a==="genSave"){const id=uid(),g=genMon(x.name,GEN);await save("monsters",id,g);if(sel.col==="characters")await patchRec("characters",x.id,{mon:id});else U.pplSel={col:"monsters",id};U.pplTab="block";toast(`Saved a CR ${g.cr} stat block for ${g.name}`);project();render();return}
+  if(a==="genApply"){if(U.genArm!==x.id){U.genArm=x.id;render();return}U.genArm=null;const{name:_,...g}=genMon(x.name,GEN);
+    // clear the fields the maker doesn't fill so old values don't sit next to new numbers; keep legendary actions and notes
+    await patchRec("monsters",x.id,{acNote:"",resist:"",...g});U.pplTab="block";toast("Numbers and abilities replaced");render()}}
 document.addEventListener("change",e=>{const t=e.target;
   if(t.dataset&&t.dataset.gen){GEN[t.dataset.gen]=t.value;U.genArm=null;render();return}
-  if(t.id==="ppl-link"&&t.value&&U.pplSel&&U.pplSel.col==="characters")pplPatch("characters",U.pplSel.id,{mon:t.value})});
+  if(t.id==="ppl-link"&&t.value&&U.pplSel&&U.pplSel.col==="characters")patchRec("characters",U.pplSel.id,{mon:t.value})});
 document.addEventListener("submit",async e=>{const f=e.target.closest("[data-ppladd]");if(!f)return;e.preventDefault();e.stopPropagation();const i=document.getElementById("ppl-add"),v=i.value.trim();if(!v)return;
   const foe=document.getElementById("ppl-addk").value==="foe",id=uid();
-  if(foe)await save("monsters",id,{name:v,cr:"1"});else await save("characters",id,{name:v,kind:"npc",status:"alive"});
-  U.pplSel={col:foe?"monsters":"characters",id};U.pplTab=foe?"gen":"notes";U.pplQ="";U.noteReading=true;project();render()});
+  const col=foe?"monsters":"characters",ok=await save(col,id,foe?{name:v,cr:"1"}:{name:v,kind:"npc",status:"alive"});project();
+  if(ok&&rec(col,id)){U.pplSel={col,id};U.pplTab=foe?"gen":"notes";U.pplQ="";U.noteReading=true}render()});
 /* Party: player characters with their sheet and story, whole-party level, and the party's languages */
+const pcList=()=>S.characters.filter(x=>x.kind==="pc");
+const heroLevelSet=()=>[...new Set(pcList().map(p=>num(p.level)||0))].sort((a,b)=>a-b);  // 0 means no level set
 function vHeroes(){
-  const pcs=S.characters.filter(x=>x.kind==="pc").sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  const pcs=pcList().sort((a,b)=>(a.name||"").localeCompare(b.name||""));
   if(!pcs.some(p=>p.id===U.heroSel))U.heroSel=pcs[0]?.id||null;
-  const x=pcs.find(p=>p.id===U.heroSel),tab=U.heroTab||"sheet";
-  const lv=[...new Set(pcs.map(p=>num(p.level)||0))].sort((a,b)=>a-b),lvTxt=!pcs.length?"":lv.length===1?(lv[0]?`Level ${lv[0]}`:"No level set"):`Levels ${lv.filter(Boolean).join(", ")}`;
+  const x=pcs.find(p=>p.id===U.heroSel),tab=U.heroTab||"sheet",dm=isDM(),busy=!!U.heroBusy;
+  const lv=heroLevelSet(),lvTxt=!pcs.length?"":lv.length===1?(lv[0]?`Level ${lv[0]}`:"No level set"):`Levels ${lv.filter(Boolean).join(", ")}`;
   const langs=(S.settings.party||{}).languages||"";
-  const row=p=>`<button class="nitem hero-i" data-act="heroSel" data-id="${p.id}" aria-current="${p.id===U.heroSel}">${avatar(p,32)}<span><b>${esc(p.name||"Unnamed")}</b><small>${esc([p.cls,p.level?"Lv "+p.level:""].filter(Boolean).join(" · ")||"Player character")}${p.player?` · ${esc(p.player)}`:""}</small></span></button>`;
+  const row=p=>`<button class="nitem hero-i" data-act="heroSel" data-id="${p.id}" ${p.id===U.heroSel?'aria-current="true"':""}>${avatar(p,32)}<span><b>${esc(p.name||"Unnamed")}</b><small>${esc([p.cls,p.level?"Lv "+p.level:""].filter(Boolean).join(" · ")||"Player character")}${p.player?` · ${esc(p.player)}`:""}</small></span></button>`;
   const left=`<div class="nlist"><div class="ppl-tools">
-    <div class="hero-lv"><span><span class="label">Whole party</span><b>${lvTxt||"No heroes yet"}</b></span><span class="dm-only hero-lvb"><button type="button" class="btn icon" data-act="heroLvl" data-n="-1" aria-label="Every hero down one level" ${pcs.length?"":"disabled"}>−</button><button type="button" class="btn sm" data-act="heroLvl" data-n="1" ${pcs.length?"":"disabled"}>Level up</button></span></div>
-    <label class="scn-f"><span class="label">Party languages</span><input class="search" id="party-lang" value="${esc(langs)}" placeholder="e.g. Common, Elvish, Dwarvish" aria-describedby="party-lang-h"></label><small id="party-lang-h" class="muted">Saves when you leave the box. The Session Table cheat sheet shows it.</small>
+    <div class="hero-lv"><span><span class="label">Whole party</span><b>${lvTxt||"No heroes yet"}</b></span><span class="dm-only hero-lvb"><button type="button" class="btn ${U.lvArm?"sm danger armed":"icon"}" data-act="heroLvl" data-n="-1" aria-label="${U.lvArm?"Yes, every hero down one level":"Every hero down one level"}" ${pcs.length&&!busy?"":"disabled"}>${U.lvArm?"Yes, all down":"−"}</button><button type="button" class="btn sm" data-act="heroLvl" data-n="1" aria-label="Every hero up one level" ${pcs.length&&!busy?"":"disabled"}>Level up</button></span></div>
+    <label class="scn-f"><span class="label">Party languages</span><input class="search" id="party-lang" value="${esc(langs)}" placeholder="e.g. Common, Elvish, Dwarvish" aria-describedby="party-lang-h" ${dm?"":"readonly"}></label>${dm?`<small id="party-lang-h" class="muted">Saves when you leave the box. The Session Table cheat sheet shows it.</small>`:""}
     <form data-heroadd class="tq dm-only"><input id="hero-add" placeholder="Add a hero by name" aria-label="Name of a new hero"><button class="btn sm primary" type="submit">Add</button></form></div>
     <div class="lib-lh"><h3>The Party</h3><span>${pcs.length}</span></div>${pcs.length?pcs.map(row).join(""):`<div class="empty">No heroes yet. Add one by name.</div>`}</div>`;
   if(!x)return `<div class="notes lib ppl hero ${U.noteReading?"reading":""}">${left}<div class="empty lib-pick">Pick a hero to see their sheet and story.</div></div>`;
   const max=x.hpMax||0,hp=x.hp??max;
-  const stats=`<div class="hero-stats"><div><b>${x.ac??"–"}</b><span>AC</span></div><div><b>${max?hp:"–"}</b><span>HP${max?` / ${max}`:""}</span></div><div><b>${x.level||"–"}</b><span>Level</span></div></div>${passiveLine(x)}`;
+  const stats=`<div class="hero-stats"><div aria-label="Armor class ${esc(x.ac??"not set")}"><b aria-hidden="true">${esc(x.ac??"–")}</b><span aria-hidden="true">AC</span></div><div aria-label="${max?`Hit points ${esc(hp)} of ${esc(max)}`:"Hit points not set"}"><b aria-hidden="true">${esc(max?hp:"–")}</b><span aria-hidden="true">HP${max?` / ${esc(max)}`:""}</span></div><div aria-label="Level ${esc(x.level||"not set")}"><b aria-hidden="true">${esc(x.level||"–")}</b><span aria-hidden="true">Level</span></div></div>${passiveLine(x)}`;
   const tabs=`<div class="seg ppl-tabs">${[["sheet","Character sheet"],["story","Story & hooks"]].map(([k,l])=>`<button type="button" data-act="heroTab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join("")}</div>`;
   let body;
-  if(tab==="sheet")body=x.sheet?sheetPanel(x):`<p class="vempty">No character sheet yet. Use Edit and paste it into Character sheet.</p>`;
+  if(tab==="sheet")body=x.sheet?sheetPanel(x):`<p class="vempty">${dm?"No character sheet yet. Use Edit and paste it into Character sheet.":"No character sheet yet."}</p>`;
   else{const arcs=S.quests.filter(q=>q.pc===x.id);
     body=`<div class="le-cols"><div class="le-main">
       <section><h4 class="le-h">Backstory</h4>${x.backstory?`<div class="prose vprose">${rich(x.backstory,"characters:"+x.id)}</div>`:`<p class="vempty">No backstory yet.</p>`}</section>
@@ -2969,16 +3026,21 @@ function vHeroes(){
     <div class="le-head"><div class="le-t"><span class="le-crumb">${esc(["Player character",x.player?"Played by "+x.player:""].filter(Boolean).join(" · "))}</span><h3 class="t">${esc(x.name||"Unnamed")}</h3><span class="pb-sub">${esc([x.race,x.cls].filter(Boolean).join(" · "))}</span></div><span class="dm-only acts-r"><button type="button" class="btn sm" data-act="view" data-type="characters" data-id="${x.id}">Full page</button><button type="button" class="btn sm" data-act="edit" data-type="characters" data-id="${x.id}">Edit</button></span></div>
     ${stats}${tabs}${body}</article></div>`;
 }
-async function heroAct(a,t){
+async function heroAct(a,t){if(a!=="heroLvl")U.lvArm=false;
   if(a==="heroSel"){U.heroSel=t.dataset.id;U.noteReading=true;render();if(isPhone())window.scrollTo({top:0});return}
   if(a==="heroTab"){U.heroTab=t.dataset.v;render();return}
-  if(a==="heroLvl"){const n=num(t.dataset.n);const pcs=S.characters.filter(x=>x.kind==="pc");let changed=0;
-    for(const p of pcs){const cur=num(p.level)||0;if(!cur&&n<0)continue;const nx=cur?Math.max(1,Math.min(20,cur+n)):1;if(nx!==cur){await charPatch(p.id,{level:nx});changed++}}
-    if(changed)toast(n>0?"Every hero went up a level":"Every hero went down a level");}}
-document.addEventListener("change",e=>{if(e.target.id!=="party-lang")return;const v=e.target.value.trim();if(v===((S.settings.party||{}).languages||""))return;save("settings","party",{...(S.settings.party||{}),languages:v}).then(()=>toast("Party languages saved"))});
+  if(a==="heroLvl"){const n=num(t.dataset.n);
+    if(n<0&&!U.lvArm){U.lvArm=true;render();return}  // going down asks for a second tap
+    U.lvArm=false;U.heroBusy=true;render();
+    try{const jobs=pcList().map(p=>{const cur=num(p.level)||0;if(!cur&&n<0)return null;const nx=cur?Math.max(1,Math.min(20,cur+n)):1;return nx!==cur?charPatch(p.id,{level:nx}):null}).filter(Boolean);
+      const ok=(await Promise.all(jobs)).filter(Boolean).length;
+      if(jobs.length)toast(ok===jobs.length?`${ok} hero${ok===1?"":"es"} went ${n>0?"up":"down"} a level`:`Only ${ok} of ${jobs.length} heroes changed level. Try again.`)}
+    finally{U.heroBusy=false;render()}}}
+document.addEventListener("change",e=>{if(e.target.id!=="party-lang"||!isDM())return;const v=e.target.value.trim();if(v===((S.settings.party||{}).languages||""))return;save("settings","party",{...(S.settings.party||{}),languages:v}).then(ok=>{if(ok)toast("Party languages saved")})});
 document.addEventListener("submit",async e=>{const f=e.target.closest("[data-heroadd]");if(!f)return;e.preventDefault();e.stopPropagation();const i=document.getElementById("hero-add"),v=i.value.trim();if(!v)return;
-  const id=uid(),lv=[...new Set(S.characters.filter(x=>x.kind==="pc").map(x=>num(x.level)).filter(Boolean))];
-  await save("characters",id,{name:v,kind:"pc",status:"alive",...(lv.length===1?{level:lv[0]}:{})});U.heroSel=id;U.heroTab="sheet";U.noteReading=true;project();render()});
+  const id=uid(),lv=heroLevelSet().filter(Boolean);
+  const ok=await save("characters",id,{name:v,kind:"pc",status:"alive",...(lv.length===1?{level:lv[0]}:{})});project();
+  if(ok&&rec("characters",id)){U.heroSel=id;U.heroTab="sheet";U.noteReading=true}render()});
 function vBestiary(){
   const list=S.monsters.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||""));
   return `<div class="sub-bar"><p class="tool-d">Your own stat blocks. Names link everywhere, encounters can pull them in, and table mode shows them when a plan mentions them.</p><button class="btn primary" data-act="new" data-type="monsters">New stat block</button></div>
@@ -3000,11 +3062,11 @@ function gcalLink(){
 }
 
 /* ---------- goals & to-do list ---------- */
+function todoRow(t){const today=new Date().toLocaleDateString("en-CA");return `<div class="th ${t.done?"done":""}"><input type="checkbox" data-todo="${t.id}" ${t.done?"checked":""} aria-label="Done"><button class="th-t" data-act="edit" data-type="todos" data-id="${t.id}"><span>${linkify(esc(t.text||""),"")}</span>${t.due||t.notes?`<small>${t.due?`<span class="${!t.done&&t.due<today?"t-bad":""}">Due ${esc(new Date(t.due+"T12:00").toLocaleDateString("en-US",{month:"short",day:"numeric"}))}</span>`:""}${t.due&&t.notes?" · ":""}${esc(plain(t.notes||"").slice(0,90))}</small>`:""}</button></div>`}
 function vTodos(){
   const goals=S.todos.filter(t=>t.kind==="goal").sort((a,b)=>(a.done?1:0)-(b.done?1:0)||(a.updated||0)-(b.updated||0));
   const todos=S.todos.filter(t=>t.kind!=="goal");const open=todos.filter(t=>!t.done).sort((a,b)=>(a.due||"9999").localeCompare(b.due||"9999")||(a.updated||0)-(b.updated||0)),done=todos.filter(t=>t.done).sort((a,b)=>(b.updated||0)-(a.updated||0));
-  const today=new Date().toLocaleDateString("en-CA");
-  const row=t=>`<div class="th ${t.done?"done":""}"><input type="checkbox" data-todo="${t.id}" ${t.done?"checked":""} aria-label="Done"><button class="th-t" data-act="edit" data-type="todos" data-id="${t.id}"><span>${linkify(esc(t.text||""),"")}</span>${t.due||t.notes?`<small>${t.due?`<span class="${!t.done&&t.due<today?"t-bad":""}">Due ${esc(new Date(t.due+"T12:00").toLocaleDateString("en-US",{month:"short",day:"numeric"}))}</span>`:""}${t.due&&t.notes?" · ":""}${esc(plain(t.notes||"").slice(0,90))}</small>`:""}</button></div>`;
+  const row=todoRow;
   return `<div class="todo-grid">
     <section class="side"><h4>Campaign goals <span class="mono">${goals.filter(g=>!g.done).length}</span></h4>
       <form data-form="todoQuick" data-kind="goal" class="tq"><input id="tq-goal" placeholder="Add a goal, e.g. finish the main arc by summer" aria-label="New goal"><button class="btn sm primary" type="submit">Add</button></form>
@@ -3323,7 +3385,7 @@ function sheetPanel(x){
 }
 function condRow(x){const on=new Set(String(x.conditions||"").split(",").map(s=>s.trim()).filter(Boolean));
   return `<div class="conds"><span class="conds-l">Conditions</span>${CONDS.map(c=>`<button type="button" class="cond ${on.has(c)?"on":""}" data-cond="${esc(c)}" data-id="${x.id}" aria-pressed="${on.has(c)}">${c}</button>`).join("")}</div>`}
-async function charPatch(id,patch){const x=S.characters.find(c=>c.id===id);if(!x)return;const{id:_,...r}=x;await save("characters",id,{...r,...patch})}
+const charPatch=(id,patch)=>patchRec("characters",id,patch);
 document.addEventListener("click",async e=>{
   const sr=e.target.closest("[data-sroll]");if(sr){e.preventDefault();e.stopPropagation();doRoll({label:sr.dataset.slabel,parts:[{expr:sr.dataset.sroll,kind:"check"}]});return}
   const st=e.target.closest("[data-stab]");if(st){e.preventDefault();e.stopPropagation();SHEETTAB=st.dataset.stab;const box=st.closest(".csheet");const id=box&&box.dataset.cid;const x=S.characters.find(c=>c.id===id);if(x&&box){const sc=box.closest(".sheet,.pin-body,.tm-body");const top=sc?sc.scrollTop:0;box.outerHTML=sheetPanel(x);if(sc)sc.scrollTop=top}return}
@@ -3386,7 +3448,7 @@ document.addEventListener("submit",async e=>{const f=e.target.closest("[data-qno
 document.addEventListener("click",e=>{if(e.target.closest("[data-qclose]")){e.stopPropagation();closeQuick()}if(e.target.closest("[data-act=quickNote]")){e.stopPropagation();quickNote()}},true);
 
 /* shortcuts */
-const KEYS=[["/","Search"],["D","Dice tray"],["N","Quick note"],["K","Keep the open entry open"],["P","Show or hide Kept open"],["T","Table mode"],["B","Saved ideas"],["1–6","Characters, Library, Quests, Calendar, World, Prep"],["1–9 (table mode)","Play a Music button"],["?","This list (or the keyboard button at the top)"],["Esc","Close"],["Alt + click","On a heading: collapse or expand that whole group"]];
+const KEYS=[["/","Search"],["D","Dice tray"],["N","Quick note"],["K","Keep the open entry open"],["P","Show or hide Kept open"],["T","Table mode"],["B","Saved ideas"],["1–7","Jump to that menu item, in the order the menu shows"],["1–9 (table mode)","Play a Music button"],["?","This list (or the keyboard button at the top)"],["Esc","Close"],["Alt + click","On a heading: collapse or expand that whole group"]];
 function showKeys(){showSheet(`<div class="sheet" role="dialog" aria-label="Keyboard shortcuts"><h2>Keyboard shortcuts</h2><table class="keys">${KEYS.map(([k,l])=>`<tr><td><kbd>${k}</kbd></td><td>${l}</td></tr>`).join("")}</table><p class="vempty">Shortcuts work when you're not typing in a box. Forgot them? Click the keyboard button at the top of the page, or press <kbd>?</kbd>. Hover over a button to see its shortcut.</p><div class="foot"><span class="grow"></span><button type="button" class="btn primary" data-act="close">Done</button></div></div>`,true)}
 document.addEventListener("keydown",e=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;const a=document.activeElement;if(a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)))return;
@@ -3396,7 +3458,7 @@ document.addEventListener("keydown",e=>{
   if(k==="k"||k==="K"){if(OPEN&&(OPEN.kind==="view"||OPEN.kind==="monster")){e.preventDefault();pinToggle(OPEN.kind==="monster"?"monsters":OPEN.type,OPEN.id)}return}
   if(k==="p"||k==="P"){e.preventDefault();DOCK_OPEN=!DOCK_OPEN;pinsSave();renderDock();return}
   if((k==="t"||k==="T")&&isDM()){e.preventDefault();document.querySelector(TM?"[data-act=tmExit]":"[data-act=tmOpen]")?.click();return}
-  if(/^[1-7]$/.test(k)&&!TM){e.preventDefault();const vis=TABS.filter(([x])=>((x!=="prep")||isDM())&&(x!=="home"||!isDM()));const t=vis[+k-1];if(t){closeSheet();location.hash=t[0]}return}
+  if(/^[1-7]$/.test(k)&&!TM){e.preventDefault();const t=visibleTabs()[+k-1];if(t){closeSheet();location.hash=t[0]}return}
   if((k==="b"||k==="B")&&isDM()&&!TM){e.preventDefault();closeSheet();U.prepTab="ideas";if(location.hash!=="#prep")location.hash="prep";else render();return}
 
   if(k==="?"){e.preventDefault();showKeys();return}
@@ -3438,9 +3500,13 @@ document.addEventListener("click",e=>{const el=e.target.closest(".rule");if(el){
 addEventListener("scroll",hideRule,true);
 
 /* reveal checklist */
-function revealItems(plan){return String(plan?.reveals||"").split("\n").map(s=>s.trim()).filter(Boolean).map((l,i)=>({i,done:/^\[x\]\s*/i.test(l),text:l.replace(/^\[[ x]?\]\s*/i,"")}))}
+// A plan with scenes keeps its clues in the scenes, so the reveal checklist reads (and ticks) those instead of the old reveals text.
+function revealItems(plan){if(plan&&Array.isArray(plan.scenes)){const out=[];plan.scenes.forEach(s=>(s.clues||[]).forEach((k,ci)=>{const t=String(k.t||"").trim();if(t)out.push({i:out.length,done:!!k.found,text:t,sid:s.id,ci})}));return out}
+  return String(plan?.reveals||"").split("\n").map(s=>s.trim()).filter(Boolean).map((l,i)=>({i,done:/^\[x\]\s*/i.test(l),text:l.replace(/^\[[ x]?\]\s*/i,"")}))}
 function revealList(plan){const it=revealItems(plan);if(!it.length)return "";return `<section class="tm-s rev"><h3>Reveal checklist <span class="mono">${it.filter(x=>x.done).length}/${it.length}</span></h3><ul class="revl">${it.map(x=>`<li class="${x.done?"done":""}"><label><input type="checkbox" data-reveal="${plan.id}|${x.i}" ${x.done?"checked":""}><span>${linkify(esc(x.text),"")}</span></label></li>`).join("")}</ul></section>`}
-async function toggleReveal(pid,i,on){const p=rec("plans",pid);if(!p)return;const lines=String(p.reveals||"").split("\n").map(s=>s.trim()).filter(Boolean);if(!lines[i])return;const t=lines[i].replace(/^\[[ x]?\]\s*/i,"");learnFromReveal(pid,i,on,t);lines[i]=(on?"[x] ":"")+t;const{id:_,...r}=p;await save("plans",pid,{...r,reveals:lines.join("\n")})}
+async function toggleReveal(pid,i,on){const p=rec("plans",pid);if(!p)return;
+  if(Array.isArray(p.scenes)){const it=revealItems(p)[i];if(!it)return;learnFromReveal(pid,i,on,it.text);return stScenePatch(pid,sc=>{const s=sc.find(x=>x.id===it.sid);if(s&&s.clues[it.ci])s.clues[it.ci].found=on})}
+  const lines=String(p.reveals||"").split("\n").map(s=>s.trim()).filter(Boolean);if(!lines[i])return;const t=lines[i].replace(/^\[[ x]?\]\s*/i,"");learnFromReveal(pid,i,on,t);lines[i]=(on?"[x] ":"")+t;const{id:_,...r}=p;await save("plans",pid,{...r,reveals:lines.join("\n")})}
 document.addEventListener("change",e=>{const el=e.target.closest("[data-reveal]");if(!el)return;const [pid,i]=el.dataset.reveal.split("|");el.closest("li")?.classList.toggle("done",el.checked);toggleReveal(pid,+i,el.checked)},true);
 /* session clock */
 let CLOCK={start:null,acc:0,running:false,lastBreak:0};try{const c=JSON.parse(localStorage.getItem("dmdesk-clock")||"null");if(c)CLOCK={...CLOCK,...c}}catch(e){}
@@ -3608,7 +3674,7 @@ function bsTrim(list){let out=list.filter((s,i)=>s.focus||i<30);while(out.length
 async function bsStore(list){const d=bsDoc();const{id:_,...keep}=d;await save("meta","brainstorms",{...keep,list:bsTrim(list)})}
 async function bsSave(sid,iid,kind){const list=bsList();const s=list.find(x=>x.id===sid);const it=s&&s.ideas.find(x=>x.id===iid);if(!it)return;
   const dev=bsPicked(it);const body=`${it.pitch}${it.ties?`\n\n*Ties in:* ${it.ties}`:""}${dev?`\n\n${dev}`:""}`;
-  const n=nextSession();const plan=S.plans.find(p=>p.status!=="played")||S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0))[0];
+  const n=nextSession();const plan=thNext()||S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0))[0];
   if(kind==="note")await save("notes",uid(),{title:it.title,category:"plot",body,dmOnly:true});
   else if(kind==="thread")await save("threads",uid(),{text:`${it.title}: ${it.pitch}`,status:"open"});
   else if(kind==="quest")await save("quests",uid(),{title:it.title,status:"rumor",notes:body,dmOnly:true});
@@ -3668,7 +3734,7 @@ function bsEditHtml(s,it){const k=`${s.id}|${it.id}`;return `<article class="bs-
 /* adding an idea onto something you already have */
 const BS_ADD_TYPES=["characters","notes","quests","plans","threads"];
 function bsAddSearch(q){q=String(q||"").trim().toLowerCase();const out=[];for(const t of BS_ADD_TYPES)for(const x of S[t]||[]){const n=String(titleOf(t,x)||"").toLowerCase();if(!q||n.includes(q))out.push([t,x]);if(out.length>=(q?14:0))return out}return out}
-function bsAddToHtml(s,it){const fx=s.focus&&rec(s.focus.type,s.focus.id);const plan=S.plans.filter(p=>p.status!=="played").sort((a,b)=>(num(a.session)||0)-(num(b.session)||0))[0];
+function bsAddToHtml(s,it){const fx=s.focus&&rec(s.focus.type,s.focus.id);const plan=thNext();
   const quick=[fx&&[s.focus.type,fx],plan&&["plans",plan]].filter(Boolean).filter((v,i,a)=>a.findIndex(w=>w[1].id===v[1].id)===i);
   const res=bsAddSearch(BS.addq);
   return `<div class="bs-addto"><div class="bs-addto-h"><b>Add “${esc(it.title)}” to…</b><button type="button" class="btn icon" data-bsaddx aria-label="Close">✕</button></div>
@@ -3869,9 +3935,16 @@ async function calMigrate(){
   MIG_BUSY=false;
 }
 /* ---------- render ---------- */
+/* Keep keyboard focus on the same button across a redraw. Buttons without an id are found again by their data- attributes.
+   Set FOCUS_NEXT to a selector to move focus somewhere else after the next redraw (a moved row, a new input). */
+const FOCUS_ATTRS=["act","id","n","i","v","type","gen","k","tab"];
+let FOCUS_NEXT=null;
+function focusSel(ae,root){if(!ae||!root||!root.contains(ae)||ae.id||!ae.dataset)return null;const ks=FOCUS_ATTRS.filter(k=>ae.dataset[k]!=null);if(!ks.length)return null;
+  return ae.tagName.toLowerCase()+ks.map(k=>`[data-${k}="${CSS.escape(ae.dataset[k])}"]`).join("")}
+function focusAfter(root,sel){const s=FOCUS_NEXT||sel;FOCUS_NEXT=null;if(!s||!root)return;const el=root.querySelector(s);if(el&&!el.disabled)el.focus({preventScroll:true})}
 function render(){
   if(!BOOT.ready){const app=document.getElementById("app");if(app&&!app.querySelector(".boot"))app.innerHTML=`<div class="boot"><span class="boot-sigil">✦</span><p>Opening the Desk…</p></div>`;return}
-  const ae=document.activeElement,aid=ae&&ae.id,sel=ae&&ae.selectionStart;
+  const ae=document.activeElement,aid=ae&&ae.id,sel=ae&&ae.selectionStart,fsel=focusSel(ae,document.getElementById("app"));
   const c=cal();
   document.getElementById("campName").textContent=S.settings.campaign?.name||"The Campaign";
   document.getElementById("clockDate").textContent=fmtDate(c,c.today);
@@ -3882,12 +3955,12 @@ function render(){
   if(U.tab==="prep"&&!isDM())U.tab="home";if(U.tab==="home"&&isDM())U.tab="party";
   const counts={party:S.characters.length,notes:S.notes.length,calendar:S.events.length,quests:S.quests.filter(q=>q.status==="active").length,world:S.maps.length,prep:S.threads.filter(t=>t.status!=="resolved").length};
   const tabLinks=TABS.filter(([k])=>((k!=="prep")||isDM())&&(k!=="home"||!isDM())).map(([k,l,sh])=>[k,`<a href="#${k}" ${U.tab===k?'aria-current="page"':""}><span class="full">${l}</span><span class="short">${sh}</span><span class="n">${counts[k]||""}</span></a>`]);
-  // Side menu (Wood & Wax, wide screens): brand, Session, Prep, Party/Characters, then the rest under a label
-  const sideTop=["prep","home","party"],linkHtml=list=>list.map(([,h])=>h).join("");
+  // Side menu (Wood & Wax, wide screens): brand, Session, Prep, Party/Characters, then the rest under "Reference". Number keys follow this order (visibleTabs).
+  const sideTop=SIDE_TOP,linkHtml=list=>list.map(([,h])=>h).join("");
   document.getElementById("tabs").innerHTML=sideMenu()
     ?`<span class="nav-brand" aria-hidden="true">DM's Desk</span>${isDM()?`<button type="button" class="nav-sess" data-act="tmOpen" title="A big-text screen for running the session (T)">Session</button>`:""}`
       +linkHtml(sideTop.map(k=>tabLinks.find(([t])=>t===k)).filter(Boolean))
-      +`<span class="nav-h" aria-hidden="true">The Library</span>`
+      +`<span class="nav-h" role="presentation">Reference</span>`
       +linkHtml(tabLinks.filter(([k])=>!sideTop.includes(k)))
     :linkHtml(tabLinks);
   const banner=(S.live?"":`<div class="banner">Saving isn't available in this view, so changes last only until you close the page.</div>`)+(U.preview?`<div class="preview-bar"><span>Previewing what your players see.</span><button class="btn sm" data-act="previewToggle">Stop previewing</button></div>`:"");
@@ -3900,7 +3973,8 @@ function render(){
   document.getElementById("app").innerHTML=banner+views[U.tab](c);
   [...document.querySelectorAll("#app .sub-tabs, #app .seg, #app .lib-groups, #app .table-wrap, #app .spot-wrap, #app .graph-wrap, #app .calgrid-wrap")].forEach((e,i)=>{if(hs[i])e.scrollLeft=hs[i]});
   if(popS){const np=document.querySelector("#app .bs-pop");if(np&&np.getAttribute("aria-label")===popKey){np.scrollTop=popS[0];const t=np.querySelector(".bs-thread");if(t)t.scrollTop=popS[1]}}
-  if(aid){const el=document.getElementById(aid);if(el){el.focus({preventScroll:true});try{if(sel!=null)el.setSelectionRange(sel,sel)}catch(_){}if(ta)el.scrollTop=ta}}
+  if(aid&&!FOCUS_NEXT){const el=document.getElementById(aid);if(el){el.focus({preventScroll:true});try{if(sel!=null)el.setSelectionRange(sel,sel)}catch(_){}if(ta)el.scrollTop=ta}}
+  else focusAfter(document.getElementById("app"),fsel);
   if(Math.abs(window.scrollY-y)>1)window.scrollTo(0,y);
   const ng=document.getElementById("nextGame");if(ng)ng.textContent=nextGameText();
   if(TM)renderTable();
@@ -3921,17 +3995,14 @@ function vParty(){
   h+=whatsNew();
   if(f==="npc")return h+vPeople();
   if(f==="pc")return h+vHeroes()+treasury();
-  if(f!=="npc"){
+  // All: the party cards and treasury, then every NPC
     h+=`<h3 class="section-h">The Adventuring Party · ${pcs.length}</h3>`;
     h+=pcs.length?`<div class="pcs">${pcs.map(pcCard).join("")}</div>`:`<div class="empty" style="margin-bottom:28px">No player characters yet.${isDM()?" Use <b>Add character</b> and set the type to Player character.":""}</div>`;
     h+=treasury();
-  }
-  if(f!=="pc"){
     h+=`<h3 class="section-h">Dramatis Personae · ${npcs.length}</h3>`;
     h+=npcs.length?`<div class="table-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Where</th><th>Faction</th><th>Attitude</th><th>Notes</th></tr></thead><tbody>${npcs.map(n=>`<tr data-act="view" data-type="characters" data-id="${n.id}"><td><span class="namecell">${avatar(n,28)}<b>${esc(n.name)}</b>${n.pronounce?`<small class="muted">(${esc(n.pronounce)})</small>`:""} ${dmBadge(n)}</span>${n.status&&n.status!=="alive"?` <span class="pill ${n.status==="dead"?"bad":"warn"}">${esc(n.status)}</span>`:""}</td><td>${esc(n.cls)}</td><td>${esc(n.location)}</td><td>${esc(n.faction)}</td><td>${n.attitude?`<span class="pill ${n.attitude==="friendly"?"ok":n.attitude==="hostile"?"bad":""}">${esc(n.attitude)}</span>`:""}</td><td><span class="clip">${esc(plain(n.notes))}</span></td></tr>`).join("")}</tbody></table></div>
       <div class="npc-list">${npcs.map(n=>`<button class="npc" data-act="view" data-type="characters" data-id="${n.id}"><span class="npc-top">${avatar(n,26)}<b>${esc(n.name)}</b>${n.status&&n.status!=="alive"?`<span class="pill ${n.status==="dead"?"bad":"warn"}">${esc(n.status)}</span>`:""}${n.attitude?`<span class="pill ${n.attitude==="friendly"?"ok":n.attitude==="hostile"?"bad":""}">${esc(n.attitude)}</span>`:""}</span>${n.cls?`<small class="npc-role">${esc(n.cls)}</small>`:""}${n.location||n.faction?`<small>${esc([n.location,n.faction].filter(Boolean).join(" · "))}</small>`:""}</button>`).join("")}</div>`
       :`<div class="empty">${isDM()?"No NPCs yet. Add the innkeeper, the villain, and everyone in between.":"No one here yet. People the party meets will show up here."}</div>`;
-  }
   return h;
 }
 function pcCard(p){
@@ -3985,7 +4056,9 @@ function libItems(g){const T=(col,f)=>(S[col]||[]).filter(f||(()=>true)).map(x=>
     case"tables":return [...T("tables"),...T("clocks")];
     default:return N(g)}}
 const libTag=(col,x)=>col==="notes"?(NOTE_CATS[x.category]||"Note"):col==="characters"?(x.kind==="pc"?"Player character":"NPC"):(COL_LABEL[col]||"Entry");
-const libBlurb=(col,x)=>(plain(col==="notes"?x.body:textOf(col,x)).split("\n").map(s=>s.trim()).find(Boolean)||"").slice(0,90);
+// only the start of a long body is needed for the one-line preview
+const libBlurb=(col,x)=>(plain(String((col==="notes"?x.body:textOf(col,x))||"").slice(0,600)).split("\n").map(s=>s.trim()).find(Boolean)||"").slice(0,90);
+const libNewFor=()=>String(U.noteQ||"").trim()?LIB_NEW.all:LIB_NEW[U.libGrp];
 function vNotes(c){
   const q=String(U.noteQ||"").trim().toLowerCase();if(!LIB_GROUPS.some(g=>g[0]===U.libGrp))U.libGrp="all";
   const g=U.libGrp,alpha=["party","npcs","bestiary","tables"].includes(g);
@@ -3994,13 +4067,16 @@ function vNotes(c){
   const notesIn=list.filter(i=>i.col==="notes");
   if(!notesIn.find(i=>i.x.id===U.noteSel))U.noteSel=notesIn[0]?.x.id||null;
   const cur=S.notes.find(n=>n.id===U.noteSel),gName=(LIB_GROUPS.find(x=>x[0]===g)||[])[1];
-  const nw=LIB_NEW[g];
+  // the main button follows the group (or "New note" while searching); the menu never repeats it
+  const nw=libNewFor(),mainAct=nw?"libNew":"newRecap";
+  const extra=[["newRecap","New session recap"],["libNewNote","New note"]].filter(([a,l])=>a!==mainAct&&!(nw&&nw[2]===l));
   let h=`<div class="bar"><h2>Library</h2>
     <input class="search lib-q" id="libq" data-in="noteQ" type="search" placeholder="Search every entry" aria-label="Search every entry" value="${esc(U.noteQ||"")}">
-    <span class="split dm-only">${nw?`<button class="btn primary" data-act="libNew">${nw[2]}</button>`:`<button class="btn primary" data-act="newRecap">New session recap</button>`}${moreMenu([mi("newRecap","New session recap"),mi("libNewNote","New note")],{label:"▾",title:"More ways to add",sm:false,cls:"split-m"})}</span></div>`;
+    <span class="split dm-only"><button class="btn primary" data-act="${mainAct}">${nw?nw[2]:"New session recap"}</button>${extra.length?moreMenu(extra.map(([a,l])=>mi(a,l)),{label:"▾",title:"More ways to add",sm:false,cls:"split-m"}):""}</span></div>`;
   const groups=`<div class="lib-groups" role="group" aria-label="Library groups">${LIB_GROUPS.map(([k,l])=>`<button type="button" class="lib-g" data-act="libGrp" data-v="${k}" aria-pressed="${!q&&g===k}">${l}<span class="n">${libItems(k).length}</span></button>`).join("")}</div>`;
-  const row=({col,x})=>col==="notes"?`<button class="nitem" data-act="pick" data-id="${x.id}" aria-current="${x.id===U.noteSel}"><b>${x.pinned?'<span class="pill acc">Pinned</span> ':""}${esc(x.title||"Untitled")}</b><small>${esc(libTag(col,x))}${x.session?` · Session ${x.session}`:""}${x.ig?` · ${esc(shortDate(c,x.ig))}`:""}</small>${libBlurb(col,x)?`<span class="nb">${esc(libBlurb(col,x))}</span>`:""}</button>`
-    :`<button class="nitem" data-act="open" data-type="${col}" data-id="${x.id}"><b>${esc(titleOf(col,x)||"Untitled")}</b><small>${esc(libTag(col,x))}</small>${libBlurb(col,x)?`<span class="nb">${esc(libBlurb(col,x))}</span>`:""}</button>`;
+  const nb=(col,x)=>{const b=libBlurb(col,x);return b?`<span class="nb">${esc(b)}</span>`:""};
+  const row=({col,x})=>col==="notes"?`<button class="nitem" data-act="pick" data-id="${x.id}" aria-current="${x.id===U.noteSel}"><b>${x.pinned?'<span class="pill acc">Pinned</span> ':""}${esc(x.title||"Untitled")}</b><small>${esc(libTag(col,x))}${x.session?` · Session ${x.session}`:""}${x.ig?` · ${esc(shortDate(c,x.ig))}`:""}</small>${nb(col,x)}</button>`
+    :`<button class="nitem" data-act="open" data-type="${col}" data-id="${x.id}"><b>${esc(titleOf(col,x)||"Untitled")}</b><small>${esc(libTag(col,x))}</small>${nb(col,x)}</button>`;
   h+=`<div class="notes lib ${U.noteReading?"reading":""}"><div class="nlist">${groups}<div class="lib-lh"><h3>${q?"Search results":esc(gName)}</h3><span>${list.length}</span></div>${list.length?list.map(row).join(""):`<div class="empty">${q?"Nothing matches that search.":`Nothing in ${esc(gName)} yet.`}</div>`}</div>`;
   const fl=[cur&&cur.session&&["Session",cur.session],cur&&cur.ig&&["In-game date",fmtDate(c,cur.ig)],cur&&cur.played&&["Played",new Date(cur.played+"T12:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})]].filter(Boolean);
   h+=cur?`<article class="reader lib-entry"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ Back to the list</button>${backBtn()}</div><div class="le-head"><div class="le-t"><span class="le-crumb">${esc((LIB_GROUPS.find(x=>x[0]===noteGroup(cur))||[])[1]||"")} · ${esc(NOTE_CATS[cur.category]||"Note")}</span>
@@ -4062,14 +4138,14 @@ function vQuests(){
 
 /* ---------- forms ---------- */
 const charOpts=()=>Object.fromEntries([["","— Choose —"],...S.characters.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(x=>[x.id,x.name])]);
-const FAC={fac:true};
+const FAC={fac:true},NPCF={npc:true};
 const FORMS={
   characters:{title:"Character",fields:c=>[
-    ["name","Name","text",6],["pronounce","Pronunciation","text",3,null,"e.g. Ah-LAR-ick"],["voice","Voice & mannerisms","text",3,null,"e.g. hissing, slow, never blinks"],["wants","What they want","text",6,null,"e.g. to buy back the family farm"],["mon","Stat block","select",6,Object.fromEntries([["","— None —"],...S.monsters.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(m=>[m.id,m.name||"Monster"])])],["kind","Type","select",3,{pc:"Player character",npc:"NPC"}],["status","Status","select",3,{alive:"Alive",missing:"Missing",dead:"Dead",unknown:"Unknown"}],
+    ["name","Name","text",6],["pronounce","Pronunciation","text",3,null,"e.g. Ah-LAR-ick"],["voice","Voice & mannerisms","text",3,null,"e.g. hissing, slow, never blinks"],["wants","What they want","text",6,null,"e.g. to buy back the family farm",NPCF],["mon","Stat block","select",6,Object.fromEntries([["","— None —"],...S.monsters.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(m=>[m.id,m.name||"Monster"])]),null,NPCF],["kind","Type","select",3,{pc:"Player character",npc:"NPC"}],["status","Status","select",3,{alive:"Alive",missing:"Missing",dead:"Dead",unknown:"Unknown"}],
     ["img","Portrait","image",6],
     ["player","Player","text",3],["race","Species","text",3],["cls","Class / role","text",4,null,"e.g. Tempest Cleric, or Blacksmith"],["level","Level","number",2],
     ["ac","AC","number",2],["hpMax","Max HP","number",2],["hp","Current HP","number",2],["pp","Passive Perception","number",2],
-    ["attitude","Attitude toward party","select",4,{"":"—",friendly:"Friendly",neutral:"Neutral",hostile:"Hostile"}],
+    ["attitude","Starting attitude","select",4,{"":"—",friendly:"Friendly",neutral:"Neutral",hostile:"Hostile"},null,NPCF],
     ["location","Location","text",3],["faction","Faction","text",3],["notes","Notes","textarea",6,null,"Backstory hooks, items, what they want"],
     ["backstory","Backstory","textarea",6,null,"The character's full backstory, personality, ideals, bonds and flaws"],["sheet","Character sheet","textarea",6,null,"Abilities, skills, features, spells and inventory"],
     ["secret","DM secrets","textarea",6,null,"Only you can see this, even if the character is visible to players"]]},
@@ -4102,9 +4178,9 @@ function openForm(type,id,preset){
   if(!row&&type==="clocks"){if(v.segments===undefined)v.segments="6";if(v.filled===undefined)v.filled=0}
   if(!row&&v.dmOnly===undefined)v.dmOnly=!((type==="characters"&&v.kind==="pc")||(type==="notes"&&v.category==="session")||type==="loot");
   if(type==="events"&&v.m!=null)v.date={y:v.y,m:v.m,d:v.d};
-  const isFac=(v.category||"")==="faction",isSess=(v.category||"")==="session",isShop=(v.category||"")==="shop",isPlace=["location","shop","lore"].includes(v.category||"");
+  const isNpc=type==="characters"&&v.kind!=="pc",isFac=(v.category||"")==="faction",isSess=(v.category||"")==="session",isShop=(v.category||"")==="shop",isPlace=["location","shop","lore"].includes(v.category||"");
   const fs=F.fields(c).map(([k,l,t,span,opts,hint,fl])=>{
-    const val=v[k]??"",cls=`field ${span===2?"s2":span===3?"s3":span===4?"s3":""} ${fl&&fl.fac?"fac-only":""} ${fl&&fl.sess?"sess-only":""} ${fl&&fl.shop?"shop-only":""} ${fl&&fl.place?"place-only":""}`,hid=(fl&&fl.fac&&!isFac)||(fl&&fl.sess&&!isSess)||(fl&&fl.shop&&!isShop)||(fl&&fl.place&&!isPlace)?" hidden":"";
+    const val=v[k]??"",cls=`field ${span===2?"s2":span===3?"s3":span===4?"s3":""} ${fl&&fl.fac?"fac-only":""} ${fl&&fl.sess?"sess-only":""} ${fl&&fl.shop?"shop-only":""} ${fl&&fl.place?"place-only":""} ${fl&&fl.npc?"npc-only":""}`,hid=(fl&&fl.npc&&!isNpc)||(fl&&fl.fac&&!isFac)||(fl&&fl.sess&&!isSess)||(fl&&fl.shop&&!isShop)||(fl&&fl.place&&!isPlace)?" hidden":"";
     let input;
     if(t==="checklist")return `<div class="${cls} cl-field"${hid}><span class="label">${l}</span><div class="cl-rows" id="f-${k}">${beatList({beats:val}).map(b=>clRow(b.text,b.done)).join("")}</div><button type="button" class="btn sm cl-add" data-act="clAdd" data-k="${k}">Add a beat</button></div>`;
     if(t==="plain"||t==="plain-tall")return `<label class="${cls}"${hid}><span class="label">${l}</span><textarea id="f-${k}" class="plain-ta ${t==="plain-tall"?"tall":""}">${esc(val)}</textarea>${hint?`<span class="hint">${hint}</span>`:""}</label>`;
@@ -4173,7 +4249,7 @@ function openView(type,id){
       <div class="props">
       ${pc?propAll("Played by",x.player):""}
       ${propAll("Species",x.race)}${propAll(pc?"Class":"Class / role",x.cls)}${propAll("Level",x.level)}
-      ${propAll("Status",CAP(x.status||"alive"))}${propAll("Attitude toward party",CAP(x.attitude))}
+      ${propAll("Status",CAP(x.status||"alive"))}${propAll("Starting attitude",CAP(x.attitude))}
       ${propAll("Location",x.location)}${propAll("Faction",x.faction)}
       ${!pc&&x.player?propAll("Player",x.player):""}
       </div>
@@ -4363,7 +4439,7 @@ document.addEventListener("click",async e=>{
       await remove(t.dataset.type,t.dataset.id);closeSheet();toast("Deleted");break;
     case"charFilter":U.charFilter=t.dataset.v;render();break;
     case"libGrp":U.libGrp=t.dataset.v;U.noteQ="";U.noteReading=false;render();break;
-    case"libNew":{const n=LIB_NEW[U.libGrp]||LIB_NEW.all;openForm(n[0],null,{...n[1]});break}
+    case"libNew":{const n=libNewFor()||LIB_NEW.all;openForm(n[0],null,{...n[1]});break}
     case"libNewNote":openForm("notes",null,{category:"lore"});break;
     case"pick":NAV=[];U.noteSel=t.dataset.id;U.noteReading=true;render();if(isPhone())window.scrollTo({top:0});break;
     case"noteBack":U.noteReading=false;render();break;
@@ -4441,7 +4517,7 @@ document.addEventListener("click",async e=>{
     case"planPlayed":{const pl=rec("plans",t.dataset.id);if(pl){const{id,...r}=pl;save("plans",id,{...r,status:pl.status==="played"?"planned":"played"})}break}
     case"pbPlan":U.planSel=t.dataset.id;U.prepTab="plan";render();window.scrollTo({top:0});break;
     case"scnSel":case"scnMove":case"scnDel":case"scnReserve":case"scnClueDel":case"scnIfAdd":case"scnIfDel":case"scnWhoAdd":case"scnWhoDel":scnAct(a,t);break;
-    case"stView":case"stTime":case"stTravel":case"stLong":case"stUndo":case"stScene":case"stPrev":case"stAdv":case"stRoll":case"stAtt":case"stEdit":case"stClue":case"stNext":stAct(a,t);break;
+    case"stView":case"stTime":case"stShort":case"stLong":case"stUndo":case"stScene":case"stPrev":case"stAdv":case"stRoll":case"stAtt":case"stEdit":case"stClue":case"stNext":stAct(a,t);break;
     case"heroSel":case"heroTab":case"heroLvl":heroAct(a,t);break;
     case"pplSel":case"pplKind":case"pplTab":case"pplAtt":case"pplUnlink":case"genSave":case"genApply":pplAct(a,t);break;
     case"scnOpen":U.planSel=t.dataset.id;U.prepTab="scenes";render();window.scrollTo({top:0});break;
@@ -4457,13 +4533,16 @@ document.addEventListener("input",e=>{if(e.target.id==="gq"){renderSearch(e.targ
   if(e.target.id==="tm-notes"){const n=rcSession();markDirty(n);U.rcNotes=e.target.value;saveLogSoon(n);return}
   if(e.target.id==="rc-notes"||e.target.id==="rc-open"){const n=rcSession();markDirty(n);if(e.target.id==="rc-notes")U.rcNotes=e.target.value;else U.rcOpen=e.target.value;saveLogSoon(n);return}
   if(e.target.id==="rc-n"){if(logTimer&&U.rcDirty!=null)saveLog(U.rcDirty);U.rcN=e.target.value;U.rcDirty=null;return}
-  const keep={"tq-in":"tq","rc-add":"rcAdd"}[e.target.id];if(keep){U[keep]=e.target.value;return}const k=e.target.dataset.in;if(k){U[k]=e.target.value;render()}});
+  const keep={"tq-in":"tq","rc-add":"rcAdd"}[e.target.id];if(keep){U[keep]=e.target.value;return}const k=e.target.dataset.in;if(k){U[k]=e.target.value;
+    // search boxes redraw once typing pauses, not on every key
+    if(e.target.type==="search"){clearTimeout(window.__inT);window.__inT=setTimeout(render,150)}else render()}});
 document.addEventListener("change",async e=>{
   const el=e.target;
   if(el.dataset.thread){const th=rec("threads",el.dataset.thread);if(th){const{id,...r}=th;save("threads",id,{...r,status:el.checked?"resolved":"open"})}return}
   if(el.dataset.coin){const purse={...(S.settings.purse||{})};purse[el.dataset.coin]=num(el.value)||0;save("settings","purse",purse);return}
   if(el.id==="imp-file"&&el.files[0]){importPreview(el.files[0]);return}
   if(el.id==="rc-n"){render();return}
+  if(el.id==="f-kind"){document.querySelectorAll(".npc-only").forEach(n=>n.hidden=el.value==="pc");return}
   if(el.id==="f-category"){const fac=el.value==="faction";document.querySelectorAll(".fac-only").forEach(n=>n.hidden=!fac);document.querySelectorAll(".sess-only").forEach(n=>n.hidden=el.value!=="session");document.querySelectorAll(".shop-only").forEach(n=>n.hidden=el.value!=="shop");document.querySelectorAll(".place-only").forEach(n=>n.hidden=!["location","shop","lore"].includes(el.value));return}
   if(el.dataset.todo){const td=rec("todos",el.dataset.todo);if(td){const{id,...r}=td;save("todos",id,{...r,done:el.checked})}return}
   if(el.dataset.spot){const [pc,ss]=el.dataset.spot.split("|");toggleSpot(pc,num(ss),el.checked);return}
@@ -4493,7 +4572,7 @@ document.addEventListener("submit",async e=>{
     else if(type==="plans"){if(!data.title)data.title=`Session ${data.session||nextSession()}`}
     else if(!data.title&&!data.name){toast(type==="characters"||type==="loot"?"Give it a name.":"Give it a title.");return}
     const old=S[type].find(x=>x.id===id)||{};const{id:_,...keep}=old;
-    await save(type,id,{...keep,...data});if(type==="notes"){U.noteSel=id;if(U.libGrp!=="all"&&!U.noteQ)U.libGrp=noteGroup({...keep,...data})}if(type==="plans"){U.planSel=id;U.prepTab="plan"}
+    await save(type,id,{...keep,...data});if(type==="notes"){U.noteSel=id;if(U.libGrp!=="all"&&!U.noteQ)U.libGrp=noteGroup({...keep,...data})}if(type==="plans"){U.planSel=id;if(U.prepTab!=="scenes")U.prepTab="plan"}
     if(type==="maps"){closeSheet();toast("Saved");setTimeout(()=>openMap(id),60)}else{closeSheet();toast("Saved")}}
   if(k==="cal"){const months=document.getElementById("c-months").value.split("\n").map(l=>l.split(",").map(x=>x.trim())).filter(p=>p[0]).map(([n,d,...fl])=>{const mm=n.match(/^(.*?)\s*\((.*)\)\s*$/);const o={name:(mm?mm[1]:n).trim(),days:Math.max(1,num(d)||30)};if(mm&&mm[2])o.sub=mm[2].trim();fl.forEach(f=>{if(/^festival$/i.test(f))o.festival=true;const lp=f.match(/^leap\s+(\d+)(?:\+(\d+))?\s*(.*)$/i);if(lp){o.leapEvery=+lp[1];if(lp[2])o.leapOffset=+lp[2];if(lp[3])o.leapName=lp[3].trim()}});return o});
     const moons=document.getElementById("c-moon").value.split(";").map(x=>x.split(",").map(y=>y.trim())).filter(p=>p[0]&&parseFloat(p[1])>0).map(([n,cy,sh])=>({name:n,cycle:parseFloat(cy),shift:parseFloat(sh)||0}));
@@ -4506,7 +4585,7 @@ document.addEventListener("submit",async e=>{
     U.calY=today.y;U.calM=today.m;closeSheet();toast("Calendar saved")}
   if(k==="rename"){await save("settings","campaign",{name:document.getElementById("r-name").value.trim()||"The Campaign"});toast("Renamed")}
   if(k==="schedule"){const v=document.getElementById("sch-dt").value;await save("settings","schedule",{next:v,repeat:document.getElementById("sch-rep").value});toast(v?"Schedule saved":"Schedule cleared");return}
-  if(k==="todoQuick"){const kind=f.dataset.kind,inp=document.getElementById(kind==="goal"?"tq-goal":"tq-todo");const v=(inp?.value||"").trim();if(!v)return;inp.value="";inp.blur();await save("todos",uid(),{text:v,kind,done:false});project();render();setTimeout(()=>document.getElementById(kind==="goal"?"tq-goal":"tq-todo")?.focus(),60);return}
+  if(k==="todoQuick"){const kind=f.dataset.kind,inp=f.querySelector("input"),iid=inp?.id;const v=(inp?.value||"").trim();if(!v)return;inp.value="";inp.blur();await save("todos",uid(),{text:v,kind,done:false});project();render();setTimeout(()=>document.getElementById(iid)?.focus(),60);return}
   if(k==="threadQuick"){const v=(document.getElementById("tq-in").value||"").trim();if(!v)return;U.tq="";await save("threads",uid(),{text:v,status:"open"});setTimeout(()=>document.getElementById("tq-in")?.focus(),60)}
   if(k==="rcAdd"){const v=(document.getElementById("rc-add").value||"").trim();if(!v)return;const n=rcSession();markDirty(n);const cur=U.rcNotes.replace(/\s+$/,"");U.rcNotes=(cur?cur+"\n":"")+(/^[-*] /.test(v)?v:"- "+v);U.rcAdd="";await saveLog(n);render();setTimeout(()=>document.getElementById("rc-add")?.focus(),40);return}
   if(k==="pin"){const mapId=f.dataset.map,m=rec("maps",mapId);if(!m)return;const pins=(m.pins||[]).slice();const ref=document.getElementById("pin-ref").value;const [type,rid]=ref?ref.split(":"):["",""];
