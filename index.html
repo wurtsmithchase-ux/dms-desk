@@ -2414,7 +2414,12 @@ function rcSession(){
   if(U.rcN!=null&&String(U.rcN).trim()!=="")return num(U.rcN)||recapNext();
   const max=Math.max(0,...S.notes.filter(n=>n.category==="session").map(n=>n.session||0));
   const last=S.logs.slice().sort((a,b)=>(b.updated||0)-(a.updated||0))[0];
-  return last&&(last.session||0)>=max?last.session:recapNext();
+  // the last log's session is over once it has a recap or is marked played and a later plan is waiting
+  if(last&&(last.session||0)>=max){const ls=last.session||0;
+    const upN=Math.min(Infinity,...S.plans.filter(p=>p.status!=="played"&&num(p.session)>ls).map(p=>num(p.session)));
+    if(upN<Infinity&&(recapFor(ls)||S.plans.some(p=>num(p.session)===ls&&p.status==="played")))return upN;
+    return ls}
+  return recapNext();
 }
 const rcNotesVal=n=>U.rcDirty===n?(U.rcNotes||""):(logFor(n)?.notes||"");
 const rcOpenVal=n=>U.rcDirty===n?(U.rcOpen||""):(logFor(n)?.open||"");
@@ -2882,7 +2887,7 @@ let TMV=(()=>{try{return localStorage.getItem("desk.tmview")||"session"}catch(_)
 function setTMV(v){TMV=v;try{localStorage.setItem("desk.tmview",v)}catch(_){}renderTable()}
 const ST={scene:null,rolls:[],undo:[],miles:"",pace:"normal",prevHide:false,open:new Set(["read"]),q:"",pins:[],resOpen:true,tag:"",rcat:"Conditions",improv:null,sheet:null,entry:null,gen:null,recap:false,hooksSent:false};
 document.addEventListener("toggle",e=>{const d=e.target;if(d.matches&&d.matches("#tablemode details[data-k]"))d.open?ST.open.add(d.dataset.k):ST.open.delete(d.dataset.k)},true);
-function stPlan(){const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));return plans.find(p=>p.id===U.planSel)||thNext()||null}
+function stPlan(){const plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));const n=rcSession();return plans.find(p=>p.id===U.planSel)||plans.find(p=>num(p.session)===n&&p.status!=="played")||plans.find(p=>num(p.session)===n)||thNext()||null}
 // older or hand-edited scenes may be missing their lists, so fill them in before the Table reads them
 const stScenes=p=>p?(Array.isArray(p.scenes)?p.scenes:scnLegacy(p)).map(s=>({...s,clues:s.clues||[],ifs:s.ifs||[],who:s.who||[]})):[];
 /* in-game time of day: minutes after midnight in settings/igtime; crossing midnight moves the date quietly */
@@ -3206,8 +3211,7 @@ function renderTable(){
   if(typingInTable()||TMD.drag){renderPending=true;return}
   if(TMV!=="board"){el.className="tablemode sx-mode";renderSession(el);return}
   el.classList.remove("sx-mode");
-  const c=cal(),plans=S.plans.slice().sort((a,b)=>(b.session||0)-(a.session||0));
-  const plan=plans.find(p=>p.id===U.planSel)||thNext()||null;
+  const c=cal(),plan=stPlan();
   const n=rcSession();
   const cast=plan?[...new Map(backlinksFrom(textOf("plans",plan)).filter(o=>o.type==="characters").map(o=>[o.id,rec("characters",o.id)])).values()].filter(Boolean):[];
   const threads=S.threads.filter(t=>t.status!=="resolved").slice(0,10);
