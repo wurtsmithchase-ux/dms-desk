@@ -5020,8 +5020,8 @@ document.addEventListener("click",async e=>{
     case"planPlayed":{const pl=rec("plans",t.dataset.id);if(pl){const{id,...r}=pl;save("plans",id,{...r,status:pl.status==="played"?"planned":"played"})}break}
     case"pbPlan":U.planSel=t.dataset.id;U.prepTab="plan";render();window.scrollTo({top:0});break;
     case"scnSel":case"scnMove":case"scnDel":case"scnReserve":case"scnClueDel":case"scnIfAdd":case"scnIfDel":case"scnWhoAdd":case"scnWhoDel":scnAct(a,t);break;
-    case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stAlertOk":case"stAlertAll":case"stRes":case"stRead":case"stIf":case"stIfDone":case"stMoveRes":case"stDone":case"stSpot":case"stSeg":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
-    case"stView":case"stTime":case"stShort":case"stLong":case"stUndo":case"stScene": case"stRoll":case"stAtt":case"stEdit":case"stClue":case"stNext":stAct(a,t);break;
+    case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stAlertOk":case"stAlertAll":case"stRes":case"stRead":case"stIf":case"stDone":case"stSpot":case"stSeg":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
+    case"stView":case"stTime":case"stShort":case"stLong":case"stUndo":case"stScene": case"stRoll":case"stAtt":case"stEdit":case"stClue":case"stNext":case"stIfDone":case"stMoveRes":stAct(a,t);break;
     case"heroSel":case"heroTab":case"heroLvl":heroAct(a,t);break;
     case"pplSel":case"pplKind":case"pplTab":case"pplAtt":case"pplUnlink":case"genSave":case"genApply":pplAct(a,t);break;
     case"scnOpen":U.planSel=t.dataset.id;U.prepTab="scenes";render();window.scrollTo({top:0});break;
