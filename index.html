@@ -285,8 +285,19 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 .sx-time{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .sx-moon{font-size:26px;line-height:1}
 .sx-dt{display:flex;flex-direction:column;line-height:1.2}.sx-dt b{font:700 16px var(--drop);color:#f6e8c6}.sx-dt span{font-size:14px;color:#b5a07e}
-.sx-music{flex:1 1 300px;min-width:0}
-.sx-alerts{display:flex;flex-direction:column;gap:4px;align-items:flex-end;font-size:14px;max-width:340px}
+/* the header is always two rows so it can't jump between layouts: row 1 is the clock, search, time and buttons; row 2 is the music with every starred playlist showing */
+.sx-id{flex:0 0 auto}
+.sx-search{flex:0 1 300px}
+.sx-time{flex:1 1 0;min-width:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.sx-time::-webkit-scrollbar{display:none}
+.sx-time>*{flex:0 0 auto;white-space:nowrap}
+.sx-top>.btn{flex:0 0 auto}
+.sx-music{flex:1 1 100%;min-width:0}
+.sx-alerts{display:flex;flex-direction:column;gap:4px;align-items:flex-start;font-size:14px;flex:1 1 100%}.sx-alerts:empty{display:none}
+@media (min-width:901px){
+  .sx-top{display:grid;grid-template-columns:auto minmax(160px,300px) minmax(0,1fr) auto auto;align-items:center}
+  .sx-music{grid-column:1/4;grid-row:2}
+  .sx-alerts{grid-column:4/6;grid-row:2;justify-self:end;align-items:flex-end;max-width:340px}
+}
 .sx-alert{display:flex;align-items:center;gap:8px;padding:4px 4px 4px 10px;border-radius:3px;background:var(--accent);color:#f6e8c6}
 .sx-alert .btn{min-height:32px;padding:0 10px}
 .sx-alert.sx-amore{background:rgba(0,0,0,.35)}
@@ -404,7 +415,7 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 /* phones and tablets: the whole Table scrolls, so windows and the playlists popup are pinned to the screen, the top bar stays in view and stays short, and small buttons get bigger */
 @media (max-width:900px){
   .sx-scrim{position:fixed;padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px))}
-  .sx-top{position:sticky;top:0;gap:6px 10px;padding-top:calc(6px + env(safe-area-inset-top,0px));padding-bottom:6px}
+  .sx-top{position:sticky;top:0;display:flex;gap:6px 10px;padding-top:calc(6px + env(safe-area-inset-top,0px));padding-bottom:6px}
   .sx-camp{font-size:18px}
   .sx-search{flex:1 1 150px;min-width:0}
   .sx-q{min-height:40px}
@@ -440,16 +451,17 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 /* top-bar music (spotify.js) */
 .sp-top{position:relative;display:flex;align-items:center;gap:8px;min-width:0}
 .sp-pp{flex:0 0 40px;height:40px;border-radius:50%;border:1px solid var(--gold);background:#2e2015;color:var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center}
-.sp-now{display:flex;flex-direction:column;min-width:0;max-width:170px;line-height:1.2}.sp-now small{font-size:12px;color:#b5a07e}.sp-now b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sp-favs{display:flex;gap:4px;overflow-x:auto;min-width:0;flex:1 1 auto;scrollbar-width:none}.sp-favs::-webkit-scrollbar{display:none}
-.sp-favs button,.sp-all{flex:0 0 auto;min-height:36px;padding:0 10px;border-radius:999px;border:1px solid var(--gilt-edge);background:#2e2015;color:#ead9b5;font:400 14px var(--sc);cursor:pointer;white-space:nowrap}
+.sp-now{display:flex;flex-direction:column;min-width:0;flex:0 0 200px;line-height:1.2}.sp-now small{font-size:12px;color:#b5a07e}.sp-now b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-favs{display:flex;flex-wrap:wrap;gap:6px;min-width:0;flex:1 1 0}
+.sp-favs button,.sp-all{flex:0 0 auto;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--gilt-edge);background:#2e2015;color:#ead9b5;font:400 14px var(--sc);cursor:pointer;white-space:nowrap}
 .sp-favs button[aria-pressed="true"]{background:var(--accent);border-color:#5e140b;color:#f6e8c6}
-.sp-pop{position:absolute;top:calc(100% + 8px);right:0;z-index:6;width:min(560px,90vw);background:#efe0be;color:#2a1b10;border-radius:3px;box-shadow:var(--frame),0 8px 24px rgba(0,0,0,.5);padding:12px;display:flex;flex-direction:column;gap:8px}
+.sp-pop{position:absolute;top:calc(100% + 8px);right:0;z-index:6;width:min(760px,92vw);background:#efe0be;color:#2a1b10;border-radius:3px;box-shadow:var(--frame),0 8px 24px rgba(0,0,0,.5);padding:12px;display:flex;flex-direction:column;gap:8px}
 .sp-poph{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.sp-poph small{color:#5e4630;font-size:13px}
 .sp-popg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 .sp-pr{display:flex;gap:3px;margin-top:4px}.sp-pr button:first-child{flex:1;text-align:left;min-height:36px;padding:0 8px;border:1px solid #b08e52;border-radius:3px;background:#f6ebd0;color:#2a1b10;cursor:pointer;font:inherit;font-size:14px}
 .sp-star{min-width:36px;border:1px solid #b08e52;border-radius:3px;background:#f6ebd0;color:#b08e52;cursor:pointer}.sp-star[aria-pressed="true"]{color:var(--accent);border-color:var(--accent)}
 .sp-off{font-size:13px;color:#b5a07e}
+@media (max-width:900px){.sp-top{flex-wrap:wrap}.sp-now{flex:1 1 0}.sp-favs{order:3;flex:1 1 100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.sp-favs::-webkit-scrollbar{display:none}.sp-all{order:2}}
 @media (max-width:640px){.lib-groups{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;position:static}.lib-groups::-webkit-scrollbar{display:none}.lib-g{flex:0 0 auto;min-height:44px}.lib-q{max-width:none;flex-basis:100%}}
 .reader .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font:500 14px var(--sc);letter-spacing:.04em;margin-bottom:6px}
 .prose{max-width:68ch;overflow-wrap:anywhere;margin-top:14px}
@@ -3024,9 +3036,9 @@ function renderSession(el){
     <div class="sx-search"><label class="sx-q">${navIco("search")}<input id="sx-q" type="search" value="${esc(ST.q)}" placeholder="Search…" aria-label="Search NPCs, places, items and rules" autocomplete="off">${ST.q?`<button type="button" class="sx-qx" data-act="stQClear" aria-label="Clear search">×</button>`:""}</label><div id="sx-results">${stResults()}</div></div>
     <div class="sx-time">${stMoon()}<span class="sx-dt"><b>${esc(fmtDate(c,c.today))}</b><span>${fmtMin(stMin??igMin())}</span></span>
       <button type="button" class="btn sm" data-act="stTime" data-n="10">+10 min</button><button type="button" class="btn sm" data-act="stTime" data-n="60">+1 hour</button><button type="button" class="btn sm" data-act="stShort" title="An hour passes and the rest goes in this session's notes">Short rest</button><button type="button" class="btn sm" data-act="stLong" title="Next day at 8 am, logged in this session's notes">Long rest</button><button type="button" class="btn sm" data-act="stUndo" ${ST.undo.length?"":"disabled"} title="Undo the last time change" aria-label="Undo the last time change">↶ Undo</button></div>
+    <button type="button" class="btn sx-prep" data-act="stPrepLib">Prep &amp; Library</button><button type="button" class="btn primary sx-end" data-act="stRecap">End session</button>
     ${music?`<div class="sx-music">${music}</div>`:""}
-    <div class="sx-alerts">${stAlerts()}</div>
-    <button type="button" class="btn sx-prep" data-act="stPrepLib">Prep &amp; Library</button><button type="button" class="btn primary sx-end" data-act="stRecap">End session</button></header>`;
+    <div class="sx-alerts">${stAlerts()}</div></header>`;
   // ---- column 1: the path and the party
   const done=main.filter(s=>s.done).length;
   const pRow=(s,i)=>{const open=!!cur&&s.id===cur.id;return `<div class="sx-pr ${s.done?"done":""} ${open?"open":""}">${legacy?"":`<button type="button" class="sx-tick" data-act="stDone" data-id="${esc(s.id)}" aria-pressed="${!!s.done}" aria-label="${esc(s.title||"Scene")}: ${s.done?"done, mark not done":"mark done"}">${s.done?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>':""}</button>`}<button type="button" class="sx-ps" data-act="stScene" data-id="${esc(s.id)}" aria-current="${open}"><span class="sx-pt">${s.reserve?"":`<span class="sx-pn">${i+1}</span>`}<span>${esc(s.title||"Untitled scene")}</span></span>${(s.reserve?s.when:open&&s.note)?`<small>${esc(s.reserve?s.when:s.note)}</small>`:""}</button></div>`};
