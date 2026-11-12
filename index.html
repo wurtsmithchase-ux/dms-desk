@@ -359,7 +359,12 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 .sx-clue[aria-pressed="true"] .sx-dot{background:var(--accent)}
 .sx-rev{margin-left:auto;font:400 13px var(--sc);color:var(--accent)}
 .sx-if{border:1px solid var(--gilt-rule);border-radius:3px;background:#f6ebd0}
-.sx-ifq{display:flex;gap:8px;width:100%;text-align:left;min-height:44px;padding:8px 12px;border:0;background:none;color:#2a1b10;cursor:pointer;font:inherit;font-weight:600}
+.sx-ifr{display:flex;align-items:center}
+.sx-ifc{flex:0 0 44px;min-height:44px;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.sx-box{width:20px;height:20px;border:2px solid var(--accent);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;color:#fff;background:#fff}
+.sx-ifc[aria-checked="true"] .sx-box{background:var(--accent)}
+.sx-if.done .sx-ifq{text-decoration:line-through;color:#5e4630}
+.sx-ifq{display:flex;gap:8px;flex:1;min-width:0;width:100%;padding-left:0 !important;text-align:left;min-height:44px;padding:8px 12px;border:0;background:none;color:#2a1b10;cursor:pointer;font:inherit;font-weight:600}
 .sx-if p{margin:0;padding:0 12px 10px 30px}
 .sx-npc,.sx-foe{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1px solid var(--gilt-rule);border-radius:3px;background:#f6ebd0;font-size:15px}
 .sx-foe{border-color:var(--accent)}
@@ -3052,7 +3057,7 @@ function renderSession(el){
     ${prevT&&!ST.prevHide?`<section class="sx-prev" aria-label="Previously on"><div class="sx-ph"><span>Previously on ${esc(camp)}…</span><button type="button" class="btn sm" data-act="stPrev">Read it · hide</button></div><p>${esc(prevT.length>900?prevT.slice(0,900).replace(/\s+\S*$/,"")+"…":prevT)}</p><small>Written from the Session ${esc(String(r.session||"?"))} recap</small></section>`:prevT?`<button type="button" class="btn sm sx-prevb" data-act="stPrev">Show “Previously on”</button>`:""}
     ${rd?`<section class="sx-read" aria-label="Read aloud"><div class="sx-ph"><span>Read aloud</span><button type="button" class="btn sm" data-act="stRead" aria-expanded="${readOpen}">${readOpen?"Hide":"Show"}</button></div>${readOpen?`<p><span class="sx-drop">${esc(rd.charAt(0))}</span>${esc(rd.slice(1))}</p>`:""}</section>`:""}
     <div class="sx-two"><section class="sx-cl" aria-label="Secrets and clues"><h2>Secrets &amp; Clues${cur.clues.length?` <small>${cur.clues.filter(k=>k.found).length} of ${cur.clues.length}</small>`:""}</h2>${cur.clues.map(clue).join("")||`<p class="vempty">No clues for this scene.</p>`}
-        <h2>If They…</h2>${cur.ifs.map((k,j)=>{const key="if-"+cur.id+"-"+j,o=ST.open.has(key);return `<div class="sx-if"><button type="button" class="sx-ifq" data-act="stIf" data-k="${esc(key)}" aria-expanded="${o}"><span aria-hidden="true">${o?"▾":"▸"}</span><span>If they ${esc(k.if||"…")}</span></button>${o?`<p>${esc(k.then||"")}</p>`:""}</div>`}).join("")||`<p class="vempty">Nothing planned.</p>`}</section>
+        <h2>If They…</h2>${cur.ifs.map((k,j)=>{const key="if-"+cur.id+"-"+j,o=ST.open.has(key),dn=!!k.done||ST.open.has("ifd-"+key);return `<div class="sx-if${dn?" done":""}"><div class="sx-ifr"><button type="button" class="sx-ifc" role="checkbox" aria-checked="${dn}" aria-label="Mark “if they ${esc(k.if||"…")}” as happened" data-act="stIfDone" data-i="${j}" data-k="${esc(key)}"><span class="sx-box" aria-hidden="true">${dn?"✓":""}</span></button><button type="button" class="sx-ifq" data-act="stIf" data-k="${esc(key)}" aria-expanded="${o}"><span aria-hidden="true">${o?"▾":"▸"}</span><span>If they ${esc(k.if||"…")}</span></button></div>${o?`<p>${esc(k.then||"")}</p>`:""}</div>`}).join("")||`<p class="vempty">Nothing planned.</p>`}</section>
       <section class="sx-wh" aria-label="Characters in this scene"><h2>Who's Here</h2>${pins.map(pinCard).join("")}${ppl.map(npcCard).join("")}${foes.map(foeCard).join("")}
         ${other.length?`<div class="sx-other">${other.map(({w,x})=>`<button type="button" class="chip" data-act="open" data-type="${esc(w.col)}" data-id="${esc(x.id)}">${esc(titleOf(w.col,x)||"Untitled")}</button>`).join("")}</div>`:""}
         ${!pins.length&&!ppl.length&&!foes.length&&!other.length?`<p class="vempty">Nobody added to this scene. Search above and pin someone.</p>`:""}</section></div>
@@ -3180,6 +3185,9 @@ async function stAct(a,t){const plan=stPlan(),n=rcSession(),i=num(t.dataset.i);
   if(a==="stAtt")return stSetAtt(n,t.dataset.id,t.dataset.v);
   if(a==="stEdit"){closeTableMode();U.planSel=t.dataset.id;U.prepTab="scenes";if(location.hash!=="#prep")location.hash="prep";else render();return}
   if(!plan)return;
+  if(a==="stIfDone"){const k="ifd-"+t.dataset.k,j=num(t.dataset.i);
+    if(!Array.isArray(plan.scenes)){ST.open.has(k)?ST.open.delete(k):ST.open.add(k);return renderTable()}
+    return stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===ST.scene);if(s&&s.ifs&&s.ifs[j])s.ifs[j].done=!s.ifs[j].done})}
   if(a==="stClue"){const sc0=stScenes(plan),cur=sc0.find(s=>s.id===ST.scene)||(Array.isArray(plan.scenes)?null:sc0[0]);if(!cur||!cur.clues[i])return;
     if(!Array.isArray(plan.scenes))return toggleReveal(plan.id,i,!cur.clues[i].found).then(()=>{project();renderTable()});
     return stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===ST.scene);if(s&&s.clues&&s.clues[i])s.clues[i].found=!s.clues[i].found})}
@@ -5014,7 +5022,7 @@ document.addEventListener("click",async e=>{
     case"planPlayed":{const pl=rec("plans",t.dataset.id);if(pl){const{id,...r}=pl;save("plans",id,{...r,status:pl.status==="played"?"planned":"played"})}break}
     case"pbPlan":U.planSel=t.dataset.id;U.prepTab="plan";render();window.scrollTo({top:0});break;
     case"scnSel":case"scnMove":case"scnDel":case"scnReserve":case"scnClueDel":case"scnIfAdd":case"scnIfDel":case"scnWhoAdd":case"scnWhoDel":scnAct(a,t);break;
-    case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stAlertOk":case"stAlertAll":case"stRes":case"stRead":case"stIf":case"stDone":case"stSpot":case"stSeg":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
+    case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stAlertOk":case"stAlertAll":case"stRes":case"stRead":case"stIf":case"stIfDone":case"stDone":case"stSpot":case"stSeg":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
     case"stView":case"stTime":case"stShort":case"stLong":case"stUndo":case"stScene":case"stPrev":case"stRoll":case"stAtt":case"stEdit":case"stClue":case"stNext":stAct(a,t);break;
     case"heroSel":case"heroTab":case"heroLvl":heroAct(a,t);break;
     case"pplSel":case"pplKind":case"pplTab":case"pplAtt":case"pplUnlink":case"genSave":case"genApply":pplAct(a,t);break;
