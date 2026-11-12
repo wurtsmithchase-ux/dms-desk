@@ -3848,7 +3848,7 @@ const ABBR={STR:"Strength",DEX:"Dexterity",CON:"Constitution",INT:"Intelligence"
 const SKILL_AB={"Acrobatics":"DEX","Animal Handling":"WIS","Arcana":"INT","Athletics":"STR","Deception":"CHA","History":"INT","Insight":"WIS","Intimidation":"CHA","Investigation":"INT","Medicine":"WIS","Nature":"INT","Perception":"WIS","Performance":"CHA","Persuasion":"CHA","Religion":"INT","Sleight of Hand":"DEX","Stealth":"DEX","Survival":"WIS"};
 function parseSheet(md){
   const t=String(md||"").replace(/\r/g,"");if(!t.trim())return null;
-  const sec={};let cur="_";t.split("\n").forEach(l=>{const h=l.match(/^##\s+(.+)/);if(h){cur=h[1].trim().toLowerCase();sec[cur]="";return}sec[cur]=(sec[cur]||"")+l+"\n"});
+  const sec={};let cur="_";t.split("\n").forEach(l=>{const h=l.match(/^#{1,3}\s+(.+)/);if(h){cur=h[1].trim().toLowerCase();sec[cur]="";return}sec[cur]=(sec[cur]||"")+l+"\n"});
   const get=k=>Object.entries(sec).find(([n])=>n.startsWith(k))?.[1]||"";
   const abil={};const ab=get("ability");let m;const re=/\*\*(STR|DEX|CON|INT|WIS|CHA)\*\*\s*(\d+)\s*\(([+\-−]\d+)\)/g;while((m=re.exec(ab)))abil[m[1]]={score:+m[2],mod:+m[3].replace("−","-")};
   if(Object.keys(abil).length<6)return null;
