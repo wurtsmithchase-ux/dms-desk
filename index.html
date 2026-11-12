@@ -289,6 +289,7 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 .sx-alerts{display:flex;flex-direction:column;gap:4px;align-items:flex-end;font-size:14px;max-width:340px}
 .sx-alert{display:flex;align-items:center;gap:8px;padding:4px 4px 4px 10px;border-radius:3px;background:var(--accent);color:#f6e8c6}
 .sx-alert .btn{min-height:32px;padding:0 10px}
+.sx-alert.sx-amore{background:rgba(0,0,0,.35)}
 .sx-nexttr{font-style:italic;color:#b5a07e;text-align:right}
 .sx-top .sx-end{background:var(--accent);border-color:#5e140b;color:#f6e8c6}
 .sx-body{flex:1;min-height:0;overflow:auto}
@@ -2942,12 +2943,14 @@ async function stSpot(n,id,d){const l=logFor(n)||{};const{id:_i,dmOnly:_d,secret
 const stNowAbs=()=>{const c=cal();return toIdx(c,c.today)*1440+(stMin??igMin())};
 function stEvents(){const c=cal(),yl=yearLen(c),ti=toIdx(c,c.today);
   return S.events.map(e=>{let i=e.yearly?toIdx(c,{y:c.today.y,m:e.m,d:e.d}):toIdx(c,{y:e.y,m:e.m,d:e.d});if(e.yearly&&i<ti-1)i+=yl;return{e,at:i*1440,key:e.id+"@"+i}}).filter(x=>isFinite(x.at)).sort((a,b)=>a.at-b.at)}
+// only events reached in the last two weeks of in-game time alert, so an old calendar doesn't flood the bar
+const stAlertsDue=(ev=stEvents(),now=stNowAbs())=>ev.filter(x=>x.at<=now&&now-x.at<14*1440&&!ST_ALERTS_DONE.has(x.key));
+const ST_ALERTS_SHOWN=2;  // a busy calendar can have dozens due; more than a couple pushed the whole Table off screen
 function stAlerts(){const now=stNowAbs(),c=cal(),ev=stEvents();
-  // only events reached in the last two weeks of in-game time alert, so an old calendar doesn't flood the bar
-  const al=ev.filter(x=>x.at<=now&&now-x.at<14*1440&&!ST_ALERTS_DONE.has(x.key));
+  const due=stAlertsDue(ev,now),al=due.slice(-ST_ALERTS_SHOWN),more=due.length-al.length;
   const nx=ev.find(x=>x.at>now);let next="No timed events coming up";
   if(nx){const dm=nx.at-now,dd=Math.floor(dm/1440),hh=Math.floor(dm%1440/60),mn=dm%60;next=`Next in-world event in ${dd?dd+" d ":""}${hh?hh+" h ":""}${!dd&&mn?mn+" m":""}: ${nx.e.title||"Untitled"}`.replace(/\s+:/,":")}
-  return `${al.map(x=>`<span class="sx-alert" role="status"><span><b>${esc(shortDate(c,{y:x.e.y||c.today.y,m:x.e.m,d:x.e.d}))}:</b> ${esc(x.e.title||"Untitled")}</span><button type="button" class="btn sm" data-act="stAlertOk" data-k="${esc(x.key)}">Got it</button></span>`).join("")}<span class="sx-nexttr">${esc(next)}</span>`}
+  return `${al.map(x=>`<span class="sx-alert" role="status"><span><b>${esc(shortDate(c,{y:x.e.y||c.today.y,m:x.e.m,d:x.e.d}))}:</b> ${esc(x.e.title||"Untitled")}</span><button type="button" class="btn sm" data-act="stAlertOk" data-k="${esc(x.key)}">Got it</button></span>`).join("")}${more?`<span class="sx-alert sx-amore"><span>${more} older alert${more===1?"":"s"}</span><button type="button" class="btn sm" data-act="stAlertAll" title="Mark every alert showing here as seen">Clear all</button></span>`:""}<span class="sx-nexttr">${esc(next)}</span>`}
 // search results under the top bar's box; Pin adds the entry to Who's Here for tonight
 const ST_SEARCH_COLS=["characters","monsters","notes","quests","threads","loot","events","tables"];
 function stResults(){const q=String(ST.q||"").trim().toLowerCase();if(!q)return "";
@@ -3114,6 +3117,7 @@ async function stAct2(a,t){const n=rcSession(),plan=stPlan();
   if(a==="stPin"){const{col,id}=t.dataset,i=ST.pins.findIndex(p=>p.col===col&&p.id===id);i>=0?ST.pins.splice(i,1):ST.pins.push({col,id});
     if(document.activeElement&&document.activeElement.id==="sx-q"){stRefreshResults();renderPending=true;return}return renderTable()}
   if(a==="stAlertOk"){ST_ALERTS_DONE.add(t.dataset.k);stAlertsSave();return renderTable()}
+  if(a==="stAlertAll"){for(const x of stAlertsDue())ST_ALERTS_DONE.add(x.key);stAlertsSave();return renderTable()}
   if(a==="stRes"){ST.resOpen=!ST.resOpen;return renderTable()}
   if(a==="stRead"){ST.open.has("read")?ST.open.delete("read"):ST.open.add("read");return renderTable()}
   if(a==="stIf"){const k=t.dataset.k;ST.open.has(k)?ST.open.delete(k):ST.open.add(k);return renderTable()}
@@ -4986,7 +4990,7 @@ document.addEventListener("click",async e=>{
     case"planPlayed":{const pl=rec("plans",t.dataset.id);if(pl){const{id,...r}=pl;save("plans",id,{...r,status:pl.status==="played"?"planned":"played"})}break}
     case"pbPlan":U.planSel=t.dataset.id;U.prepTab="plan";render();window.scrollTo({top:0});break;
     case"scnSel":case"scnMove":case"scnDel":case"scnReserve":case"scnClueDel":case"scnIfAdd":case"scnIfDel":case"scnWhoAdd":case"scnWhoDel":scnAct(a,t);break;
-    case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stAlertOk":case"stRes":case"stRead":case"stIf":case"stDone":case"stSpot":case"stSeg":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
+    case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stAlertOk":case"stAlertAll":case"stRes":case"stRead":case"stIf":case"stDone":case"stSpot":case"stSeg":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
     case"stView":case"stTime":case"stShort":case"stLong":case"stUndo":case"stScene":case"stPrev":case"stRoll":case"stAtt":case"stEdit":case"stClue":case"stNext":stAct(a,t);break;
     case"heroSel":case"heroTab":case"heroLvl":heroAct(a,t);break;
     case"pplSel":case"pplKind":case"pplTab":case"pplAtt":case"pplUnlink":case"genSave":case"genApply":pplAct(a,t);break;
