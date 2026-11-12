@@ -414,7 +414,6 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 .sx-imp .btn{align-self:flex-start;background:#f6ebd0;color:#2a1b10;border:1px solid #b08e52;min-height:36px}
 .sx-mi{display:flex;align-items:center;gap:8px;font-size:15px}.sx-mi input{width:110px;min-height:40px;padding:0 8px;border-radius:4px;border:1px solid var(--gilt-edge);background:#efe0be;color:#2a1b10;font:inherit}
 .sx-box .sx-tr{margin:0;font-size:15px}.sx-box #sx-tr .btn{background:var(--accent);border:1px solid #5e140b;color:#f6e8c6;font:400 15px var(--sc)}
-.sx-board{align-self:flex-start}
 /* windows over the table */
 .sx-scrim{position:absolute;inset:0;z-index:10;background:rgba(10,6,4,.72);display:flex;align-items:flex-start;justify-content:center;padding:24px;overflow:auto}
 /* phones and tablets: the whole Table scrolls, so windows and the playlists popup are pinned to the screen, the top bar stays in view and stays short, and small buttons get bigger */
@@ -897,26 +896,7 @@ body.player .beats li:not(.done){display:none}
 .tm-date{font:600 16px var(--title);color:var(--gold)}
 .tm-top .grow{flex:1}
 .tm-body{flex:1;overflow:auto;overscroll-behavior:contain;padding:18px max(16px,env(safe-area-inset-right,0px)) calc(30px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-.tm-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:22px;max-width:1500px;margin:0 auto;align-items:start}
-.tm-main,.tm-side{display:flex;flex-direction:column;gap:14px;min-width:0}
-.tm-plan-h h2{margin:0;font:700 36px/1.1 var(--display);color:var(--accent)}
-.tm-s{background:var(--paper);border:1px solid var(--line);padding:12px 16px}
-.tm-s h3{margin:0 0 6px;font:700 22px var(--display);color:var(--accent);border-bottom:1px solid var(--gold)}
-.tm-s .prose{font-size:19px;max-width:none}
-.tm-cast{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
-.tm-npc{display:flex;gap:12px;align-items:flex-start;text-align:left;border:1px solid var(--line);background:var(--block);padding:10px;cursor:pointer;font-family:var(--body)}
-.tm-npc:hover{border-color:var(--accent)}
-.tm-npc span{display:flex;flex-direction:column;min-width:0}
-.tm-npc b{font-size:19px}
-.tm-npc small{color:var(--muted);font:500 14px var(--ui)}
-.tm-npc-n{font-size:15px;margin-top:2px}
-.tm-npc-s{font-size:14px;color:var(--blood);margin-top:4px}
-#tm-notes{width:100%;min-height:220px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:10px;font:17px/1.45 var(--ui);resize:vertical}
-.tm-rolls{display:flex;flex-direction:column;gap:6px}
-.tm-roll{display:flex;gap:8px;align-items:baseline;font-size:16px}
-.tm-roll .btn{flex:none}
-.tm-coins{margin:0;font-size:17px}
-@media (max-width:900px){.tm-grid{grid-template-columns:minmax(0,1fr)}.tablemode{font-size:17px}.tm-plan-h h2{font-size:28px}}
+@media (max-width:900px){.tablemode{font-size:17px}}
 
 /* ask the desk */
 
@@ -969,94 +949,16 @@ table.stock-t tbody tr:hover td{background:inherit}
 .pl-lab{color:var(--accent)}
 .pl-sub{font:700 16px var(--display);color:var(--accent);margin:8px 0 4px}
 .th{position:relative}
-.tm-qs{display:flex;flex-direction:column;gap:8px}
-.tm-q{display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--line);padding-top:6px}
-.tm-q:first-child{border-top:0;padding-top:0}
-.tm-qt{border:0;background:none;padding:0;text-align:left;cursor:pointer;font:700 17px var(--display);color:var(--accent)}
-.tm-qt:hover{text-decoration:underline}
-.tm-q .pill{align-self:flex-start}
-.tm-beat{display:flex;gap:6px;align-items:flex-start;font-size:15px;cursor:pointer}
-.tm-beat input{margin-top:4px}
-.tm-board{position:relative;margin:0 auto;max-width:none}
-.tm-note.dragging{transition:none}
-.tm-note{position:absolute;display:flex;flex-direction:column;min-width:200px;min-height:40px;overflow:hidden}
-.tm-note.sized{overflow:auto}
-.tm-note.sized>.tm-s{min-height:100%}
-.tm-note.dragging{box-shadow:0 10px 26px rgba(40,20,5,.3);opacity:.96}
-.tm-note>.tm-s{flex:1;margin:0}
-.tm-grip{position:absolute;top:0;left:0;right:0;z-index:2;display:flex;align-items:center;gap:4px;height:12px;padding:0 6px;cursor:grab;color:var(--muted);font-size:11px;line-height:1;user-select:none;touch-action:none;opacity:.35;background:transparent;transition:opacity .12s,background .12s}
-.tm-note:hover>.tm-grip,.tm-note.dragging>.tm-grip{opacity:1;background:var(--surface2)}
-.tm-grip.st-bar{position:static;height:20px;opacity:1}
-.tm-rs{position:absolute;right:0;bottom:0;width:16px;height:16px;cursor:nwse-resize;z-index:2;touch-action:none;background:linear-gradient(135deg,transparent 55%,var(--gold) 55%,var(--gold) 62%,transparent 62%,transparent 72%,var(--gold) 72%,var(--gold) 79%,transparent 79%);opacity:.5}
-.tm-note:hover>.tm-rs{opacity:1}
-.tm-board.locked .tm-grip,.tm-board.locked .tm-rs{display:none}
-.tm-guide{position:absolute;pointer-events:none;z-index:9999}
-.tm-guide.v{top:0;bottom:0;width:0;border-left:1px dashed var(--accent)}
-.tm-guide.h{left:0;right:0;height:0;border-top:1px dashed var(--accent)}
-.tm-grip:active{cursor:grabbing}
-.tm-grip .grow{flex:1}
-.tm-grip button{border:0;background:none;cursor:pointer;color:inherit;font-size:12px;padding:0 3px;line-height:1}
-.tm-grip .st-del.armed{color:var(--blood);font:700 11px var(--sc)}
-.tm-note.sticky{border:0;box-shadow:0 3px 10px rgba(40,20,5,.22)}
-.tm-note.sticky textarea{flex:1;border:0;background:transparent;resize:none;padding:8px 10px;font:16px/1.45 var(--body);color:#2a1d14;min-height:110px;outline:none}
-.tm-note.sticky .tm-grip{background:rgba(0,0,0,.06);border:0;color:#5a4a3a}
-.tm-note.c-yellow{background:#f7e27a}.tm-note.c-rose{background:#f4b9b2}.tm-note.c-sky{background:#b5d7f0}.tm-note.c-mint{background:#bfe3c0}.tm-note.c-lilac{background:#d6c4ec}
-.tm-note.c-yellow .st-col{color:#c9a400}.tm-note.c-rose .st-col{color:#c0564a}.tm-note.c-sky .st-col{color:#3a7fb5}.tm-note.c-mint .st-col{color:#3f8a45}.tm-note.c-lilac .st-col{color:#7a58a8}
 .tm-top .btn.on{background:var(--bar);color:var(--hdr);border-color:var(--gold)}
 /* wide desktop: use the screen instead of a narrow centered column */
 @media (min-width:1280px){
   .wrap{max-width:1760px;padding-left:max(32px,env(safe-area-inset-left,0px));padding-right:max(32px,env(safe-area-inset-right,0px))}
-  .tm-grid{max-width:1760px;grid-template-columns:minmax(0,1fr) 420px}
   .pstrip{max-width:1760px}
   .notes{grid-template-columns:320px minmax(0,1fr)}
   .bs-wrap{grid-template-columns:340px minmax(0,1fr)}
 }
-.tm-arrbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;display:flex;gap:6px;align-items:center;padding:6px 10px;background:var(--hdr);border:1px solid var(--gold);border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
-.tm-arrbar .btn{background:transparent;color:var(--hdr-ink);border-color:rgba(214,179,106,.5)}
-.tm-arrbar .btn:hover{border-color:var(--gold);background:rgba(214,179,106,.15)}
-.tm-arrbar .btn.on{background:var(--bar);color:var(--hdr)}
-.tm-arrhint{color:var(--gold);font:12px var(--ui);margin-left:4px;white-space:nowrap}
-.tm-arrwrap{position:fixed;left:50%;transform:translateX(-50%);width:max-content;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;display:flex;flex-direction:column;align-items:center;gap:8px;max-width:calc(100vw - 24px)}
-.tm-arrwrap .tm-arrbar{position:static;transform:none;flex-wrap:nowrap;justify-content:center;border-radius:18px;max-width:calc(100vw - 24px);overflow-x:auto;scrollbar-width:none}
-.tm-sep{width:1px;align-self:stretch;background:rgba(214,179,106,.35);margin:0 2px}
-.tm-set{background:var(--hdr2);color:var(--hdr-ink);border:1px solid rgba(214,179,106,.5);border-radius:var(--r);padding:3px 6px;font:600 13px var(--ui);max-width:160px}
-.tm-arrbar .btn.icon{width:26px;height:26px}
-.tm-z{min-width:52px}
-.tm-pop{background:var(--paper);border:1px solid var(--gold);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:12px 14px;width:min(460px,calc(100vw - 32px));max-height:55vh;overflow:auto;display:flex;flex-direction:column;gap:8px;color:var(--ink)}
-.tm-pop h4{margin:0;font:700 18px var(--display);color:var(--accent)}
-.tm-pop .tool-d{margin:0;font-size:14px}
-.tm-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.tm-row input,#tm-cardq{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:6px 9px;font:15px var(--ui)}
-.tm-row>span{flex:1}
-.tm-kinds{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.tm-kind{display:flex;flex-direction:column;gap:2px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:8px 10px;cursor:pointer;color:var(--ink)}
-.tm-kind:hover{border-color:var(--accent)}
-.tm-kind b{font:700 15px var(--display);color:var(--accent)}.tm-kind small{color:var(--muted);font:12.5px/1.35 var(--ui)}
-.tm-res{display:flex;flex-direction:column;max-height:34vh;overflow:auto}
 .tm-ri{display:flex;justify-content:space-between;gap:8px;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:6px 4px;cursor:pointer;color:var(--ink)}
 .tm-ri:hover{background:var(--accent-soft)}.tm-ri small{color:var(--muted);font:12px var(--ui)}
-.tm-grip .tm-hide{margin-left:auto;border:0;background:none;color:inherit;cursor:pointer;font:700 13px var(--ui);padding:0 4px;line-height:1}
-.tm-note.sel{outline:2px solid var(--accent);outline-offset:2px}
-.tm-note.card{background:var(--paper);border:1px solid var(--line);box-shadow:0 2px 8px rgba(40,20,5,.15)}
-.tm-note.card .tm-grip{background:var(--surface2);color:var(--muted)}
-.tm-note.card .cd-t{font:700 13px var(--display);color:var(--accent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tm-note.card .tm-grip button{font-size:13px}
-.cd-body{padding:8px 12px;overflow:auto;flex:1}
-.cd-body .sheet{width:auto;height:auto;padding:0;box-shadow:none;background:none}
-.cd-body .foot{display:none}
-.st-link{display:block;margin:6px 10px 0;border:0;background:rgba(0,0,0,.08);border-radius:999px;padding:2px 10px;font:600 13px var(--ui);color:#3a2a1a;cursor:pointer;text-align:left;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.st-list{display:flex;flex-direction:column;gap:3px;padding:8px 10px}
-.st-ci,.st-cn{display:flex;align-items:center;gap:6px}
-.st-ci.done .st-in{text-decoration:line-through;opacity:.6}
-.st-in{flex:1;min-width:0;border:0;border-bottom:1px dashed rgba(0,0,0,.18);background:transparent;font:15px var(--ui);color:#2a1d14;padding:2px 0;outline:none}
-.st-add{border-bottom-style:solid;margin-top:4px}
-.st-x{border:0;background:none;cursor:pointer;color:rgba(0,0,0,.35);font-size:12px}
-.st-b{border:1px solid rgba(0,0,0,.2);background:rgba(255,255,255,.4);border-radius:6px;width:26px;height:24px;cursor:pointer;font:700 15px var(--ui);color:#2a1d14}
-.st-n{min-width:28px;text-align:center;font:700 18px var(--ui);color:#2a1d14}
-.tm-note.sticky .st-lk{font-size:11px}
-.btn.on-tm{background:var(--ok-soft);color:var(--ok);border-color:transparent}
-.tm-cardacts{display:flex;gap:6px;margin:-2px 0 6px}
-.tm-cardsec .cd-body{max-height:420px;padding:0}
 /* the in-game date bar only lives in Table mode now */
 header.top .clock{display:none!important}
 /* Table mode header on phones: one slim, swipeable row; Exit stays first */
@@ -1178,7 +1080,6 @@ header.top .clock{display:none!important}
 .pron{font:italic 15px var(--body);color:var(--muted)}
 .voice{font:14px/1.35 var(--ui);color:var(--ink)}
 .voice b{color:var(--accent)}
-.tm-npc .pron,.tm-npc .voice{font-size:14px}
 .place-box{background:var(--side);border-left:4px solid var(--gold);padding:6px 12px;margin:8px 0;display:flex;flex-direction:column;gap:3px;font-size:15px}
 .crumbs{font:500 14px var(--sc);letter-spacing:.03em}
 .ptree,.ptree ul{list-style:none;margin:0;padding-left:22px;border-left:2px solid var(--gold)}
@@ -1199,7 +1100,6 @@ header.top .clock{display:none!important}
 .sb-ab span{font:500 14px var(--ui);font-variant-numeric:tabular-nums}
 .sb-h{font:700 19px var(--display);color:var(--accent);border-bottom:1px solid var(--accent);margin:10px 0 4px}
 .statblock p{margin:0 0 6px}
-.tm-sbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
 @media (max-width:520px){.sb-ab{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .enc-res{display:flex;flex-direction:column;gap:6px;background:var(--paper);border:1px solid var(--line);padding:10px 12px}
 .res-list{margin:0;padding-left:18px;font-size:15px}
@@ -2222,7 +2122,6 @@ const sessList=()=>[...new Set(S.scenes.map(s=>num(s.session)||0).filter(n=>n>0)
 function sessPlan(n){const L=S.scenes.filter(s=>num(s.session)===n).sort(scnSort);
   return {id:sessId(n),session:n,title:`Session ${n}`,status:L.length&&L.every(s=>s.played)?"played":"planned",
     scenes:L.map(s=>({...s,clues:s.clues||[],ifs:s.ifs||[],who:s.who||[]})),updated:L.length+"|"+L.map(s=>s.id+(s.updated||0)).join(",")}}
-const sessText=p=>p.scenes.map(s=>textOf("scenes",s)).join("\n");
 // the next session to run: the lowest-numbered session that isn't marked played
 const thNext=()=>{const n=sessList().find(k=>sessPlan(k).status!=="played");return n?sessPlan(n):null};
 const scnSess=()=>{const l=sessList();return U.sess||(thNext()||{}).session||l[l.length-1]||null};
@@ -2286,6 +2185,7 @@ async function sessAddScene(n,o){
 const scnUnsaved=pid=>(SCN.pid===pid&&SCN.dirty)||!!SCN.pending[pid];
 document.addEventListener("visibilitychange",()=>{if(document.hidden)scnFlush()});
 window.addEventListener("pagehide",()=>{scnFlush()});
+function tmSearch(q){q=String(q||"").trim().toLowerCase();if(!q)return [];const out=[];for(const t of ["characters","notes","quests","monsters"])for(const x of S[t]||[]){const n=String(titleOf(t,x)||"").toLowerCase();if(n.includes(q))out.push([t,x]);if(out.length>=14)return out}return out}
 function scnLibHtml(){const q=SCN.q.trim();if(!q)return `<p class="vempty">Type to find people, places, quests and stat blocks.</p>`;const r=tmSearch(q);
   return r.length?r.map(([t,x])=>`<div class="scn-lr"><span class="scn-lrt"><b>${esc(titleOf(t,x)||"Untitled")}</b><small>${esc(libTag(t,x))}</small></span><button type="button" class="btn sm" data-act="open" data-type="${t}" data-id="${x.id}">Open</button><button type="button" class="btn sm primary" data-act="scnWhoAdd" data-type="${t}" data-id="${x.id}" ${scnCur()?"":"disabled"} aria-label="Add ${esc(titleOf(t,x)||"")} to Who's Here">Add</button></div>`).join(""):`<p class="vempty">Nothing matches.</p>`}
 function scnMove(id,n){const s=SCN.d.find(x=>x.id===id);if(!s)return;const same=SCN.d.filter(x=>!!x.reserve===!!s.reserve),j=same.indexOf(s)+n;if(j<0||j>=same.length)return;
@@ -2573,15 +2473,6 @@ function arcsBlock(){
         :`<p class="vempty">No story beats yet.${isDM()?" Edit the quest to list them.":""}</p>`}</div>`}).join("")}).join("")}</div>`;
 }
 /* table mode: active quests at a glance, with the next story beat to tick off */
-function tmQuests(){
-  const act=S.quests.filter(q=>q.status==="active").sort((a,b)=>(!!a.pc-!!b.pc)||(a.title||"").localeCompare(b.title||""));
-  const rum=S.quests.filter(q=>(q.status||"rumor")==="rumor").length;
-  if(!act.length&&!rum)return "";
-  return `<section class="tm-s"><h3>Quests</h3>${act.length?`<div class="tm-qs">${act.map(q=>{const bs=beatList(q),done=bs.filter(b=>b.done).length,ni=bs.findIndex(b=>!b.done),pc=q.pc&&rec("characters",q.pc);
-    return `<div class="tm-q"><button class="tm-qt" data-act="view" data-type="quests" data-id="${q.id}">${esc(q.title||"Untitled quest")}</button>${pc?`<span class="pill acc">${esc(pc.name)}'s arc</span>`:""}
-      ${q.giver||q.location?`<small class="muted">${esc([q.giver&&"From "+q.giver,q.location].filter(Boolean).join(" · "))}</small>`:""}
-      ${bs.length?(ni>=0?`<label class="tm-beat"><input type="checkbox" data-beat="${q.id}|${ni}" aria-label="Mark revealed"><span><b>Next:</b> ${linkify(esc(bs[ni].text),"quests:"+q.id)}</span></label><small class="muted">${done} of ${bs.length} beats revealed</small>`:`<small class="muted">All ${bs.length} beats revealed</small>`):""}</div>`}).join("")}</div>`:`<p class="vempty">No active quests.</p>`}
-    ${rum?`<small class="muted">${rum} rumor${rum===1?"":"s"} in Notes under Quests</small>`:""}</section>`}
 async function toggleBeat(qid,i,on){
   const q=rec("quests",qid);if(!q)return;const bs=beatList(q);if(!bs[i])return;bs[i].done=on;
   const{id,...keep}=q;await save("quests",id,{...keep,beats:bs.map(b=>(b.done?"[x] ":"")+b.text).join("\n")});
@@ -2635,211 +2526,10 @@ function vTimeline(c){
 /* ---------- table mode ---------- */
 let TM=false;
 function openTableMode(){TM=true;document.documentElement.classList.add("locked");renderTable();}
-function closeTableMode(){TM=false;if(TMD.drag){clearInterval(TMD.drag.timer);TMD.drag=null}const el=document.getElementById("tablemode");el.hidden=true;el.innerHTML="";if(document.getElementById("modal").hidden)document.documentElement.classList.remove("locked")}
+function closeTableMode(){TM=false;const el=document.getElementById("tablemode");el.hidden=true;el.innerHTML="";if(document.getElementById("modal").hidden)document.documentElement.classList.remove("locked")}
 function typingInTable(){const a=document.activeElement;return !!a&&document.getElementById("tablemode").contains(a)&&(a.tagName==="TEXTAREA"||a.tagName==="INPUT"&&a.type!=="checkbox")}
 
-/* ================= Table mode: free layout, panels as movable sticky notes ================= */
-const TMD={edit:false,drag:null,sel:null,pop:null,popFor:null,q:"",nudgeT:null,nudged:false,newName:""};let TML=null;
-function tmRender(){const a=document.activeElement;if(a&&a.closest&&a.closest("#tablemode .tm-pop, #tablemode .tm-arrbar, #tablemode .st-list"))a.blur();renderTable()}
-const TM_FIELDS=["p","stickies","hidden","cards"];
-function tmL(){const st=S.settings.tmlayout;if(!TML||(st&&(st.updated||0)>(TML.updated||0)))TML=JSON.parse(JSON.stringify(st||{}));const L=TML;
-  L.p=L.p||{};L.stickies=L.stickies||[];L.hidden=L.hidden||{};L.cards=L.cards||[];L.sets=L.sets||{};L.active=L.active||"Main";L.zoom=L.zoom||1;return L}
-function tmCur(L){const o={};TM_FIELDS.forEach(f=>o[f]=JSON.parse(JSON.stringify(L[f])));return o}
-let tmSaveT=null;function tmSave(){const L=tmL();L.sets[L.active]=tmCur(L);L.updated=Date.now();clearTimeout(tmSaveT);tmSaveT=setTimeout(()=>{const{id,...d}=JSON.parse(JSON.stringify(L));save("settings","tmlayout",d)},350)}
-const tmCanArrange=()=>window.innerWidth>=760;
-function tmArrangeBtns(){const L=tmL();if(!tmCanArrange())return "";return L.on&&TMD.edit?`<button class="btn sm on" data-tmarr="done" title="Keep this arrangement and hide the arrange tools">Done arranging</button>`:`<button class="btn sm" data-tmarr="on" title="Drag panels anywhere, resize them, and add sticky notes">Arrange</button>`}
-/* layouts: several named arrangements, one active */
-function tmSwitch(name){const L=tmL();if(name===L.active)return;L.sets[L.active]=tmCur(L);const nx=L.sets[name]||{p:{},stickies:[],hidden:{},cards:[]};TM_FIELDS.forEach(f=>L[f]=JSON.parse(JSON.stringify(nx[f]||(f==="stickies"||f==="cards"?[]:{}))));L.active=name;TMU.length=0;tmSave();tmRender();toast(`Layout: ${name}`)}
-function tmSaveAs(name){name=String(name||"").trim().slice(0,30);if(!name)return;const L=tmL();L.sets[L.active]=tmCur(L);L.sets[name]=tmCur(L);L.active=name;tmSave();TMD.pop=null;tmRender();toast(`Saved as “${name}”`)}
-function tmDeleteSet(){const L=tmL();const names=Object.keys(L.sets);if(names.length<2){toast("Keep at least one layout");return}const gone=L.active;delete L.sets[gone];const nx=Object.keys(L.sets)[0];L.active="__";tmSwitch(nx);toast(`Deleted “${gone}”`)}
-/* the arrange tools float at the bottom, so turning Arrange on never pushes the panels down */
-function tmArrangeBar(){const L=tmL();if(!L.on||!TMD.edit||!tmCanArrange())return "";const names=Object.keys(L.sets);if(!names.includes(L.active))names.unshift(L.active);const nh=Object.keys(L.hidden).filter(k=>L.hidden[k]).length;
-  const pop=TMD.pop?`<div class="tm-pop" role="dialog">${tmPopHtml()}</div>`:"";
-  return `<div class="tm-arrwrap">${pop}<div class="tm-arrbar" role="toolbar" aria-label="Arrange tools">
-    <select class="tm-set" data-tmset aria-label="Layout" title="Switch layout">${names.map(n=>`<option ${n===L.active?"selected":""}>${esc(n)}</option>`).join("")}</select>
-    <button class="btn sm ${TMD.pop==="layouts"?"on":""}" data-tmpop="layouts" title="Save, rename or delete layouts">Layouts…</button><span class="tm-sep"></span>
-    <button class="btn sm ${TMD.pop==="sticky"?"on":""}" data-tmpop="sticky">+ Sticky</button>
-    <button class="btn sm ${TMD.pop==="card"&&!TMD.popFor?"on":""}" data-tmpop="card" title="Put a character, note, quest or stat block on the board">+ Page card</button>
-    <button class="btn sm ${TMD.pop==="hidden"?"on":""}" data-tmpop="hidden" title="Panels you've hidden">Hidden${nh?` (${nh})`:""}</button><span class="tm-sep"></span>
-    <button class="btn sm" data-tmarr="tidy" title="Pack every panel into neat columns with no gaps">Tidy</button>
-    <button class="btn sm" data-tmarr="undo" title="Undo the last change (Ctrl+Z)">Undo</button>
-    <button class="btn sm ${L.lock?"on":""}" data-tmarr="lock" title="Lock the layout so nothing moves by accident during play">${L.lock?"🔒 Locked":"Lock"}</button><span class="tm-sep"></span>
-    <button class="btn sm icon" data-tmzoom="-" title="Zoom out" aria-label="Zoom out">−</button><button class="btn sm tm-z" data-tmzoom="1" title="Back to 100%">${Math.round(L.zoom*100)}%</button><button class="btn sm icon" data-tmzoom="+" title="Zoom in" aria-label="Zoom in">+</button><button class="btn sm" data-tmzoom="fit" title="Fit the whole board on screen">Fit</button><span class="tm-sep"></span>
-    <button class="btn sm" data-tmarr="off" title="Go back to the standard two-column layout (your arrangement is kept for next time you press Arrange)">Standard layout</button><button class="btn sm" data-tmarr="reset" title="Put every panel back in its original spot">Reset</button></div></div>`}
-function tmPopHtml(){const L=tmL();
-  if(TMD.pop==="layouts")return `<h4>Layouts</h4><p class="tool-d">Keep different arrangements, for example one for combat and one for roleplay. Switch with the menu on the left of the bar.</p>
-    <div class="tm-row"><input id="tm-newset" placeholder="Name, e.g. Combat" value="${esc(TMD.newName)}" aria-label="New layout name"><button class="btn sm primary" data-tmarr="saveas">Save current as new</button></div>
-    <div class="tm-row"><button class="btn sm" data-tmarr="renameset">Rename “${esc(L.active)}” to the name above</button><button class="btn sm danger" data-tmarr="delset">Delete “${esc(L.active)}”</button></div>`;
-  if(TMD.pop==="sticky")return `<h4>Add a sticky</h4><div class="tm-kinds">
-    <button class="tm-kind" data-tmsticky="text"><b>Note</b><small>Free text: reminders, scribbles.</small></button>
-    <button class="tm-kind" data-tmsticky="check"><b>Checklist</b><small>Things to hit tonight; tick them off.</small></button>
-    <button class="tm-kind" data-tmsticky="count"><b>Counter</b><small>Tallies with + and −: rounds, charges, legendary actions.</small></button></div>`;
-  if(TMD.pop==="hidden"){const ks=Object.keys(L.hidden).filter(k=>L.hidden[k]);return `<h4>Hidden panels</h4>${ks.length?`<div class="tm-hid">${ks.map(k=>`<div class="tm-row"><span>${esc(tmKeyLabel(k))}</span><button class="btn sm" data-tmshow="${esc(k)}">Show</button></div>`).join("")}</div><button class="btn sm" data-tmarr="showall">Show all</button>`:`<p class="vempty">Nothing hidden. Use the – on a panel's top bar to hide it.</p>`}`}
-  if(TMD.pop==="card"){const res=tmSearch(TMD.q);return `<h4>${TMD.popFor?"Link this sticky to a page":"Put a page on the board"}</h4><input id="tm-cardq" placeholder="Search characters, notes, quests, stat blocks…" value="${esc(TMD.q)}" autocomplete="off" aria-label="Search pages">
-    <div class="tm-res">${res.length?res.map(([t,x])=>`<button class="tm-ri" data-tmpick="${esc(t)}|${esc(x.id)}"><b>${esc(titleOf(t,x)||"Untitled")}</b><small>${esc(COL_LABEL[t]||t)}</small></button>`).join(""):`<p class="vempty">${TMD.q?"No matches.":"Start typing a name."}</p>`}</div>`}
-  return ""}
-/* put any page on Table mode from where you're reading it */
-function tmCardOn(type,eid){return tmL().cards.some(c=>c.type===type&&c.eid===eid)}
-function tmCardBtn(type,eid){const on=tmCardOn(type,eid);return `<button class="btn sm ${on?"on-tm":""}" data-tmcard="${type}|${eid}" title="${on?"Take this off Table mode":"Show this as a card in Table mode"}">${on?"✓ On Table mode":"+ Table mode"}</button>`}
-function tmCardToggle(type,eid){const L=tmL();TMU.push(tmSnapshot());const ex=L.cards.find(c=>c.type===type&&c.eid===eid);
-  if(ex){L.cards=L.cards.filter(c=>c!==ex);toast("Taken off Table mode")}
-  else{const z=Math.max(2,...L.cards.map(c=>c.z||1),...Object.values(L.p).map(v=>v.z||1))+1;const k=L.cards.length;L.cards.push({id:uid(),type,eid,x:30+k*36,y:30+k*36,w:type==="monsters"?440:380,z});toast("Added to Table mode")}
-  tmSave();render();if(TM)renderTable()}
-function tmCardsStd(){const L=tmL();if(L.on&&tmCanArrange())return "";return L.cards.map(c=>{const r=rec(c.type,c.eid);if(!r)return "";return `<section class="tm-s tm-cardsec"><h3>${esc(titleOf(c.type,r)||"Untitled")}</h3><div class="tm-cardacts"><button class="btn sm" data-act="view" data-type="${c.type}" data-id="${c.eid}">Open</button><button class="btn sm" data-cddel="${c.id}">Remove</button></div><div class="pin-body cd-body" data-pintype="${c.type}">${captureView(c.type,c.eid)||""}</div></section>`}).join("")}
-document.addEventListener("click",e=>{const b=e.target.closest("[data-tmcard]");if(!b)return;e.preventDefault();e.stopPropagation();const [t,id]=b.dataset.tmcard.split("|");tmCardToggle(t,id)},true);
-function tmKeyLabel(k){const m=k.match(/^s:(.*?)(#\d+)?$/);if(m)return m[1].replace(/\b\w/g,c=>c.toUpperCase());if(k.startsWith("cd:")){const c=tmL().cards.find(x=>"cd:"+x.id===k);const r=c&&rec(c.type,c.eid);return r?titleOf(c.type,r):"Page card"}return ({"c:tm-plan-h":"Plan title","c:lt-card":"Last time","c:empty":"No plan yet"})[k]||k.replace(/^c:/,"")}
-function tmSearch(q){q=String(q||"").trim().toLowerCase();if(!q)return [];const out=[];for(const t of ["characters","notes","quests","monsters"])for(const x of S[t]||[]){const n=String(titleOf(t,x)||"").toLowerCase();if(n.includes(q))out.push([t,x]);if(out.length>=14)return out}return out}
-function tmKey(el){if(el.matches(".tm-s")){const h=el.querySelector(":scope>h3");if(h){const t=h.textContent.toLowerCase().replace(/\d+/g,"").replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim();return "s:"+(/^session notes$/.test(t)?"session notes":/^last time/.test(t)?"last time":/^twists/.test(t)?"twists":t)}}
-  return "c:"+(String(el.className||el.tagName).split(/\s+/)[0]||"x")}
-const TM_COLORS=["yellow","rose","sky","mint","lilac"];
-function tmStickyBody(st){const items=st.items||[];
-  const link=st.link&&rec(st.link.type,st.link.id)?`<button type="button" class="st-link" data-act="view" data-type="${st.link.type}" data-id="${st.link.id}">🔗 ${esc(titleOf(st.link.type,rec(st.link.type,st.link.id)))}</button>`:"";
-  if(st.kind==="check")return `${link}<div class="st-list">${items.map((it,i)=>`<div class="st-ci ${it.done?"done":""}"><input type="checkbox" data-stci="${st.id}|${i}" ${it.done?"checked":""} aria-label="Done"><input class="st-in" data-stct="${st.id}|${i}" value="${esc(it.t||"")}" aria-label="Item"><button type="button" class="st-x" data-stcx="${st.id}|${i}" aria-label="Remove item">✕</button></div>`).join("")}<input class="st-in st-add" data-stcadd="${st.id}" placeholder="Add an item and press Enter" aria-label="Add item"></div>`;
-  if(st.kind==="count")return `${link}<div class="st-list">${items.map((it,i)=>`<div class="st-cn"><input class="st-in" data-stct="${st.id}|${i}" value="${esc(it.t||"")}" aria-label="Counter name"><button type="button" class="st-b" data-stcn="${st.id}|${i}|-1" aria-label="Minus one">−</button><b class="st-n" data-stnv="${st.id}|${i}">${num(it.n)||0}</b><button type="button" class="st-b" data-stcn="${st.id}|${i}|1" aria-label="Plus one">+</button><button type="button" class="st-x" data-stcx="${st.id}|${i}" aria-label="Remove counter">✕</button></div>`).join("")}<input class="st-in st-add" data-stcadd="${st.id}" placeholder="Add a counter, e.g. Round, and press Enter" aria-label="Add counter"></div>`;
-  return `${link}<textarea data-stk="${st.id}" placeholder="Write anything…" aria-label="Sticky note">${esc(st.text||"")}</textarea>`}
-function tmLayoutApply(el){const L=tmL();if(!L.on||!tmCanArrange())return;
-  const grid=el.querySelector(".tm-grid");if(!grid)return;const gr=grid.getBoundingClientRect();
-  const panels=[...grid.querySelectorAll(":scope>.tm-main>*, :scope>.tm-side>*")];
-  const seen={};const items=panels.map(p=>{let k=tmKey(p);seen[k]=(seen[k]||0)+1;if(seen[k]>1)k+="#"+seen[k];const r=p.getBoundingClientRect();return {p,k,dx:Math.round(r.left-gr.left),dy:Math.round(r.top-gr.top),dw:Math.round(r.width)}});
-  const board=document.createElement("div");board.className="tm-board"+(L.lock||!TMD.edit?" locked":"");board.style.width=Math.round(gr.width)+"px";if(L.zoom!==1)board.style.zoom=L.zoom;let maxZ=Math.max(1,...Object.values(L.p).map(v=>v.z||1));
-  const mk=(k,pos,cls)=>{const n=document.createElement("div");n.className="tm-note"+(cls?" "+cls:"")+(pos.h?" sized":"")+(TMD.sel===k?" sel":"");n.dataset.k=k;n.style.left=(pos.x??20)+"px";n.style.top=(pos.y??20)+"px";n.style.width=(pos.w??320)+"px";if(pos.h)n.style.height=pos.h+"px";n.style.zIndex=pos.z||1;return n};
-  items.forEach(({p,k,dx,dy,dw})=>{if(L.hidden[k])return;const pos={x:dx,y:dy,w:dw,...(L.p[k]||{})};const n=mk(k,pos);
-    n.innerHTML=`<div class="tm-grip" title="Drag to move. Panels in the way step aside (hold Shift to place freely). Click, then arrow keys to nudge."><span>⠿</span><span class="grow"></span><button type="button" class="tm-hide" data-tmhide="${esc(k)}" title="Hide this panel" aria-label="Hide this panel">–</button></div><div class="tm-rs" title="Drag to resize"></div>`;n.insertBefore(p,n.lastChild);board.appendChild(n)});
-  L.cards.forEach(c=>{const r=rec(c.type,c.eid);if(!r)return;const k="cd:"+c.id;if(L.hidden[k])return;const n=mk(k,{w:380,z:maxZ+1,...c},"card");
-    n.innerHTML=`<div class="tm-grip st-bar" title="Drag to move"><span>⠿</span><b class="cd-t">${esc(titleOf(c.type,r)||"Untitled")}</b><span class="grow"></span><button type="button" data-act="view" data-type="${c.type}" data-id="${c.eid}" title="Open the full page" aria-label="Open">↗</button><button type="button" class="st-del" data-cddel="${c.id}" title="Take this card off the board" aria-label="Remove card">✕</button></div><div class="cd-body pin-body" data-pintype="${c.type}">${captureView(c.type,c.eid)||""}</div><div class="tm-rs" title="Drag to resize"></div>`;board.appendChild(n)});
-  L.stickies.forEach(st=>{const k="st:"+st.id;const n=mk(k,{w:240,z:maxZ+1,...st},"sticky c-"+(st.color||"yellow"));
-    n.innerHTML=`<div class="tm-grip st-bar" title="Drag to move"><span>⠿</span><span class="grow"></span><button type="button" class="st-lk" data-stlink="${st.id}" title="Link to a character, note or quest" aria-label="Link to a page">🔗</button><button type="button" class="st-col" data-stcol="${st.id}" title="Change color" aria-label="Change color">●</button><button type="button" class="st-del" data-stdel="${st.id}" title="Delete this sticky" aria-label="Delete sticky">✕</button></div>${tmStickyBody(st)}<div class="tm-rs" title="Drag to resize"></div>`;board.appendChild(n)});
-  grid.replaceWith(board);tmBoardSize(board);}
-function tmBoardSize(board){let H=0,W=0;board.querySelectorAll(".tm-note").forEach(n=>{H=Math.max(H,n.offsetTop+n.offsetHeight);W=Math.max(W,n.offsetLeft+n.offsetWidth)});board.style.height=(H+80)+"px";board.style.minWidth=(W+20)+"px";board.dataset.w=W;board.dataset.h=H}
-/* write a panel's current spot into the layout (without saving yet) */
-function tmSetVals(n){if(!n||!n.isConnected)return;const k=n.dataset.k;const L=tmL();const v={x:Math.round(n.offsetLeft),y:Math.round(n.offsetTop),w:Math.round(n.offsetWidth),z:+n.style.zIndex||1};if(n.style.height)v.h=Math.round(n.offsetHeight);
-  if(k.startsWith("st:")){const st=L.stickies.find(s=>"st:"+s.id===k);if(st)Object.assign(st,v)}else if(k.startsWith("cd:")){const c=L.cards.find(s=>"cd:"+s.id===k);if(c)Object.assign(c,v)}else L.p[k]=v}
-function tmStore(n){if(!n||!n.isConnected)return;tmSetVals(n);tmSave()}
-/* snapping: line edges up with other panels (or sit a neat gap away), with guide lines while you drag */
-const TM_GAP=14,TM_SNAP=12;
-function tmOthers(n){return [...n.parentElement.querySelectorAll(".tm-note")].filter(o=>o!==n).map(o=>({l:o.offsetLeft,t:o.offsetTop,r:o.offsetLeft+o.offsetWidth,b:o.offsetTop+o.offsetHeight}))}
-function tmBest(vals,cands){let best=null;vals.forEach(([v,off])=>cands.forEach(c=>{const d=Math.abs(v-c);if(d<=TM_SNAP&&(!best||d<best.d))best={d,pos:c-off,line:c}}));return best}
-function tmGuides(board,xs,ys){board.querySelectorAll(".tm-guide").forEach(g=>g.remove());xs.forEach(x=>{const g=document.createElement("div");g.className="tm-guide v";g.style.left=x+"px";board.appendChild(g)});ys.forEach(y=>{const g=document.createElement("div");g.className="tm-guide h";g.style.top=y+"px";board.appendChild(g)})}
-function tmSnapMove(n,x,y){const w=n.offsetWidth,h=n.offsetHeight,O=tmOthers(n);
-  const cx=[0];O.forEach(o=>cx.push(o.l,o.r,o.r+TM_GAP,o.l-TM_GAP));const cy=[0];O.forEach(o=>cy.push(o.t,o.b,o.b+TM_GAP,o.t-TM_GAP));
-  const bx=tmBest([[x,0],[x+w,w],[x+w/2,w/2]],cx.concat(O.map(o=>(o.l+o.r)/2))),by=tmBest([[y,0],[y+h,h]],cy);
-  return {x:bx?bx.pos:Math.round(x/10)*10,y:by?by.pos:Math.round(y/10)*10,gx:bx?[bx.line]:[],gy:by?[by.line]:[]}}
-function tmSnapSize(n,w,h){const x=n.offsetLeft,y=n.offsetTop,O=tmOthers(n);
-  const cx=[];O.forEach(o=>cx.push(o.l-TM_GAP,o.r,o.l));const cy=[];O.forEach(o=>cy.push(o.t-TM_GAP,o.b,o.t));
-  const bx=tmBest([[x+w,0]],cx),by=tmBest([[y+h,0]],cy);
-  return {w:Math.max(200,bx?bx.pos-x:Math.round(w/10)*10),h:Math.max(60,by?by.pos-y:Math.round(h/10)*10),gx:bx?[bx.line]:[],gy:by?[by.line]:[]}}
-function tmSelect(k){TMD.sel=k;document.querySelectorAll("#tablemode .tm-note").forEach(n=>n.classList.toggle("sel",n.dataset.k===k))}
-/* dragging by the grip, resizing by the corner */
-document.addEventListener("pointerdown",e=>{if(TMD.drag||e.button>0)return;const g=e.target.closest("#tablemode .tm-grip, #tablemode .tm-rs");if(!g||e.target.closest("button"))return;const n=g.closest(".tm-note");if(!n||n.closest(".tm-board.locked"))return;e.preventDefault();tmSelect(n.dataset.k);
-  const z=Math.max(1,...[...document.querySelectorAll("#tablemode .tm-note")].map(x=>+x.style.zIndex||1))+1;n.style.zIndex=z;const Z=tmL().zoom||1;
-  TMD.drag={n,Z,mode:g.classList.contains("tm-rs")?"size":"move",sx:e.clientX,sy:e.clientY,ox:n.offsetLeft,oy:n.offsetTop,ow:n.offsetWidth,oh:n.offsetHeight,id:e.pointerId,before:tmSnapshot()};
-  const b=n.closest(".tm-body");Object.assign(TMD.drag,{b,cx:e.clientX,cy:e.clientY,shift:e.shiftKey,st:b?b.scrollTop:0,sl:b?b.scrollLeft:0,home:tmHome(n),orig:{left:n.style.left,top:n.style.top,width:n.style.width,height:n.style.height},origSized:n.classList.contains("sized")});
-  /* keep scrolling while the pointer rests near the top or bottom edge; the scroll listener below moves the held panel */
-  TMD.drag.timer=setInterval(()=>{const d=TMD.drag;if(!d||!d.b)return;const r=d.b.getBoundingClientRect();const v=d.cy>r.bottom-50?14:d.cy<r.top+50?-14:0;if(!v)return;d.b.scrollTop+=v},30);
-  n.classList.add("dragging");g.setPointerCapture(e.pointerId)});
-document.addEventListener("pointermove",e=>{const d=TMD.drag;if(!d||e.pointerId!==d.id)return;d.cx=e.clientX;d.cy=e.clientY;d.shift=e.shiftKey;tmDragMove()});
-/* the mouse wheel scrolls the board under a held panel, so the panel follows it */
-document.addEventListener("scroll",e=>{const d=TMD.drag;if(d&&e.target===d.b)tmDragMove()},true);
-/* place the held panel from the pointer position plus however far the board has scrolled since the grab */
-function tmDragMove(){const d=TMD.drag;if(!d)return;const e={shiftKey:d.shift};const dx=(d.cx-d.sx+(d.b?d.b.scrollLeft-d.sl:0))/d.Z,dy=(d.cy-d.sy+(d.b?d.b.scrollTop-d.st:0))/d.Z;const board=d.n.parentElement;tmRoomReset(d);
-  if(d.mode==="move"){let x=Math.max(0,d.ox+dx),y=Math.max(0,d.oy+dy),gx=[],gy=[];if(!e.shiftKey){const s=tmSnapMove(d.n,x,y);x=Math.max(0,s.x);y=Math.max(0,s.y);gx=s.gx;gy=s.gy}d.n.style.left=x+"px";d.n.style.top=y+"px";tmGuides(board,gx,gy)}
-  else{let w=Math.max(200,d.ow+dx),h=Math.max(60,d.oh+dy),gx=[],gy=[];if(!e.shiftKey){const s=tmSnapSize(d.n,w,h);w=s.w;h=s.h;gx=s.gx;gy=s.gy}d.n.style.width=w+"px";d.n.style.height=h+"px";d.n.classList.add("sized");tmGuides(board,gx,gy)}
-  if(!e.shiftKey)tmMakeRoom(d);
-  if(board){let H=0;board.querySelectorAll(".tm-note").forEach(o=>{H=Math.max(H,o.offsetTop+o.offsetHeight)});if(H+80>board.offsetHeight)board.style.height=(H+80)+"px"}}
-/* panels in the way of the held one step aside: narrower if there is room beside it, otherwise down below it */
-function tmHome(n){return [...n.parentElement.querySelectorAll(".tm-note")].filter(o=>o!==n).map(o=>({o,l:o.style.left,t:o.style.top,w:o.style.width,h:o.style.height,sz:o.classList.contains("sized")}))}
-function tmRoomReset(d){(d.home||[]).forEach(h=>{h.o.style.left=h.l;h.o.style.top=h.t;h.o.style.width=h.w;h.o.style.height=h.h;h.o.classList.toggle("sized",h.sz)})}
-function tmMakeRoom(d){const R=o=>({l:o.offsetLeft,t:o.offsetTop,r:o.offsetLeft+o.offsetWidth,b:o.offsetTop+o.offsetHeight});const hit=(a,b)=>a.l<b.r&&b.l<a.r&&a.t<b.b&&b.t<a.b;
-  const placed=[R(d.n)];const list=(d.home||[]).map(h=>h.o).sort((a,b)=>a.offsetTop-b.offsetTop||a.offsetLeft-b.offsetLeft);
-  list.forEach(o=>{const minW=Math.max(200,Math.round(o.offsetWidth*.6));for(let i=0;i<60;i++){const a=R(o);const B=placed.find(p=>hit(a,p));if(!B)break;
-    const rightW=B.l-TM_GAP-a.l,leftW=a.r-(B.r+TM_GAP);
-    if(B.l>a.l&&rightW>=minW&&rightW>=leftW)o.style.width=rightW+"px";
-    else if(B.r<a.r&&leftW>=minW){o.style.left=(B.r+TM_GAP)+"px";o.style.width=leftW+"px"}
-    else o.style.top=(B.b+TM_GAP)+"px"}
-    placed.push(R(o))})}
-const tmDragEnd=(e,cancelled)=>{const d=TMD.drag;if(!d||e.pointerId!==d.id)return;
-  clearInterval(d.timer);d.n.classList.remove("dragging");TMD.drag=null;const bd=d.n.parentElement;tmGuides(bd,[],[]);
-  if(cancelled){/* the system cancelled the gesture: put everything back where it was */tmRoomReset(d);Object.assign(d.n.style,d.orig);d.n.classList.toggle("sized",d.origSized)}
-  else if(d.n.offsetLeft!==d.ox||d.n.offsetTop!==d.oy||d.n.offsetWidth!==d.ow||d.n.offsetHeight!==d.oh){TMU.push(d.before);if(TMU.length>30)TMU.shift();
-    (d.home||[]).forEach(h=>{if(h.o.style.left!==h.l||h.o.style.top!==h.t||h.o.style.width!==h.w)tmSetVals(h.o)});tmStore(d.n)}
-  else tmRoomReset(d);
-  tmBoardSize(bd);if(renderPending&&!typingInTable()){renderPending=false;renderTable()}};
-document.addEventListener("pointerup",e=>tmDragEnd(e,false));document.addEventListener("pointercancel",e=>tmDragEnd(e,true));
-/* undo for layout changes */
-const TMU=[];function tmSnapshot(){const L=tmL();return JSON.stringify(tmCur(L))}
-function tmUndo(){const b=TMU.pop();if(!b){toast("Nothing to undo");return}const L=tmL();const o=JSON.parse(b);TM_FIELDS.forEach(f=>L[f]=o[f]);tmSave();tmRender()}
-/* keyboard: Ctrl+Z, arrow-key nudging of the selected panel, Esc to deselect */
-document.addEventListener("keydown",e=>{if(!TM||!tmL().on||!TMD.edit||typingInTable())return;const L=tmL();
-  if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&(e.key==="z"||e.key==="Z")){e.preventDefault();tmUndo();return}
-  if(e.key==="Escape"&&(TMD.sel||TMD.pop)){e.preventDefault();e.stopPropagation();if(TMD.pop){TMD.pop=null;TMD.popFor=null;tmRender()}else tmSelect(null);return}
-  const dir={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!dir||!TMD.sel||L.lock)return;
-  const n=document.querySelector(`#tablemode .tm-note[data-k="${CSS.escape(TMD.sel)}"]`);if(!n)return;e.preventDefault();e.stopPropagation();
-  if(!TMD.nudged){TMU.push(tmSnapshot());TMD.nudged=true}const step=e.shiftKey?10:1;
-  if(e.altKey){n.style.width=Math.max(200,n.offsetWidth+dir[0]*step)+"px";if(dir[1]){n.style.height=Math.max(60,n.offsetHeight+dir[1]*step)+"px";n.classList.add("sized")}}
-  else{n.style.left=Math.max(0,n.offsetLeft+dir[0]*step)+"px";n.style.top=Math.max(0,n.offsetTop+dir[1]*step)+"px"}
-  tmSetVals(n);clearTimeout(TMD.nudgeT);TMD.nudgeT=setTimeout(()=>{TMD.nudged=false;tmSave();const bd=document.querySelector("#tablemode .tm-board");if(bd)tmBoardSize(bd)},500)},true);
-document.addEventListener("pointerdown",e=>{if(!TM||!TMD.sel)return;if(!e.target.closest("#tablemode .tm-note"))tmSelect(null)});
-/* zoom */
-function tmZoom(v){const L=tmL();const b=document.querySelector("#tablemode .tm-board");
-  if(v==="fit"){const body=document.querySelector("#tablemode .tm-body");if(!b||!body)return;const W=+b.dataset.w||b.offsetWidth,H=+b.dataset.h||b.offsetHeight;L.zoom=Math.max(.35,Math.min(1,(body.clientWidth-40)/W,(body.clientHeight-90)/H))}
-  else if(v==="1")L.zoom=1;else L.zoom=Math.max(.35,Math.min(1.5,Math.round((L.zoom+(v==="+"?.1:-.1))*10)/10));
-  L.zoom=Math.round(L.zoom*100)/100;tmSave();tmRender()}
-/* buttons */
-document.addEventListener("click",async e=>{const t=e.target.closest("[data-tmarr],[data-stdel],[data-stcol],[data-tmpop],[data-tmsticky],[data-tmshow],[data-tmhide],[data-tmpick],[data-cddel],[data-tmzoom],[data-stlink],[data-stcn],[data-stcx]");if(!t)return;e.preventDefault();e.stopPropagation();const L=tmL();const d=t.dataset;
-  const nz=()=>Math.max(1,...[...document.querySelectorAll("#tablemode .tm-note")].map(x=>+x.style.zIndex||1))+1;
-  const spot=()=>{const b=document.querySelector("#tablemode .tm-body");const Z=L.zoom||1;let x=Math.round(((b?b.scrollLeft:0)/Z)+30),y=Math.round(((b?b.scrollTop:0)/Z)+30);
-    const taken=[...document.querySelectorAll("#tablemode .tm-note.sticky, #tablemode .tm-note.card")].map(n=>[n.offsetLeft,n.offsetTop]);let guard=0;while(guard++<30&&taken.some(([a,c])=>Math.abs(a-x)<20&&Math.abs(c-y)<20)){x+=36;y+=36}return {x,y}};
-  if(d.tmarr==="on"){L.on=true;TMD.edit=true;tmSave();tmRender();toast("Drag panels by their top bar. Drag a corner to resize.")}
-  else if(d.tmarr==="done"){TMD.edit=false;TMD.pop=null;tmSelect(null);tmSave();tmRender()}
-  else if(d.tmarr==="off"){L.on=false;TMD.edit=false;TMD.pop=null;tmSave();tmRender()}
-  else if(d.tmarr==="tidy")tmTidy();
-  else if(d.tmarr==="undo")tmUndo();
-  else if(d.tmarr==="lock"){L.lock=!L.lock;tmSave();tmRender();toast(L.lock?"Layout locked":"Layout unlocked")}
-  else if(d.tmarr==="reset"){if(!t.classList.contains("armed")){t.classList.add("armed");t.dataset.label=t.textContent;t.textContent="Sure? Reset";return}TMU.push(tmSnapshot());L.p={};L.hidden={};tmSave();tmRender()}
-  else if(d.tmarr==="saveas"){const i=document.getElementById("tm-newset");tmSaveAs(i?i.value:"");TMD.newName=""}
-  else if(d.tmarr==="renameset"){const i=document.getElementById("tm-newset");const nm=String(i?i.value:"").trim().slice(0,30);if(!nm){toast("Type the new name first");return}if(L.sets[nm]){toast("That name is taken");return}L.sets[nm]=tmCur(L);delete L.sets[L.active];L.active=nm;TMD.newName="";tmSave();tmRender()}
-  else if(d.tmarr==="delset"){if(!t.classList.contains("armed")){t.classList.add("armed");t.dataset.label=t.textContent;t.textContent="Sure? Delete";return}tmDeleteSet()}
-  else if(d.tmarr==="showall"){TMU.push(tmSnapshot());L.hidden={};tmSave();TMD.pop=null;tmRender()}
-  else if(d.tmpop){TMD.pop=TMD.pop===d.tmpop&&!TMD.popFor?null:d.tmpop;TMD.popFor=null;TMD.q="";tmRender();if(TMD.pop==="card")setTimeout(()=>document.getElementById("tm-cardq")?.focus(),30);if(TMD.pop==="layouts")setTimeout(()=>document.getElementById("tm-newset")?.focus(),30)}
-  else if(d.tmsticky){TMU.push(tmSnapshot());const kind=d.tmsticky;const st={id:uid(),kind,text:"",...spot(),w:kind==="text"?240:280,z:nz(),color:TM_COLORS[L.stickies.length%TM_COLORS.length]};if(kind!=="text")st.items=kind==="count"?[{t:"Round",n:1}]:[];L.stickies.push(st);TMD.pop=null;tmSave();tmRender();setTimeout(()=>{const a=document.querySelector(`#tablemode .tm-note[data-k="st:${st.id}"] textarea, #tablemode .tm-note[data-k="st:${st.id}"] .st-add`);a&&a.focus()},40)}
-  else if(d.tmhide){TMU.push(tmSnapshot());L.hidden[d.tmhide]=true;if(TMD.sel===d.tmhide)TMD.sel=null;tmSave();tmRender();toast("Hidden. Bring it back from Hidden in the bar.")}
-  else if(d.tmshow){TMU.push(tmSnapshot());delete L.hidden[d.tmshow];tmSave();tmRender()}
-  else if(d.tmpick){const [type,eid]=d.tmpick.split("|");
-    if(TMD.popFor){const st=L.stickies.find(s=>s.id===TMD.popFor);if(st){st.link={type,id:eid}}TMD.popFor=null}
-    else{if(L.cards.some(c=>c.type===type&&c.eid===eid)){toast("That page is already on the board");return}TMU.push(tmSnapshot());L.cards.push({id:uid(),type,eid,...spot(),w:type==="monsters"?440:380,z:nz()})}
-    TMD.pop=null;TMD.q="";tmSave();tmRender()}
-  else if(d.cddel){TMU.push(tmSnapshot());L.cards=L.cards.filter(c=>c.id!==d.cddel);tmSave();tmRender()}
-  else if(d.tmzoom)tmZoom(d.tmzoom);
-  else if(d.stlink){TMD.pop="card";TMD.popFor=d.stlink;TMD.q="";tmRender();setTimeout(()=>document.getElementById("tm-cardq")?.focus(),30)}
-  else if(d.stcn){const [sid,i,by]=d.stcn.split("|");const st=L.stickies.find(s=>s.id===sid);const it=st&&st.items&&st.items[+i];if(it){it.n=(num(it.n)||0)+(+by);const v=document.querySelector(`[data-stnv="${sid}|${i}"]`);if(v)v.textContent=it.n;tmSave()}}
-  else if(d.stcx){const [sid,i]=d.stcx.split("|");const st=L.stickies.find(s=>s.id===sid);if(st&&st.items){st.items.splice(+i,1);tmSave();tmRender()}}
-  else if(d.stdel){const st=L.stickies.find(s=>s.id===d.stdel);const has=st&&((st.text||"").trim()||(st.items||[]).length);if(has&&!t.classList.contains("armed")){t.classList.add("armed");t.dataset.label="✕";t.textContent="Delete?";return}TMU.push(tmSnapshot());L.stickies=L.stickies.filter(s=>s.id!==d.stdel);tmSave();tmRender()}
-  else if(d.stcol){const st=L.stickies.find(s=>s.id===d.stcol);if(st){st.color=TM_COLORS[(TM_COLORS.indexOf(st.color||"yellow")+1)%TM_COLORS.length];tmSave();const n=t.closest(".tm-note");if(n){TM_COLORS.forEach(c=>n.classList.remove("c-"+c));n.classList.add("c-"+st.color)}}}},true);
-document.addEventListener("change",e=>{const el=e.target;if(el.matches&&el.matches("[data-tmset]")){tmSwitch(el.value);return}
-  const ci=el.dataset&&el.dataset.stci;if(ci){const [sid,i]=ci.split("|");const st=tmL().stickies.find(s=>s.id===sid);const it=st&&st.items&&st.items[+i];if(it){it.done=el.checked;el.closest(".st-ci")?.classList.toggle("done",el.checked);tmSave()}}},true);
-document.addEventListener("input",e=>{const el=e.target;const L=tmL();
-  if(el.dataset&&el.dataset.stk){const st=L.stickies.find(s=>s.id===el.dataset.stk);if(st){st.text=el.value;tmSave()}}
-  else if(el.dataset&&el.dataset.stct){const [sid,i]=el.dataset.stct.split("|");const st=L.stickies.find(s=>s.id===sid);const it=st&&st.items&&st.items[+i];if(it){it.t=el.value;tmSave()}}
-  else if(el.id==="tm-cardq"){TMD.q=el.value;const box=el.parentElement.querySelector(".tm-res");if(box){const res=tmSearch(TMD.q);box.innerHTML=res.length?res.map(([t,x])=>`<button class="tm-ri" data-tmpick="${esc(t)}|${esc(x.id)}"><b>${esc(titleOf(t,x)||"Untitled")}</b><small>${esc(COL_LABEL[t]||t)}</small></button>`).join(""):`<p class="vempty">${TMD.q?"No matches.":"Start typing a name."}</p>`}}
-  else if(el.id==="tm-newset")TMD.newName=el.value},true);
-document.addEventListener("keydown",e=>{const el=e.target;if(e.key!=="Enter"||!el.dataset)return;
-  if(el.dataset.stcadd){e.preventDefault();const v=el.value.trim();if(!v)return;const st=tmL().stickies.find(s=>s.id===el.dataset.stcadd);if(st){st.items=st.items||[];st.items.push(st.kind==="count"?{t:v,n:0}:{t:v,done:false});el.value="";tmSave();const sid=st.id;el.blur();tmRender();setTimeout(()=>document.querySelector(`[data-stcadd="${sid}"]`)?.focus(),30)}}
-  else if(el.id==="tm-newset"){e.preventDefault();tmSaveAs(el.value);TMD.newName=""}
-  else if(el.id==="tm-cardq"){e.preventDefault();const first=document.querySelector("#tablemode .tm-res .tm-ri");first&&first.click()}},true);
-window.addEventListener("resize",()=>{if(TM&&tmL().on&&!typingInTable())renderTable()});
-/* tidy: pack every panel into neat columns with no gaps */
-function tmTidy(){const board=document.querySelector("#tablemode .tm-board");if(!board)return;TMU.push(tmSnapshot());const notes=[...board.querySelectorAll(".tm-note")];
-  const W=board.offsetWidth,ncol=Math.max(1,Math.min(5,Math.floor((W+TM_GAP)/(360+TM_GAP)))),colW=Math.floor((W-TM_GAP*(ncol-1))/ncol);const bottoms=new Array(ncol).fill(0);
-  notes.sort((a,b)=>(a.offsetLeft-b.offsetLeft)||(a.offsetTop-b.offsetTop)).sort((a,b)=>Math.floor(a.offsetLeft/(colW))-Math.floor(b.offsetLeft/(colW))||a.offsetTop-b.offsetTop);
-  notes.forEach(n=>{let c=bottoms.indexOf(Math.min(...bottoms));const wide=n.offsetWidth>colW*1.5&&ncol>1;let span=wide?Math.min(2,ncol):1;if(span===2){let best=0,bv=1e9;for(let i=0;i<ncol-1;i++){const v=Math.max(bottoms[i],bottoms[i+1]);if(v<bv){bv=v;best=i}}c=best}
-    const top=span===2?Math.max(bottoms[c],bottoms[c+1]):bottoms[c];n.style.left=c*(colW+TM_GAP)+"px";n.style.top=top+"px";n.style.width=(colW*span+TM_GAP*(span-1))+"px";n.style.height="";n.classList.remove("sized");
-    const b=top+n.offsetHeight+TM_GAP;for(let i=c;i<c+span;i++)bottoms[i]=b});
-  notes.forEach(tmStore);tmBoardSize(board);toast("Tidied. Ctrl+Z puts it back.")}
-
-/* Session Table: four columns for game night (path and party · current scene · dice, clocks and log · rules and travel).
-   It is what Table mode opens; the arranged board (panels, stickies, Arrange) is one tap away and remembered per device. */
-let TMV=(()=>{try{return localStorage.getItem("desk.tmview")||"session"}catch(_){return "session"}})();
-function setTMV(v){TMV=v;try{localStorage.setItem("desk.tmview",v)}catch(_){}renderTable()}
+/* Session Table: four columns for game night (path and party · current scene · dice, clocks and log · rules and travel). It is what Table mode opens. */
 const ST={scene:null,rolls:[],undo:[],miles:"",pace:"normal",prevHide:false,open:new Set(["read"]),q:"",pins:[],resOpen:true,tag:"",rcat:"Conditions",improv:null,sheet:null,entry:null,gen:null,recap:false,hooksSent:false};
 document.addEventListener("toggle",e=>{const d=e.target;if(d.matches&&d.matches("#tablemode details[data-k]"))d.open?ST.open.add(d.dataset.k):ST.open.delete(d.dataset.k)},true);
 function stPlan(){const l=sessList(),n=rcSession();return l.includes(U.sess)?sessPlan(U.sess):l.includes(n)?sessPlan(n):thNext()}
@@ -3046,7 +2736,7 @@ function renderSession(el){
       <label class="sx-mi"><span>Miles to go</span><input id="sx-miles" type="number" min="0" max="5000" step="any" inputmode="decimal" value="${esc(ST.miles)}"></label>
       <div class="sx-tabs" role="group" aria-label="Pace">${["slow","normal","fast"].filter(k=>pace[k]).map(k=>`<button type="button" data-act="stPace" data-v="${k}" aria-pressed="${ST.pace===k}">${CAP(k)}</button>`).join("")}</div>
       <div id="sx-tr">${stTravelHtml()}</div></section>
-    <button type="button" class="sx-link sx-board" data-act="stView" data-v="board">Switch to your arranged board ›</button></aside>`;
+    </aside>`;
   el.innerHTML=`${top}<div class="tm-body sx-body"><div class="sx-grid">${col1}${col2}${col3}${col4}</div></div>${stWindow(n)}`;el.hidden=false;
   el.querySelectorAll(".sx-col").forEach((x,i)=>{if(keep[i])x.scrollTop=keep[i]});const b=el.querySelector(".sx-body");if(b)b.scrollTop=bodyY;
   focusAfter(el,fsel);
@@ -3141,7 +2831,6 @@ document.addEventListener("keydown",e=>{if(e.key!=="Escape"||!TM)return;
   if(!(ST.sheet||ST.entry||ST.gen||ST.recap))return;if(!document.getElementById("modal").hidden)return;e.stopPropagation();e.preventDefault();stCloseWin()},true);
 document.addEventListener("pointerdown",e=>{if(!TM||!ST.q||e.target.closest(".sx-search"))return;ST.q="";const i=document.getElementById("sx-q");if(i)i.value="";const r=document.getElementById("sx-results");if(r)r.innerHTML=""},true);
 async function stAct(a,t){const plan=stPlan(),n=rcSession(),i=num(t.dataset.i);
-  if(a==="stView")return setTMV(t.dataset.v);
   if(a==="stTime")return stTime(num(t.dataset.n));
   if(a==="stShort")return stTime(60,false,"Short rest.");
   if(a==="stLong")return stTime(0,true);
@@ -3169,40 +2858,8 @@ document.addEventListener("submit",async e=>{const f=e.target.closest("[data-stl
   const tag=ST.tag;ST.tag="";document.querySelectorAll("#tablemode .sx-tags [aria-pressed]").forEach(b=>b.setAttribute("aria-pressed","false"));i.value="";const n=await addSessionLine((tag?`[${tag}] `:"")+v);const ul=document.querySelector("#tablemode .sx-log");if(ul)ul.innerHTML=stLogHtml(n);document.getElementById("sx-log")?.focus()});  // look it up again: a redraw may have replaced the box
 function renderTable(){
   renderDock();if(!TM)return;const el=document.getElementById("tablemode");
-  if(typingInTable()||TMD.drag){renderPending=true;return}
-  if(TMV!=="board"){el.className="tablemode sx-mode";renderSession(el);return}
-  el.classList.remove("sx-mode");
-  const c=cal(),plan=stPlan();
-  const n=rcSession();
-  const cast=plan?[...new Map(backlinksFrom(sessText(plan)).filter(o=>o.type==="characters").map(o=>[o.id,rec("characters",o.id)])).values()].filter(Boolean):[];
-  const threads=S.threads.filter(t=>t.status!=="resolved").slice(0,10);
-  const purse=S.settings.purse||{};
-  const y=el.querySelector(".tm-body")?.scrollTop||0;
-  el.innerHTML=`<div class="tm-top"><b class="tm-title">${esc(S.settings.campaign?.name||"Campaign")}</b><span class="tm-date">${esc(fmtDate(c,c.today))}</span><button class="btn sm" data-act="day" data-n="1" title="Long rest: next day, logged in this session's notes. Shift-click to skip logging.">+1 day</button><button class="btn sm" data-act="travel" title="Work out travel time and move the calendar">Travel</button>
-    ${clockHtml()}<span class="grow"></span><button class="btn sm" data-act="stView" data-v="session" title="The four-column game-night screen">Session Table</button><button class="btn sm" data-act="quickNote" title="Quick note (N)">Quick note</button><button class="btn sm" data-act="wrapUp">Wrap up</button><button class="btn sm" data-cztoggle="#tablemode" title="Collapse or expand every panel">Collapse all</button>${tmArrangeBtns()}<button class="btn sm" data-act="gsearch" title="Search (/)">Search</button><button class="btn sm keys-btn" data-act="keysOpen" title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg></button><button class="btn sm primary" data-act="tmExit" title="Exit table mode (T)">Exit table mode</button></div>
-  <div class="tm-body">${partyStrip()}<div class="tm-grid">
-    <div class="tm-main">
-      ${lastTimeCard(plan)}
-      ${plan?`<div class="tm-plan-h"><span class="label">Session ${plan.session}</span><h2>Scenes</h2></div>${plan.scenes.length?`<section class="tm-s"><ol class="pb-path">${plan.scenes.filter(x=>!x.reserve).map(x=>`<li class="${x.done?"done":""}"><b>${esc(x.title||"Untitled scene")}</b>${x.note?` · ${linkify(esc(x.note),"")}`:""}${x.read?`<div class="prose vprose">${rich(x.read)}</div>`:""}</li>`).join("")}</ol>${plan.scenes.some(x=>x.reserve)?`<p class="pb-sub">In reserve: ${plan.scenes.filter(x=>x.reserve).map(x=>esc(x.title||"Untitled scene")).join(", ")}</p>`:""}</section>`:`<p class="vempty">No scenes in this session yet.</p>`}`
-        :`<div class="empty">No scenes yet. Plan some on the Prep tab and they show here.</div>`}
-      ${plan?revealList(plan):""}
-      ${(()=>{const mons=plan?[...new Map(backlinksFrom(sessText(plan)).filter(o=>o.type==="monsters").map(o=>[o.id,rec("monsters",o.id)])).values()].filter(Boolean):[];return mons.length?`<section class="tm-s"><h3>Stat blocks</h3><div class="tm-sbs">${mons.map(statBlock).join("")}</div></section>`:""})()}
-      ${cast.length?`<section class="tm-s"><h3>In play</h3><div class="tm-cast">${cast.map(x=>`<button class="tm-npc" data-act="view" data-type="characters" data-id="${x.id}">${avatar(x,52)}<span><b>${esc(x.name)}</b><small>${esc([x.cls,x.attitude].filter(Boolean).join(" · "))}</small>${x.pronounce?`<span class="pron">“${esc(x.pronounce)}”</span>`:""}${x.voice?`<span class="voice">${esc(x.voice)}</span>`:""}<span class="tm-npc-n">${esc(plain(x.notes).slice(0,160))}${plain(x.notes).length>160?"…":""}</span>${x.secret?`<span class="tm-npc-s">Secret: ${esc(plain(x.secret).slice(0,120))}</span>`:""}</span></button>`).join("")}</div></section>`:""}
-    </div>
-    <aside class="tm-side">
-      ${PINS.length?`<section class="tm-s tm-keep"><h3>Kept open</h3>${pinsPanel()}</section>`:""}
-      ${learnTable()}${msTable()}<section class="tm-s"><h3>Session ${n} notes</h3><textarea id="tm-notes" rows="8" placeholder="Jot what happens as you play. It feeds the recap writer.">${esc(rcNotesVal(n))}</textarea></section>
-      ${S.tables.length?`<section class="tm-s"><h3>Roll tables</h3><div class="tm-rolls">${S.tables.slice().sort((a,b)=>(a.title||"").localeCompare(b.title||"")).map(t=>{const r=(ROLLS[t.id]||[])[0];return `<div class="tm-roll"><button class="btn sm" data-act="tmRoll" data-id="${t.id}">${esc(t.title)}</button>${r?`<span><b class="mono">${r.n}</b> ${esc(r.text)}</span>`:""}</div>`}).join("")}</div></section>`:""}
-      ${S.clocks.length?`<section class="tm-s"><h3>Clocks</h3><div class="clks compact">${S.clocks.map(k=>clockCard(k,true)).join("")}</div></section>`:""}
-      ${tmQuests()}<section class="tm-s"><h3>Loose threads</h3>${threads.length?threads.map(threadRow).join(""):`<p class="vempty">None open.</p>`}</section>
-      ${tmCardsStd()}
-      ${npcCard()}
-      ${timerSection()}
-      ${window.DeskSpotify?DeskSpotify.panel():""}
-      ${lootSection()}
-      <section class="tm-s"><h3>Treasury</h3><p class="mono tm-coins">${COINS.map(([k,l])=>`${fmtN(purse[k]||0)} ${l.toLowerCase()}`).join(" · ")}</p></section>
-    </aside></div></div>`;
-  el.insertAdjacentHTML("beforeend",tmArrangeBar());el.hidden=false;tmLayoutApply(el);const b=el.querySelector(".tm-body");if(b)b.scrollTop=y;
+  if(typingInTable()){renderPending=true;return}
+  el.className="tablemode sx-mode";renderSession(el);
 }
 
 
@@ -3957,7 +3614,6 @@ addEventListener("scroll",hideRule,true);
 /* reveal checklist */
 // The reveal checklist reads (and ticks) the clues kept in the scenes.
 function revealItems(plan){const out=[];(plan?plan.scenes:[]).forEach(s=>(s.clues||[]).forEach((k,ci)=>{const t=String(k.t||"").trim();if(t)out.push({i:out.length,done:!!k.found,text:t,sid:s.id,ci})}));return out}
-function revealList(plan){const it=revealItems(plan);if(!it.length)return "";return `<section class="tm-s rev"><h3>Reveal checklist <span class="mono">${it.filter(x=>x.done).length}/${it.length}</span></h3><ul class="revl">${it.map(x=>`<li class="${x.done?"done":""}"><label><input type="checkbox" data-reveal="${plan.id}|${x.i}" ${x.done?"checked":""}><span>${linkify(esc(x.text),"")}</span></label></li>`).join("")}</ul></section>`}
 async function toggleReveal(pid,i,on){const it=revealItems(sessPlan(sessNum(pid)))[i];if(!it)return;
   learnFromReveal(pid,i,on,it.text);return stScenePatch(pid,sc=>{const s=sc.find(x=>x.id===it.sid);if(s&&s.clues[it.ci])s.clues[it.ci].found=on})}
 document.addEventListener("change",e=>{const el=e.target.closest("[data-reveal]");if(!el)return;const [pid,i]=el.dataset.reveal.split("|");el.closest("li")?.classList.toggle("done",el.checked);toggleReveal(pid,+i,el.checked)},true);
@@ -3966,9 +3622,6 @@ let CLOCK={start:null,acc:0,running:false,lastBreak:0};try{const c=JSON.parse(lo
 function clockSave(){try{localStorage.setItem("dmdesk-clock",JSON.stringify(CLOCK))}catch(e){}}
 function clockMs(){return CLOCK.acc+(CLOCK.running&&CLOCK.start?Date.now()-CLOCK.start:0)}
 function fmtClock(ms){const m=Math.floor(ms/60000);return `${Math.floor(m/60)}:${String(m%60).padStart(2,"0")}`}
-function quietPCs(){const n=rcSession();const l=logFor(n);const had=new Set(l&&l.spotlight||[]);return S.characters.filter(x=>x.kind==="pc"&&!had.has(x.id))}
-function clockHtml(){const ms=clockMs();const q=ms>=45*60000?quietPCs():[];
-  return `<span class="sclock ${CLOCK.running?"on":""}"><b id="sclock-t">${fmtClock(ms)}</b><button class="btn sm" data-clock="${CLOCK.running?"pause":"start"}">${CLOCK.running?"Pause clock":ms?"Resume clock":"Start session clock"}</button>${ms&&!CLOCK.running?'<button class="btn sm" data-clock="reset">Reset</button>':""}</span>${q.length&&q.length<S.characters.filter(x=>x.kind==="pc").length?`<span class="quiet">Quiet so far: ${q.map(p=>`<button type="button" data-quiet="${p.id}" title="Mark ${esc(p.name)} as having had the spotlight">${esc((p.name||"").split(/[ "]/)[0])}</button>`).join("")}</span>`:""}`}
 document.addEventListener("click",async e=>{const c=e.target.closest("[data-clock]");if(c){e.stopPropagation();const a=c.dataset.clock;if(a==="start"){CLOCK.start=Date.now();CLOCK.running=true}else if(a==="pause"){CLOCK.acc=clockMs();CLOCK.running=false;CLOCK.start=null}else{CLOCK={start:null,acc:0,running:false,lastBreak:0}}clockSave();if(TM)renderTable();return}
   const q=e.target.closest("[data-quiet]");if(q){e.stopPropagation();await toggleSpot(q.dataset.quiet,rcSession(),true);toast("Marked as having had the spotlight");if(TM)renderTable()}},true);
 setInterval(()=>{if(!CLOCK.running)return;const ms=clockMs();const t=document.getElementById("sclock-t");if(t)t.textContent=fmtClock(ms);const per=90*60000;if(ms-CLOCK.lastBreak>=per){CLOCK.lastBreak=Math.floor(ms/per)*per;clockSave();toast(`You've been playing ${fmtClock(ms)}. Good time for a break?`)}},20000);
@@ -3982,17 +3635,8 @@ async function logLoot(text){const n=rcSession();let m,coins={};COIN_RE.lastInde
   const l=logFor(n)||{};const{id:_i,dmOnly:_d,secret:_s,...keep}=l;const lootLog=[...(Array.isArray(keep.lootLog)?keep.lootLog:[]),{at:Date.now(),text}];
   await save("logs","s"+n,{...keep,session:n,notes:keep.notes??rcNotesVal(n)??"",open:keep.open||"",spotlight:keep.spotlight||[],lootLog});
   toast(Object.keys(coins).length&&rest?"Added to the treasury and loot":Object.keys(coins).length?"Added to the treasury":"Added to party loot")}
-function lootSection(){const n=rcSession();const l=logFor(n);const ll=(l&&Array.isArray(l.lootLog)?l.lootLog:[]);
-  return `<section class="tm-s"><h3>Loot this session</h3><form class="lootq" data-lootq="1"><input id="lootq-in" placeholder="e.g. 120 gp, or Potion of Healing" autocomplete="off" aria-label="Loot found"><button class="btn sm primary" type="submit">Add</button></form>${ll.length?`<ul class="lootl">${ll.slice().reverse().map(x=>`<li>${esc(x.text)}</li>`).join("")}</ul>`:'<p class="vempty">Coins go to the treasury; items go to party loot.</p>'}</section>`}
 document.addEventListener("submit",async e=>{const f=e.target.closest("[data-lootq]");if(!f)return;e.preventDefault();e.stopPropagation();const v=document.getElementById("lootq-in").value.trim();if(!v)return;document.getElementById("lootq-in").value="";await logLoot(v);if(TM)renderTable()},true);
 
-/* party strip */
-function partyStrip(){const pcs=S.characters.filter(x=>x.kind==="pc").sort((a,b)=>(a.name||"").localeCompare(b.name||""));if(!pcs.length)return "";
-  return `<div class="pstrip">${pcs.map(p=>{const S2=p.sheet?parseSheet(p.sheet):null;const nm=(p.name||"").split(/[ "]/)[0];const pv=n=>{if(!S2)return n==="Perception"?(p.pp??"–"):"–";const sk=S2.skills.find(s=>s.name===n);return sk?10+sk.bonus:10+S2.abil[SKILL_AB[n]].mod};const conds=String(p.conditions||"").split(",").filter(Boolean);
-    return `<div class="ps"><button type="button" class="ps-n" data-act="view" data-type="characters" data-id="${p.id}">${avatar(p,30)}<b>${esc(nm)}</b><span>AC ${p.ac??"–"}</span></button>
-      <div class="ps-p"><span title="Passive Perception">Per ${pv("Perception")}</span><span title="Passive Insight">Ins ${pv("Insight")}</span><span title="Passive Investigation">Inv ${pv("Investigation")}</span></div>
-      ${S2?`<div class="ps-s">${Object.entries(S2.abil).map(([k,a])=>{const v=a.mod+(S2.saveProf.has(k)?S2.pb:0);return `<button type="button" class="${S2.saveProf.has(k)?"on":""}" data-sroll="1d20${sgn(v)}" data-slabel="${esc(nm)}: ${ABBR[k]} save" title="${ABBR[k]} save">${k[0]+k.slice(1).toLowerCase()}<b>${sgn(v)}</b></button>`}).join("")}</div>`:""}
-      ${conds.length?`<div class="ccond">${conds.map(c=>`<span class="cond on" data-cond="${esc(c)}" data-id="${p.id}">${esc(c)}</span>`).join("")}</div>`:""}</div>`}).join("")}</div>`}
 
 /* ---------- round 7: improv and wrap-up ---------- */
 async function copyText(txt,msg){try{await navigator.clipboard.writeText(txt);toast(msg||"Copied. Paste it into Roll20 chat.")}catch(_){const ta=document.createElement("textarea");ta.value=txt;ta.style.cssText="position:fixed;left:-9999px";document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand("copy")}catch(e){}ta.remove();toast(ok?(msg||"Copied. Paste it into Roll20 chat."):"Couldn't copy here. Select the text instead.")}}
@@ -4020,8 +3664,6 @@ let NPCLAST=null,NPCCULT="human";
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 function genNPC(c){c=c||NPCCULT;const f=pick(NPCGEN.first[c]);const ln=c==="thrikreen"?"":(c==="elf"?pick(["Moonwhisper","Silverfrond","Amastacia","Galanodel","Liadon","Holimion"]):c==="dwarf"?pick(["Ironfist","Battlehammer","Fireforge","Gorunn","Holderhek","Rumnaheim"]):c==="halfling"||c==="gnome"?pick(["Tealeaf","Goodbarrel","Brushgather","Underbough","Thorngage","Nackle"]):pick(NPCGEN.last));
   NPCLAST={culture:c,name:(f+" "+ln).trim(),job:pick(NPCGEN.jobs),look:pick(NPCGEN.looks),voice:pick(NPCGEN.voices),quirk:pick(NPCGEN.quirks),want:pick(NPCGEN.wants)};return NPCLAST}
-function npcCard(){const n=NPCLAST;return `<section class="tm-s npcgen"><h3>Instant NPC</h3><div class="ng-row"><select id="ng-cult" aria-label="Ancestry">${Object.entries(NPCGEN.cultures).map(([k,l])=>`<option value="${k}" ${k===NPCCULT?"selected":""}>${l}</option>`).join("")}</select><button type="button" class="btn sm primary" data-ngen>New NPC</button></div>
-  ${n?`<div class="ng-card"><b>${esc(n.name)}</b><span>${esc(NPCGEN.cultures[n.culture])} ${esc(n.job)}, with ${esc(n.look)}.</span><span><b>Voice.</b> ${esc(n.voice)}. <b>Quirk.</b> ${esc(n.quirk)}.</span><span><b>Wants</b> ${esc(n.want)}.</span><div class="ng-acts"><button type="button" class="btn sm" data-nsave>Save to the Desk</button><button type="button" class="btn sm" data-ngen>Another</button></div></div>`:'<p class="vempty">A name, look, voice, quirk and want in one tap.</p>'}</section>`}
 document.addEventListener("click",async e=>{if(e.target.closest("[data-ngen]")){e.stopPropagation();const s=document.getElementById("ng-cult");if(s)NPCCULT=s.value;genNPC();if(TM)renderTable();return}
   if(e.target.closest("[data-nsave]")&&NPCLAST){e.stopPropagation();const n=NPCLAST;const id=uid();await save("characters",id,{kind:"npc",dmOnly:true,name:n.name,race:NPCGEN.cultures[n.culture],cls:CAP(n.job),voice:CAP(n.voice),status:"alive",location:"",notes:`Looks: ${n.look}. Quirk: ${n.quirk}. Wants ${n.want}. (Met in session ${rcSession()}.)`});await addSessionLine(`Met ${n.name}, ${n.job}.`);toast(`${n.name} saved to the Desk`);NPCLAST=null;if(TM)renderTable()}},true);
 document.addEventListener("change",e=>{if(e.target.id==="ng-cult")NPCCULT=e.target.value},true);
@@ -4045,9 +3687,6 @@ let TIMERS=[];try{TIMERS=JSON.parse(localStorage.getItem("dmdesk-timers")||"[]")
 function timersSave(){try{localStorage.setItem("dmdesk-timers",JSON.stringify(TIMERS))}catch(e){}}
 function timerLeft(t){return t.kind==="rounds"?t.left:Math.max(0,Math.round((t.end-Date.now())/1000))}
 function fmtLeft(t){if(t.kind==="rounds")return `${t.left} round${t.left===1?"":"s"}`;const s=timerLeft(t);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;return h?`${h}:${String(m).padStart(2,"0")}:${String(ss).padStart(2,"0")}`:`${m}:${String(ss).padStart(2,"0")}`}
-function timerSection(){return `<section class="tm-s timers"><h3>Timers</h3><form class="tmr-f" data-tmrform="1"><input id="tmr-l" placeholder="What's running out? e.g. Torch" autocomplete="off" aria-label="Timer label"><input id="tmr-n" type="number" min="1" value="10" aria-label="Amount"><select id="tmr-u" aria-label="Unit"><option value="rounds">rounds</option><option value="min" selected>minutes</option><option value="hour">hours</option></select><button class="btn sm primary" type="submit">Start</button></form>
-  <div class="tmr-pre">${[["1 min spell","rounds",10],["Torch","hour",1],["10 min","min",10],["Short rest","hour",1],["Concentration 1 hr","hour",1]].map(([l,u,n])=>`<button type="button" class="chip sm" data-tmrpre="${esc(l)}|${u}|${n}">${esc(l)}</button>`).join("")}</div>
-  ${TIMERS.length?`<ul class="tmr-l">${TIMERS.map(t=>`<li class="${timerLeft(t)<=0?"done":""}"><b>${esc(t.label)}</b><span class="tmr-left" data-tid="${t.id}">${timerLeft(t)<=0?"Done":fmtLeft(t)}</span><button type="button" class="btn icon" data-tmrx="${t.id}" aria-label="Remove">✕</button></li>`).join("")}</ul>${TIMERS.some(t=>t.kind==="rounds"&&t.left>0)?'<button type="button" class="btn sm" data-tmrround>Next round</button>':""}`:""}</section>`}
 function addTimer(label,unit,n){n=Math.max(1,num(n)||1);const t={id:uid(),label:label||"Timer",kind:unit==="rounds"?"rounds":"real",fired:false};if(t.kind==="rounds")t.left=n;else t.end=Date.now()+n*(unit==="hour"?3600:60)*1000;TIMERS.push(t);timersSave();if(TM)renderTable();toast(`${t.label}: ${fmtLeft(t)}`)}
 document.addEventListener("submit",e=>{const f=e.target.closest("[data-tmrform]");if(!f)return;e.preventDefault();e.stopPropagation();addTimer(document.getElementById("tmr-l").value.trim(),document.getElementById("tmr-u").value,document.getElementById("tmr-n").value)},true);
 document.addEventListener("click",e=>{const p=e.target.closest("[data-tmrpre]");if(p){e.stopPropagation();const[l,u,n]=p.dataset.tmrpre.split("|");addTimer(l,u,n);return}
@@ -4059,8 +3698,6 @@ setInterval(()=>{let changed=false;TIMERS.forEach(t=>{if(t.kind==="real"){const 
 /* "last time" = the newest recap from before the session you're about to run (the next unplayed plan), or simply the newest recap */
 function lastRecap(){const recaps=S.notes.filter(x=>x.category==="session").sort((a,b)=>(b.session||0)-(a.session||0));const up=thNext();const n=up?up.session:Infinity;return recaps.find(x=>(x.session||0)<n)||recaps[0]||null}
 function lastTimeText(){const r=lastRecap();if(!r)return "";const t=plain(r.body||"");const cut=t.search(/\n\s*(As the scene fades|As the scene opens)/i);return (cut>0?t.slice(0,cut):t).trim()}
-function lastTimeCard(plan){const r=lastRecap();if(!r)return "";const t=lastTimeText();
-  return `<section class="tm-s lt-card"><h3>Last time on ${esc(S.settings.campaign?.name||"the campaign")}</h3><div class="prose vprose lt-text">${rich(t.length>900?t.slice(0,900).replace(/\s+\S*$/,"")+"…":t)}</div><div class="lt-acts"><button type="button" class="btn sm" data-copy20="desc" data-src="last">Copy for Roll20 chat</button><button type="button" class="btn sm" data-act="open" data-type="notes" data-id="${r.id}">Full ${esc(r.title||"recap")}</button></div></section>`}
 
 /* wrap-up */
 function wrapUp(){const n=rcSession();const notes=noteLines(rcNotesVal(n)).length;const plan=sessList().includes(n)?sessPlan(n):null;const rev=revealItems(plan).filter(x=>x.done).length;const l=logFor(n);const loot=(l&&l.lootLog||[]).length;const ms=clockMs();
@@ -4296,8 +3933,6 @@ function vMilestones(){
   </section>
   ${(d.history||[]).length?`<section class="ms-hist"><h3 class="section-h">Past levels</h3>${d.history.map(h=>`<div class="ms-h1"><b>Reached level ${h.level}</b>${h.session?` <span class="mono">session ${h.session}</span>`:""}<ul>${(h.items||[]).map(x=>`<li class="${x.done?"done":""}">${esc(x.text)}</li>`).join("")}</ul></div>`).join("")}</section>`:""}`;
 }
-function msTable(){const d=msDoc(),items=d.items||[];if(!items.length)return"";const done=items.filter(x=>x.done).length;
-  return `<section class="tm-s"><h3>Milestones <span class="mono">${done}/${items.length}</span></h3>${msBar(done,items.length)}<ul class="revl">${items.map(x=>`<li class="${x.done?"done":""}"><label><input type="checkbox" data-ms="${x.id}" ${x.done?"checked":""}><span>${esc(x.text)}</span></label></li>`).join("")}</ul></section>`}
 document.addEventListener("change",e=>{const el=e.target.closest("[data-ms]");if(!el)return;el.closest("li")?.classList.toggle("done",el.checked);msToggle(el.dataset.ms,"done")},true);
 document.addEventListener("submit",e=>{const f=e.target.closest("[data-msadd]");if(!f)return;e.preventDefault();e.stopPropagation();const i=document.getElementById("ms-in");const h=document.getElementById("ms-hidden");const v=i.value;i.value="";i.blur();msAdd(v,h&&h.checked)},true);
 
@@ -4315,7 +3950,6 @@ function vKnowledge(){
   <input class="search" id="lr-q" data-in="lrq" placeholder="Search what they know" value="${esc(LRN.q)}" style="margin:8px 0">
   ${list.length?`<ul class="lr-list">${list.map(x=>learnRow(x,dm)).join("")}</ul>`:`<div class="empty">${learned().length?"Nothing matches.":dm?"Nothing logged yet. Add things as the party learns them, or tick items on your reveal checklist during play.":"Nothing yet."}</div>`}`;
 }
-function learnTable(){const l=learned().slice(0,5);return `<section class="tm-s"><h3>The party learned</h3><form class="lr-add" data-lradd><input id="lr-in-tm" placeholder="They just found out…" autocomplete="off"><button class="btn sm">Add</button></form>${l.length?`<ul class="lr-list sm">${l.map(x=>`<li><span class="lr-t">${esc(x.text)}</span></li>`).join("")}</ul>`:""}</section>`}
 document.addEventListener("submit",e=>{const f=e.target.closest("[data-lradd]");if(!f)return;e.preventDefault();e.stopPropagation();const i=f.querySelector("input");const v=i.value;i.value="";i.blur();learnAdd(v).then(()=>{toast("Added to what the party knows");if(TM)renderTable()})},true);
 document.addEventListener("input",e=>{if(e.target.id==="lr-q"){LRN.q=e.target.value;queueRender()}},true);
 
@@ -4591,7 +4225,7 @@ function vNotes(c){
   h+=`<div class="notes lib ${U.noteReading?"reading":""}"><div class="nlist">${groups}${chips}${arcs}<div class="lib-lh"><h3>${q?"Search results":esc(chipName||gName)}</h3><span>${list.length}</span></div>${more?`<div class="lib-more">${more}</div>`:""}${list.length?list.map(row).join(""):`<div class="empty">${q?"Nothing matches that search.":`Nothing in ${esc(chipName||gName)} yet.`}</div>`}</div>`;
   const fl=[cur&&cur.session&&["Session",cur.session],cur&&cur.ig&&["In-game date",fmtDate(c,cur.ig)],cur&&cur.played&&["Played",new Date(cur.played+"T12:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})]].filter(Boolean);
   h+=cur?`<article class="reader lib-entry"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ Back to the list</button>${backBtn()}</div><div class="le-head"><div class="le-t"><span class="le-crumb">${esc((LIB_GROUPS.find(x=>x[0]===noteGroup(cur))||[])[1]||"")} · ${esc(NOTE_CATS[cur.category]||"Note")}</span>
-    <h3 class="t">${esc(cur.title||"Untitled")}</h3></div><span class="dm-only acts-r">${tmCardBtn("notes",cur.id)}<button class="btn sm" data-act="edit" data-type="notes" data-id="${cur.id}">Edit</button>${moreMenu([mi("copyR20","Copy for Roll20",`data-type="notes" data-id="${cur.id}"`),mi("pin",cur.pinned?"Unpin from the top":"Pin to the top",`data-id="${cur.id}"`),mi("keepOpen",isPinned("notes",cur.id)?"Kept open ✓":"Keep open beside other pages",`data-type="notes" data-id="${cur.id}"`)])}</span></div>
+    <h3 class="t">${esc(cur.title||"Untitled")}</h3></div><span class="dm-only acts-r"><button class="btn sm" data-act="edit" data-type="notes" data-id="${cur.id}">Edit</button>${moreMenu([mi("copyR20","Copy for Roll20",`data-type="notes" data-id="${cur.id}"`),mi("pin",cur.pinned?"Unpin from the top":"Pin to the top",`data-id="${cur.id}"`),mi("keepOpen",isPinned("notes",cur.id)?"Kept open ✓":"Keep open beside other pages",`data-type="notes" data-id="${cur.id}"`)])}</span></div>
     ${fl.length?`<dl class="le-fields">${fl.map(([l,v])=>`<div><dt>${l}</dt><dd>${esc(String(v))}</dd></div>`).join("")}</dl>`:""}
     <div class="le-cols"><div class="le-main">${placeBlock(cur)}${cur.img?`<img class="note-img" src="${esc(imgUrl(cur.img))}" alt="">`:""}${cur.category==="faction"?facBlock(cur):""}${cur.body||cur.category!=="shop"?`<section><h4 class="le-h">Notes</h4><div class="prose">${rich(cur.body,"notes:"+cur.id)}</div></section>`:""}${cur.category==="shop"||cur.stock?stockBlock(cur):""}</div>
     <div class="le-side">${secretBox(cur)}${backlinkBlock("notes",cur.id)}${bsEmbedHtml("notes",cur.id)}</div></div></article>`:`<div class="empty lib-pick">Notes open here. Characters, quests, stat blocks and the rest open in their own page.</div>`;
@@ -5022,7 +4656,7 @@ document.addEventListener("click",async e=>{
     case"planPlayed":{const pid=t.dataset.id,on=sessPlan(sessNum(pid)).status!=="played";stScenePatch(pid,sc=>sc.forEach(s=>{s.played=on}));break}
     case"scnSel":case"scnMove":case"scnDel":case"scnReserve":case"scnClueDel":case"scnIfAdd":case"scnIfDel":case"scnWhoAdd":case"scnWhoDel":scnAct(a,t);break;
     case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stAlertOk":case"stAlertAll":case"stRes":case"stRead":case"stIf":case"stDone":case"stSpot":case"stSeg":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
-    case"stView":case"stTime":case"stShort":case"stLong":case"stUndo":case"stScene": case"stRoll":case"stAtt":case"stEdit":case"stClue":case"stNext":case"stIfDone":case"stMoveRes":stAct(a,t);break;
+    case"stTime":case"stShort":case"stLong":case"stUndo":case"stScene": case"stRoll":case"stAtt":case"stEdit":case"stClue":case"stNext":case"stIfDone":case"stMoveRes":stAct(a,t);break;
     case"heroSel":case"heroTab":case"heroLvl":heroAct(a,t);break;
     case"pplSel":case"pplKind":case"pplTab":case"pplAtt":case"pplUnlink":case"genSave":case"genApply":pplAct(a,t);break;
     case"scnOpen":U.sess=sessNum(t.dataset.id);U.prepTab="scenes";render();window.scrollTo({top:0});break;
@@ -5036,7 +4670,6 @@ document.addEventListener("click",async e=>{
 document.addEventListener("input",e=>{if(e.target.id==="gq"){renderSearch(e.target.value);return}
   if(e.target.dataset.enc!=null&&ENC){const i=num(e.target.dataset.enc),f=e.target.dataset.f;ENC.monsters[i][f]=f==="count"?e.target.value:e.target.value;const x=document.getElementById("enc-x-"+i);if(x)x.textContent=fmtN((CR_XP[ENC.monsters[i].cr]||0)*(num(ENC.monsters[i].count)||0))+" XP";document.getElementById("enc-sum").innerHTML=encSummary();return}
   if((e.target.id==="enc-ps"||e.target.id==="enc-pl")&&ENC&&ENC.partyOverride){ENC.partyOverride[e.target.id==="enc-ps"?"size":"level"]=e.target.value;document.getElementById("enc-sum").innerHTML=encSummary();return}
-  if(e.target.id==="tm-notes"){const n=rcSession();markDirty(n);U.rcNotes=e.target.value;saveLogSoon(n);return}
   if(e.target.id==="rc-notes"||e.target.id==="rc-open"){const n=rcSession();markDirty(n);if(e.target.id==="rc-notes")U.rcNotes=e.target.value;else U.rcOpen=e.target.value;saveLogSoon(n);return}
   if(e.target.id==="rc-n"){if(logTimer&&U.rcDirty!=null)saveLog(U.rcDirty);U.rcN=e.target.value;U.rcDirty=null;return}
   const keep={"tq-in":"tq","rc-add":"rcAdd"}[e.target.id];if(keep){U[keep]=e.target.value;return}const k=e.target.dataset.in;if(k){U[k]=e.target.value;
