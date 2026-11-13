@@ -235,6 +235,7 @@ textarea.scn-in{resize:vertical;line-height:1.5}
 .scn-eh{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
 .scn-kicker{font:400 16px var(--display);color:var(--muted)}
 .scn-acts{display:flex;flex-wrap:wrap;gap:6px}
+.scn-acts .scn-mv{width:auto;min-height:36px;padding:4px 8px;font-size:15px}
 .scn-sec{display:flex;flex-direction:column;gap:8px}
 .scn-sec h4{margin:0;font:400 20px var(--display);color:var(--accent)}
 .scn-found{width:22px;height:22px;margin:0;accent-color:var(--accent)}
@@ -2181,6 +2182,18 @@ async function sessAddScene(n,o){
   if(SCN.pid===sessId(n)&&SCN.dirty)await scnFlush();
   const{id:_,...s}=scnNew(o),id=uid();
   return await save("scenes",id,{...s,session:n,order:S.scenes.filter(x=>num(x.session)===n).length})?id:null}
+/* Moves scenes to the end of another session. A moved scene starts fresh there (not done, not played); its clues stay as they were.
+   Edits in the editor are saved first, and nothing moves while this session still has unsaved edits. */
+async function sessMoveScenes(ids,m){
+  const pid=SCN.pid;if(pid&&SCN.dirty)await scnFlush();
+  if(pid&&scnUnsaved(pid)){toast("Your scene edits haven't saved yet, so nothing was moved.");render();return}
+  const base=S.scenes.filter(x=>num(x.session)===m).length;let k=0,bad=0;
+  for(const id of ids){const cur=S.scenes.find(x=>x.id===id);if(!cur)continue;
+    const{id:_i,updated:_u,dmOnly:_d,secret:_s,...r}=JSON.parse(JSON.stringify(cur));
+    if(await save("scenes",id,{...r,session:m,order:base+k,done:false,played:false}))k++;else bad++}
+  project();SCN.ver=null;SCN.sel=null;
+  if(k)toast(`Moved ${k} scene${k===1?"":"s"} to Session ${m}.`+(bad?` ${bad} didn't save.`:""));
+  render()}
 // true when this session has scene edits that aren't saved yet (open in the editor or held from a failed save)
 const scnUnsaved=pid=>(SCN.pid===pid&&SCN.dirty)||!!SCN.pending[pid];
 document.addEventListener("visibilitychange",()=>{if(document.hidden)scnFlush()});
@@ -2208,7 +2221,7 @@ function vScenes(){
   </aside>`;
   const ed=s?`<article class="scn-ed">
     <div class="scn-eh"><span class="scn-kicker">${s.reserve?"In reserve":`Scene ${main.indexOf(s)+1} of ${main.length}`}</span>
-      <span class="scn-acts"><button type="button" class="btn sm" data-act="scnReserve" data-id="${s.id}">${s.reserve?"Move to the path":"Move to reserve"}</button><button type="button" class="btn sm danger ${SCN.arm===s.id?"armed":""}" data-act="scnDel" data-id="${s.id}">${SCN.arm===s.id?"Yes, delete":"Delete scene"}</button></span></div>
+      <span class="scn-acts"><select class="scn-in scn-mv" id="scn-moveto" aria-label="Move this scene to another session"><option value="">Move to session…</option>${sessions.filter(k=>k!==sn).sort((a,b)=>a-b).map(k=>`<option value="${k}">Session ${k}</option>`).join("")}<option value="new">+ New session ${nextSession()}</option></select><button type="button" class="btn sm" data-act="scnReserve" data-id="${s.id}">${s.reserve?"Move to the path":"Move to reserve"}</button><button type="button" class="btn sm danger ${SCN.arm===s.id?"armed":""}" data-act="scnDel" data-id="${s.id}">${SCN.arm===s.id?"Yes, delete":"Delete scene"}</button></span></div>
     <label class="scn-f"><span class="label">Title</span><input class="scn-in scn-title" id="scf-title" data-scf="title" value="${esc(s.title)}" placeholder="What you call this scene"></label>
     <label class="scn-f"><span class="label">Where and what's going on</span><textarea class="scn-in" id="scf-note" data-scf="note" rows="2" placeholder="e.g. a ruined tower at dusk">${esc(s.note)}</textarea></label>
     ${s.reserve?`<label class="scn-f"><span class="label">When to pull it in</span><input class="scn-in" id="scf-when" data-scf="when" value="${esc(s.when)}" placeholder="e.g. if the party leaves town early"></label>`:""}
@@ -2220,7 +2233,7 @@ function vScenes(){
   </article>`:`<div class="empty">Add a scene to start.</div>`;
   const cnt=k=>S.scenes.filter(x=>num(x.session)===k).length;
   return `<div class="scn-top"><label class="scn-f scn-plan"><span class="label">Session</span><select class="scn-in" id="scn-plan">${sessions.map(k=>`<option value="${k}" ${k===sn?"selected":""}>Session ${k} · ${cnt(k)} scene${cnt(k)===1?"":"s"}${sessPlan(k).status==="played"?" (played)":""}</option>`).join("")}<option value="new">+ Plan session ${nextSession()}</option></select></label>
-    <span class="scn-acts"><button type="button" class="btn sm" data-act="planPlayed" data-id="${p.id}" ${p.scenes.length?"":"disabled"}>${p.status==="played"?"Mark as planned":"Mark as played"}</button>${moreMenu([mi("copyR20","Copy for Roll20",`data-type="scenes" data-id="${p.id}"`)])}</span>
+    <span class="scn-acts"><button type="button" class="btn sm" data-act="planPlayed" data-id="${p.id}" ${p.scenes.length?"":"disabled"}>${p.status==="played"?"Mark as planned":"Mark as played"}</button>${moreMenu([mi("scnMoveOpen",`Move unfinished scenes to Session ${sn+1}`,`data-id="${p.id}" ${p.scenes.some(x=>!x.done&&!x.played)?"":"disabled"}`),mi("copyR20","Copy for Roll20",`data-type="scenes" data-id="${p.id}"`)])}</span>
     <span id="scn-state" class="scn-state" role="status" aria-live="polite">${esc(SCN.state)}</span></div>
   <div class="scn">${left}${ed}</div>
   ${toolsPanel()}`;
@@ -2235,7 +2248,8 @@ document.addEventListener("submit",e=>{const f=e.target.closest("[data-scadd]");
   if(f.dataset.scadd==="clue"){const s=scnCur();if(!s)return;s.clues.push({t:v,found:false})}
   else{const s=scnNew({title:v,reserve:f.dataset.scadd==="reserve"});SCN.d.push(s);SCN.sel=s.id;SCN.arm=null}
   i.value="";scnTouch(true)},true);
-document.addEventListener("change",e=>{if(e.target.id!=="scn-plan")return;scnFlush();U.sess=e.target.value==="new"?nextSession():num(e.target.value);render()});
+document.addEventListener("change",e=>{if(e.target.id==="scn-moveto"){const v=e.target.value,s=scnCur();if(!v||!s)return;sessMoveScenes([s.id],v==="new"?nextSession():num(v));return}
+  if(e.target.id!=="scn-plan")return;scnFlush();U.sess=e.target.value==="new"?nextSession():num(e.target.value);render()});
 function scnAct(a,t){const s=scnCur(),i=num(t.dataset.i);
   if(a==="scnSel"){SCN.sel=t.dataset.id;SCN.arm=null;render();if(isPhone())document.querySelector(".scn-ed")?.scrollIntoView({block:"start"});return}
   if(a==="scnMove")return scnMove(t.dataset.id,num(t.dataset.n));
@@ -4654,6 +4668,7 @@ document.addEventListener("click",async e=>{
     case"newRel":openForm("links",null,{a:t.dataset.id,kind:"ally",dmOnly:true});break;
     case"newPlan":{U.sess=nextSession();U.prepTab="scenes";if(location.hash!=="#prep")location.hash="prep";else render();window.scrollTo({top:0});break}
     case"planPlayed":{const pid=t.dataset.id,on=sessPlan(sessNum(pid)).status!=="played";stScenePatch(pid,sc=>sc.forEach(s=>{s.played=on}));break}
+    case"scnMoveOpen":{const p=sessPlan(sessNum(t.dataset.id));sessMoveScenes(p.scenes.filter(x=>!x.done&&!x.played).map(x=>x.id),p.session+1);break}
     case"scnSel":case"scnMove":case"scnDel":case"scnReserve":case"scnClueDel":case"scnIfAdd":case"scnIfDel":case"scnWhoAdd":case"scnWhoDel":scnAct(a,t);break;
     case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stAlertOk":case"stAlertAll":case"stRes":case"stRead":case"stIf":case"stDone":case"stSpot":case"stSeg":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
     case"stTime":case"stShort":case"stLong":case"stUndo":case"stScene": case"stRoll":case"stAtt":case"stEdit":case"stClue":case"stNext":case"stIfDone":case"stMoveRes":stAct(a,t);break;
