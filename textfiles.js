@@ -61,7 +61,6 @@ function fieldsOf(col){
 function buildFields(col){
   if(!FORMS[col])return [];
   const fs=FORMS[col].fields(cal()).filter(f=>f[2]!=="image").map(([k,l,t,_s,opts])=>({k,l:String(l).trim(),t,opts:opts||{}}));
-  if(!fs.some(f=>f.k==="secret"))fs.push({k:"secret",l:"DM secrets",t:"textarea",opts:{}});
   return fs}
 const rawVal=(col,f,x)=>col==="events"&&f.k==="date"?(x.m!=null?{y:x.y,m:x.m,d:x.d}:null):x[f.k];
 function valOut(f,v){
@@ -73,7 +72,7 @@ function valOut(f,v){
     case"dates":return Array.isArray(v)?v.join(", "):String(v);
     case"checklist":return String(v).split("\n").filter(s=>s.trim()).map(s=>/^\[x\] /i.test(s)?"[x] "+s.slice(4):"[ ] "+s).join("\n");
     default:return String(v)}}
-const isSection=(f,v)=>MULTI.has(f.t)||f.k==="secret"||v.includes("\n");
+const isSection=(f,v)=>MULTI.has(f.t)||v.includes("\n");
 
 function entryFile(col,x,linked,relOf){
   const fs=fieldsOf(col),out=[HEAD+col+" | "+x.id,"# "+entryTitle(col,x)],secs=[];
@@ -88,7 +87,7 @@ function encounterFile(x){return `DM's Desk entry | read only, edit in the Desk 
 
 /* a few short facts for the index line */
 function brief(col,x){
-  return fieldsOf(col).slice(1).filter(f=>!MULTI.has(f.t)&&f.k!=="secret"&&f.t!=="check"&&!ID_SELECT.has(f.k)).map(f=>valOut(f,rawVal(col,f,x))).filter(v=>v&&v.length<=40).slice(0,3).join(", ")}
+  return fieldsOf(col).slice(1).filter(f=>!MULTI.has(f.t)&&f.t!=="check"&&!ID_SELECT.has(f.k)).map(f=>valOut(f,rawVal(col,f,x))).filter(v=>v&&v.length<=40).slice(0,3).join(", ")}
 const safeName=s=>oneLine(s).replace(/[\\/:*?"<>|]/g,"-").slice(0,80)||"Untitled";
 
 /* every file the Desk wants in the folder, keyed col:id */
