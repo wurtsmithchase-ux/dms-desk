@@ -204,7 +204,6 @@ td .clip{display:block;max-width:320px;color:var(--muted);overflow:hidden;text-o
 .pb-sp.warn small{color:var(--blood);font-weight:600}
 /* Scene Editor */
 .ph-sess{width:auto;max-width:220px;min-height:44px}
-.pp-item{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}.pp-idesc{font-size:.92em;margin-left:0}
 .scn-foot{display:flex;justify-content:flex-end}
 .scn-top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 16px;margin-bottom:12px}
 .scn-plan{flex:0 1 420px}
@@ -1101,16 +1100,27 @@ header.top .clock{display:none!important}
 @media (max-width:640px){:root[data-skin="wood"] body{background:var(--bg)}:root[data-skin="wood"] #app{margin:0;border:0;border-radius:0;box-shadow:none}}
 @media (min-width:1101px){
   /* --navw is the side menu width; 400px and 424px match the normal #pindock width and scrim padding */
-  :root[data-skin="wood"]{--navw:232px}
-  :root[data-skin="wood"] body{padding-left:var(--navw)}
-  :root[data-skin="wood"] nav.tabs{position:fixed;left:0;top:0;bottom:0;width:var(--navw);z-index:6;flex-direction:column;gap:3px;overflow-y:auto;background:var(--wood2);border-right:2px solid var(--gold);padding:24px 14px}
-  :root[data-skin="wood"] nav.tabs a,:root[data-skin="wood"] .nav-sess{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:0 12px;margin:0;border:0;border-radius:3px;background:none;color:var(--hdr-ink);opacity:1;font:400 18px var(--sc);letter-spacing:.02em;text-align:left;cursor:pointer}
+  :root[data-skin="wood"]{--navw:228px}
+  :root[data-skin="wood"][data-navrail]{--navw:60px}
+  :root[data-skin="wood"] body{padding-left:var(--navw);transition:padding-left .18s ease}
+  :root[data-skin="wood"] nav.tabs{position:fixed;left:0;top:0;bottom:0;width:var(--navw);z-index:6;flex-direction:column;gap:3px;overflow-y:auto;background:var(--wood2);border-right:2px solid var(--gold);padding:14px 10px;box-sizing:border-box;transition:width .18s ease}
+  :root[data-skin="wood"] nav.tabs a,:root[data-skin="wood"] .nav-sess{display:flex;align-items:center;justify-content:flex-start;gap:12px;min-height:42px;padding:0 12px;margin:0;border:0;border-radius:3px;background:none;color:var(--hdr-ink);opacity:1;font:400 18px var(--sc);letter-spacing:.02em;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden}
   :root[data-skin="wood"] nav.tabs a:hover,:root[data-skin="wood"] .nav-sess:hover{background:rgba(201,162,78,.14)}
-  :root[data-skin="wood"] nav.tabs a[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
-  :root[data-skin="wood"] nav.tabs a .n{font:400 14px var(--body);opacity:.75;margin:0}
+  :root[data-skin="wood"] nav.tabs a[aria-current="page"]{background:rgba(201,162,78,.2);color:#f6e8c6;box-shadow:inset 3px 0 0 var(--gold)}
+  :root[data-skin="wood"] nav.tabs a .n{font:400 14px var(--body);opacity:.75;margin:0 0 0 auto}
+  nav.tabs svg{flex:none}
+  .nav-l{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .nav-top{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px;padding:0 0 4px 2px}
+  .nav-toggle{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;border:0;border-radius:4px;background:rgba(201,162,78,.14);color:var(--gold);cursor:pointer;flex:none}
+  .nav-toggle:hover{background:rgba(201,162,78,.28)}
+  .nav-toggle:focus-visible,nav.tabs a:focus-visible,.nav-sess:focus-visible,.nav-tools button:focus-visible,.nav-camp:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+  :root[data-skin="wood"] .nav-sess{margin:4px 0 8px;background:var(--accent);color:var(--accent-ink);border:1px solid var(--gold);font-weight:700}
+  :root[data-skin="wood"] .nav-sess:hover{background:var(--accent);filter:brightness(1.12)}
+  .nav-camp .nav-camp-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .nav-camp>svg{display:none}
   /* render() writes the side menu in the order shown, so keyboard and screen reader order match */
-  :root[data-skin="wood"] .nav-brand{display:block;font:700 24px/1.2 var(--drop);color:var(--gold);padding:0 10px 18px}
-  :root[data-skin="wood"] .nav-h{display:block;font:400 16px var(--sc);color:var(--gold);padding:18px 12px 6px}
+  :root[data-skin="wood"] .nav-brand{display:block;font:700 22px/1.2 var(--drop);color:var(--gold);padding:0 6px;white-space:nowrap}
+  :root[data-skin="wood"] .nav-h{display:block;font:400 15px var(--sc);color:var(--gold);padding:14px 12px 4px}
   :root[data-skin="wood"] .brand small{display:none}
   :root[data-skin="wood"] #pindock{left:var(--navw)}
   :root[data-skin="wood"] body.docked{padding-left:calc(var(--navw) + 400px)}
@@ -1156,6 +1166,19 @@ header.top .clock{display:none!important}
   .nav-tools button:hover{color:var(--gold);background:rgba(201,162,78,.14)}
   .nav-tools button[hidden]{display:none}
   .nav-tools b{font:600 12px var(--ui)}
+  /* icon rail: labels stay in the page for screen readers, only the icons show */
+  :root[data-navrail] nav.tabs{padding:12px 8px}
+  :root[data-navrail] .nav-top{justify-content:center;padding:0}
+  :root[data-navrail] .nav-brand{display:none!important}
+  :root[data-navrail] nav.tabs a,:root[data-navrail] .nav-sess{justify-content:center;padding:0}
+  :root[data-navrail] .nav-l,:root[data-navrail] nav.tabs a .n{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  :root[data-navrail] .nav-h{height:1px;margin:10px 8px;padding:0;background:var(--gilt-edge);overflow:hidden}
+  :root[data-navrail] .nav-h .nav-l{display:none}
+  :root[data-navrail] .nav-camp{align-items:center;padding:0;border:0;height:40px;justify-content:center}
+  :root[data-navrail] .nav-camp>svg{display:block}
+  :root[data-navrail] .nav-camp-t{display:none}
+  :root[data-navrail] .nav-tools{flex-direction:column;align-items:center;gap:2px}
+  :root[data-navrail] .nav-tools b{position:absolute;margin:-22px -22px 0 0;font-size:11px}
   :root[data-skin="wood"] #ds-pill{left:calc(var(--navw) + 12px)}
 }
 /* Prep Board cards as in the design */
@@ -1216,49 +1239,94 @@ header.top .clock{display:none!important}
   .pb-cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.pb-col1{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}
 }
 @container (max-width:620px){.pb-top,.pb-cols,.pb-col1{grid-template-columns:minmax(0,1fr)}.pb-col1{grid-column:auto}}
-/* Prep Board: one column of seven sections, with the checklist beside it on wide screens */
-.pp-wrap{container-type:inline-size}
-.pp{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start}
-.pp-main{display:flex;flex-direction:column;gap:18px;min-width:0}
-.pp-sec,.pp-check{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px 16px;min-width:0;display:flex;flex-direction:column;gap:10px;scroll-margin-top:12px}
-:root[data-skin="wood"] .pp-sec,:root[data-skin="wood"] .pp-check{background:var(--bg);border:0;box-shadow:var(--frame);margin:5px}
-.pp-sh{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
-.pp-sh h3{margin:0;font:400 22px var(--display);color:var(--accent)}
-.pp-sh h3:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-.pp-state,#pp-state{align-self:flex-end}
-.pp-li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px;align-items:start}
-.pp-li .scn-found{margin-top:10px}
-.pp-ld{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:start}
-textarea.grow{display:block;overflow:hidden;resize:none;box-sizing:border-box;line-height:1.35}
-.pp-add{align-self:flex-start;min-height:36px}
-.pp-loc{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
-.pp-lh{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center}
-.pp-lname{font:700 20px var(--title)}
-.pp-pickbar{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start}
-.pp-combo{position:relative;flex:1 1 220px;min-width:0}
+/* Prep Board: three columns of sections, each with a ready toggle; one strip shows progress. Sized by the board's own width, since the side menu takes some of the screen. */
+.pp-wrap{container-type:inline-size;display:flex;flex-direction:column;gap:12px}
+.ph-c{margin:0 0 10px;gap:8px 12px}
+.ph-c .ph-h{font-size:26px}.ph-c .ph-sub{font-size:15px}
+.ph-c .btn,.ph-c .ph-search,.ph-c .ph-sess{min-height:36px}
+.ph-c .ph-sess{width:auto;padding:0 10px;font-size:15px}
+.ph-c .ph-go{font-size:16px!important;padding:0 14px}
+.ph-c .ph-search{flex:0 1 280px}
+.pp-state,#pp-state{font:italic 400 14px var(--body);min-height:0;white-space:nowrap}
+.pp-strip{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:6px 10px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r)}
+:root[data-skin="wood"] .pp-strip{background:var(--bg);border:0;box-shadow:var(--frame);margin:5px}
+.pp-prog{font:700 15px var(--ui);color:var(--ink);padding:0 6px 0 2px;white-space:nowrap}
+.pp-chip{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:0 10px;border:0;border-radius:999px;background:var(--surface);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line);font:500 14px var(--ui);cursor:pointer;white-space:nowrap}
+.pp-chip:hover{color:var(--ink);box-shadow:inset 0 0 0 1px var(--accent)}
+.pp-chip.on{background:var(--ok-soft);color:var(--ok);box-shadow:none}
+.pp-chip .ck{display:none;flex:none}.pp-chip.on .ck{display:block}
+.pp-cols{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+.pp-col{display:flex;flex-direction:column;gap:10px;min-width:0}
+@container (max-width:900px){.pp-cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.pp-c3{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}}
+@container (max-width:560px){.pp-cols,.pp-c3{grid-template-columns:minmax(0,1fr)}.pp-c3{grid-column:auto;display:flex;align-items:stretch}}
+.pp-sec{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);min-width:0;scroll-margin-top:12px}
+:root[data-skin="wood"] .pp-sec{background:var(--bg);border:0;box-shadow:var(--frame);margin:5px}
+.pp-sh{display:flex;align-items:center;gap:4px;min-height:44px;padding:0 8px 0 4px}
+.pp-sh h3{margin:0;flex:1 1 auto;min-width:0}
+.pp-sh h3:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.pp-fold{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:0 6px;border:0;background:none;color:var(--ink);cursor:pointer;text-align:left;font:inherit}
+.pp-fold:hover .pp-t{text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.pp-fold:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:var(--r)}
+.pp-fold .chev{flex:none;color:var(--muted);transition:transform .15s}
+.pp-sec.closed .chev{transform:rotate(-90deg)}
+.pp-t{font:400 16px var(--display);font-variant-caps:small-caps;color:var(--accent);letter-spacing:.02em}
+.pp-n{font:500 14px var(--ui);color:var(--muted);white-space:nowrap}
+.pp-ready{display:inline-flex;align-items:center;justify-content:center;flex:none;width:26px;height:26px;padding:0;border-radius:50%;border:1.5px solid var(--muted);background:transparent;color:transparent;cursor:pointer}
+.pp-ready:hover{border-color:var(--ok)}
+.pp-ready[aria-pressed="true"]{border-color:var(--ok);background:var(--ok);color:var(--paper)}
+.pp-ready:focus-visible,.pp-chip:focus-visible,.pp-add:focus-visible,.pp-x:focus-visible,.pp-mv:focus-visible,.pp-ob:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.pp-bd{display:flex;flex-direction:column;padding:0 12px 10px}
+.pp-bd[hidden]{display:none}
+.pp-in{display:block;width:100%;box-sizing:border-box;min-height:34px;padding:6px 8px;border:1px solid transparent;border-radius:var(--r);background:transparent;color:var(--ink);font:400 16px/1.35 var(--body);resize:none;overflow:hidden}
+.pp-in::placeholder{color:var(--muted);opacity:.8}
+.pp-in:hover{border-color:var(--line)}
+.pp-in:focus{background:var(--surface);border-color:var(--accent);outline:1px solid var(--accent);outline-offset:0}
+.pp-open{min-height:64px;background:var(--surface);border-color:var(--line)}
+.pp-row{display:flex;align-items:flex-start;gap:6px;min-height:36px;border-top:1px solid var(--line);padding:1px 0}
+.pp-row:first-child{border-top:0}
+.pp-row>.pp-in,.pp-row>.pp-ob{flex:1 1 auto;min-width:0}
+.pp-i{flex:none;width:18px;padding-top:8px;text-align:right;font:500 13px var(--ui);color:var(--muted)}
+.pp-row input[type=checkbox]{flex:none;width:18px;height:18px;margin:8px 4px 0 2px;accent-color:var(--accent)}
+.pp-row:has(input:checked) .pp-in{color:var(--muted);text-decoration:line-through}
+.pp-x,.pp-mv{flex:none;display:inline-flex;align-items:center;justify-content:center;margin-top:3px;height:28px;border:0;border-radius:var(--r);background:none;color:var(--muted);cursor:pointer;font:500 13px var(--ui);white-space:nowrap}
+.pp-x{width:28px;font-size:18px;line-height:1;opacity:.65}
+.pp-x:hover,.pp-mv:hover{background:var(--surface2);color:var(--ink);opacity:1}
+.pp-mv{padding:0 7px}
+.pp-x.armed{width:auto;padding:0 8px;background:var(--blood);color:var(--surface);opacity:1;font-size:13px}
+.pp-add{display:flex;align-items:center;gap:6px;width:100%;min-height:32px;margin-top:6px;padding:0 10px;border:1px dashed var(--line);border-radius:var(--r);background:transparent;color:var(--muted);cursor:pointer;font:500 14px var(--ui);text-align:left}
+.pp-add:hover{border-color:var(--accent);color:var(--ink)}
+.pp-add.sm{width:auto;min-height:28px;margin:2px 0 0 14px;font-size:13px}
+.pp-loc{display:flex;flex-direction:column;gap:2px;margin-top:8px;padding:6px 8px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.pp-loc:first-child{margin-top:0}
+.pp-lh{display:flex;align-items:flex-start;gap:6px}
+.pp-lname{font:700 17px var(--title);padding:4px 6px;min-height:30px}
+.pp-ld{display:flex;align-items:flex-start;gap:6px}
+.pp-ld::before{content:"";flex:none;width:5px;height:5px;margin:14px 0 0 4px;border-radius:50%;background:var(--muted)}
+.pp-item{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line);padding:2px 0}
+.pp-item:first-child{border-top:0}
+.pp-item .pp-ld::before{display:none}
+.pp-idesc{font-size:14px;color:var(--muted);min-height:28px;padding-top:2px}
+.pp-pickbar{position:relative;display:flex;align-items:center;gap:6px;min-height:32px;margin-top:6px;padding:0 4px 0 10px;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted)}
+.pp-pickbar:focus-within{border-color:var(--accent)}
+.pp-pickbar svg{flex:none}
+.pp-combo{flex:1 1 auto;min-width:0}
+.pp-combo input{display:block;width:100%;min-height:30px;padding:0;border:0;background:transparent;color:var(--ink);font:400 15px var(--ui);outline:none}
+.pp-combo input::placeholder{color:var(--muted);opacity:.85}
 .pp-lb{position:absolute;left:0;right:0;top:calc(100% + 2px);z-index:30;margin:0;padding:4px;list-style:none;max-height:300px;overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.25)}
-.pp-opt{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 10px;min-height:44px;padding:6px 10px;border-radius:var(--r);cursor:pointer}
+.pp-opt{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 10px;min-height:40px;padding:6px 10px;border-radius:var(--r);cursor:pointer}
 .pp-opt small{color:var(--muted)}
 .pp-opt:hover,.pp-opt.on{background:var(--accent);color:var(--accent-ink)}.pp-opt:hover small,.pp-opt.on small{color:inherit;opacity:.85}
 .pp-none{padding:10px;color:var(--muted);font-style:italic}
-.pp-list{display:flex;flex-direction:column;gap:6px}
-.pp-pr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center}
-.pp-ob{display:flex;align-items:center;gap:10px;min-height:44px;padding:4px 10px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--ink);text-align:left;cursor:pointer;font:inherit;min-width:0}
+.pp-list{display:flex;flex-direction:column}
+.pp-ob{display:flex;align-items:center;gap:8px;min-height:36px;padding:2px 4px;border:0;background:none;color:var(--ink);text-align:left;cursor:pointer;font:inherit;min-width:0;border-radius:var(--r)}
 .pp-ob:hover{background:var(--surface2)}.pp-ob.gone{cursor:default;color:var(--muted)}
-.pp-ob span{display:flex;flex-direction:column;min-width:0}.pp-ob b{overflow-wrap:anywhere}.pp-ob small{color:var(--muted);font-size:13px}
-.pp-path{display:flex;flex-direction:column;gap:6px}
-.pp-check ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
-.pp-check li{display:flex;align-items:center;gap:10px;min-height:44px}
-.pp-check .scn-found{flex:0 0 auto}
-.pp-jump{flex:1;text-align:left;min-height:44px;padding:0 4px;border:0;background:none;color:var(--ink);font:600 16px var(--body);cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}
-.pp-jump:hover{text-decoration-color:var(--accent);color:var(--accent)}
-.pp-jump.done{color:var(--muted)}
-.pp-count{font:700 15px var(--ui);color:var(--muted)}
-.pp-check .hint{margin:0}
-@container (min-width:900px){
-  .pp{grid-template-columns:minmax(0,1fr) 260px}
-  .pp-side{position:sticky;top:12px}
-}
+.pp-ob>span{display:flex;flex-direction:column;min-width:0;flex:1}.pp-ob b{font-weight:400;overflow-wrap:anywhere}.pp-ob small{color:var(--muted);font-size:13px;font-family:var(--ui)}
+.pp-ob .av{flex:none;border-width:1px}
+.pp-pr{display:flex;align-items:center;gap:4px;border-top:1px solid var(--line)}
+.pp-pr:first-child{border-top:0}
+.pp-pr .pp-ob{flex:1 1 auto}
+.pp-pr .pp-x{margin-top:0}
+.pp-pill{flex:none;font:500 12px var(--ui);color:var(--muted);background:var(--surface2);border-radius:999px;padding:1px 8px;white-space:nowrap}
 /* active quests as a ruled list, as in the design */
 .pboard .pb-qs .pb-row{background:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:4px 2px}
 .pboard .pb-qs .pb-row:first-of-type{border-top:0}
@@ -1686,39 +1754,61 @@ const isPhone=()=>window.matchMedia("(max-width:640px)").matches;
 // Wood & Wax turns the tabs into a side menu at 1101px and wider (matches the CSS media query)
 const SIDE_MQ=window.matchMedia("(min-width:1101px)");
 const sideMenu=()=>SIDE_MQ.matches;
-/* The DM's menu (design: Session, Prep Board, Scenes, Party, then The Library). World and Calendar open from Library groups and the board; quests and threads are Notes chips.
-   Number keys 1-5 follow NAV_DM; players keep the tab list. */
-const NAV_DM=[["board","Prep Board","Prep"],["party","Party","Party"],["npcs","NPCs & Enemies","NPCs"],["library","The Library","Library"]];
-const NAV_GROUPS=()=>LIB_GROUPS.filter(g=>g[0]!=="all");
+/* The DM's menu: Session, Prep Board, then The Library (Party, NPCs & Enemies, Notes, Sessions, Handouts, Bestiary, Tables).
+   World and Calendar open from Library groups and the board; quests and threads are Notes chips.
+   Number keys 1-8 follow NAV_DM from top to bottom; players keep the tab list. Phones show NAV_PHONE: Prep Board and The Library. */
+const NAV_DM=[["board","Prep Board"],["party","Party"],["npcs","NPCs & Enemies"],["lib:notes","Notes"],["lib:sessions","Sessions"],["lib:handouts","Handouts"],["lib:bestiary","Bestiary"],["lib:tables","Tables"]];
+const NAV_PHONE=[["board","Prep Board","Prep"],["library","The Library","Library"]];
+// Party and NPCs have their own pages, so the group list never offers them twice
+const NAV_GROUPS=()=>LIB_GROUPS.filter(g=>g[0]!=="all"&&g[0]!=="party"&&g[0]!=="npcs");
 const visibleTabs=()=>TABS;
 // which menu item the current screen belongs to
 function navCur(){
   if(U.tab==="prep")return "board";
   if(U.tab==="party")return U.charFilter==="npc"?"npcs":"party";
-  if(U.tab==="notes")return String(U.noteQ||"").trim()?"library":"lib:"+U.libGrp;
+  if(U.tab==="notes"){if(String(U.noteQ||"").trim())return "library";return U.libGrp==="party"||U.libGrp==="npcs"?U.libGrp:"lib:"+U.libGrp}
   return {world:"lib:notes",calendar:"lib:sessions"}[U.tab]||""}
 function navGo(v){let tab;
+  if(v==="lib:party"||v==="lib:npcs")v=v.slice(4);
   if(v==="board"){tab="prep";U.prepTab="board";U.prepSess=null}
   else if(v==="party"||v==="npcs"){tab="party";U.charFilter=v==="npcs"?"npc":"pc"}
   else{tab="notes";if(v.startsWith("lib:")){U.libGrp=v.slice(4);U.noteQ="";U.noteReading=false}}
   closeSheet();
   if(location.hash!=="#"+tab)location.hash=tab;else{render();window.scrollTo(0,0)}}
-const NAV_ICONS={search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/>',note:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',dock:'<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M9 4v16"/>',size:'<path d="M4 18 9 6l5 12M5.6 14h6.8M15 18l3-7 3 7M15.9 16h4.2"/>',keys:'<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>'};
+const NAV_ICONS={search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/>',note:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',dock:'<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M9 4v16"/>',size:'<path d="M4 18 9 6l5 12M5.6 14h6.8M15 18l3-7 3 7M15.9 16h4.2"/>',keys:'<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>',
+  run:'<path d="M7 4v16l13-8z"/>',
+  board:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 11l2 2 4-4M9 17h6"/>',
+  party:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.3-5.5 6.5-5.5s5.7 2 6.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14c2.4 0 4 1.6 4.6 4.5"/>',
+  npcs:'<path d="M4 5c3-1 5-1 8 0s5 1 8 0v6c0 5-4 9-8 9s-8-4-8-9z"/><path d="M8.5 10.5h2M13.5 10.5h2M9.5 15c1.5 1 3.5 1 5 0"/>',
+  notes:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
+  sessions:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  handouts:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>',
+  bestiary:'<path d="M6 4c1 5 1 11-1 16M12 3c1 6 1 12-1 18M18 4c1 5 1 11-1 16"/>',
+  tables:'<path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M12 22V12M3 7l9 5 9-5"/>',
+  camp:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
+  hide:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/><path d="M16 9l-3 3 3 3"/>',
+  show:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/><path d="M13 9l3 3-3 3"/>'};
 const navIco=k=>`<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${NAV_ICONS[k]}</svg>`;
+/* The side menu folds to an icon rail (about 60px) and back; the choice is remembered on this device. */
+let NAV_RAIL=false;try{NAV_RAIL=localStorage.getItem("dmdesk-navrail")==="1"}catch(e){}
+function navToggle(){NAV_RAIL=!NAV_RAIL;try{localStorage.setItem("dmdesk-navrail",NAV_RAIL?"1":"0")}catch(e){}render();document.getElementById("nav-toggle")?.focus()}
 function sideNav(){
-  const cur=navCur(),it=(v,l,extra,cls)=>`<a href="#${v==="board"?"prep":v==="party"||v==="npcs"?"party":"notes"}" class="${cls||""}" data-act="nav" data-v="${v}" ${cur===v?'aria-current="page"':""}><span>${l}</span>${extra||""}</a>`;
+  const cur=navCur(),rail=NAV_RAIL,
+    it=(v,l,ico,extra,cls)=>`<a href="#${v==="board"?"prep":v==="party"||v==="npcs"?"party":"notes"}" class="${cls||""}" data-act="nav" data-v="${v}" title="${l.replace(/&amp;/g,"&")}" ${rail?`aria-label="${l}"`:""} ${cur===v?'aria-current="page"':""}>${navIco(ico)}<span class="nav-l">${l}</span>${extra||""}</a>`;
   const pcs=S.characters.filter(x=>x.kind==="pc"&&x.status!=="dead"),lv=pcs.map(p=>num(p.level)).filter(Boolean),one=lv.length===pcs.length&&lv.length&&lv.every(x=>x===lv[0]);
-  return `<span class="nav-brand" aria-hidden="true">DM's Desk</span>`
-    +`<button type="button" class="nav-sess" data-act="tmOpen" title="A big-text screen for running the session (T)">Session</button>`
-    +it("board","Prep Board")+it("party","Party")
-    +`<span class="nav-h" role="presentation">The Library</span>`
-    +it("npcs","NPCs &amp; Enemies",`<span class="n nav-go" aria-hidden="true">›</span>`,"nav-lib")
-    +NAV_GROUPS().map(([k,l])=>it("lib:"+k,esc(l),`<span class="n">${libItems(k).length}</span>`,"nav-lib")).join("")
+  const cnt=k=>`<span class="n">${libItems(k).length}</span>`,cname=esc(S.settings.campaign?.name||"The Campaign");
+  return `<div class="nav-top"><span class="nav-brand" aria-hidden="true">DM's Desk</span><button type="button" id="nav-toggle" class="nav-toggle" data-act="navToggle" aria-expanded="${!rail}" aria-controls="tabs" aria-label="${rail?"Show menu":"Hide menu"}" title="${rail?"Show menu":"Hide menu"}">${navIco(rail?"show":"hide")}</button></div>`
+    +`<button type="button" class="nav-sess" data-act="tmOpen" title="${rail?"Session (T)":"A big-text screen for running the session (T)"}" ${rail?'aria-label="Session"':""}>${navIco("run")}<span class="nav-l">Session</span></button>`
+    +it("board","Prep Board","board")
+    +`<span class="nav-h" role="presentation"><span class="nav-l">The Library</span></span>`
+    +it("party","Party","party",cnt("party"),"nav-lib")
+    +it("npcs","NPCs &amp; Enemies","npcs",cnt("npcs"),"nav-lib")
+    +NAV_GROUPS().map(([k,l])=>it("lib:"+k,esc(l),k,cnt(k),"nav-lib")).join("")
     +`<span class="nav-fill" aria-hidden="true"></span>`
-    +`<button type="button" class="nav-camp" data-act="campaign" title="Campaign settings"><b>${esc(S.settings.campaign?.name||"The Campaign")}</b><small>${pcs.length} player${pcs.length===1?"":"s"}${one?` · level ${lv[0]}`:""}</small></button>`
+    +`<button type="button" class="nav-camp" data-act="campaign" title="Campaign settings" aria-label="${rail?"Campaign settings":cname}">${navIco("camp")}<span class="nav-camp-t"><b>${cname}</b><small>${pcs.length} player${pcs.length===1?"":"s"}${one?` · level ${lv[0]}`:""}</small></span></button>`
     +`<div class="nav-tools"><button type="button" data-act="gsearch" aria-label="Search everything" title="Search (/)">${navIco("search")}</button><button type="button" data-act="quickNote" aria-label="Quick note" title="Quick note (N)">${navIco("note")}</button><button type="button" class="nav-dock" data-dock hidden aria-pressed="false" aria-label="Kept open" title="Kept open (P)">${navIco("dock")}<b></b></button><button type="button" data-act="styleOpen" aria-label="Text size" title="Text size">${navIco("size")}</button><button type="button" data-act="keysOpen" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)">${navIco("keys")}</button></div>`}
-function phoneNav(){const cur=navCur(),lib=cur==="library"||cur.startsWith("lib:");
-  return NAV_DM.map(([v,l,sh])=>`<a href="#${v==="board"?"prep":v==="party"||v==="npcs"?"party":"notes"}" data-act="nav" data-v="${v}" ${(v==="library"?lib:cur===v)?'aria-current="page"':""}><span class="full">${l}</span><span class="short">${sh}</span><span class="n"></span></a>`).join("")}
+function phoneNav(){const cur=navCur(),lib=cur==="library"||cur==="party"||cur==="npcs"||cur.startsWith("lib:");
+  return NAV_PHONE.map(([v,l,sh])=>`<a href="#${v==="board"?"prep":"notes"}" data-act="nav" data-v="${v}" ${(v==="library"?lib:cur===v)?'aria-current="page"':""}><span class="full">${l}</span><span class="short">${sh}</span><span class="n"></span></a>`).join("")}
 try{SIDE_MQ.addEventListener("change",()=>render())}catch(e){}
 let db=null;
 
@@ -2030,7 +2120,7 @@ function nextSession(){return Math.max(0,...S.notes.filter(n=>n.category==="sess
    o.search replaces the search button (the Library uses its own box); o.extra adds buttons before + New entry. */
 function pageHead(sub,title,o={}){
   if(!isDM())return `<div class="bar"><h2>${title}</h2>${o.search||""}</div>`;
-  return `<header class="ph"><div class="ph-t">${sub?`<span class="ph-sub">${sub}</span>`:""}<h2 class="ph-h">${title}</h2></div>
+  return `<header class="ph${o.cls?" "+o.cls:""}"><div class="ph-t">${sub?`<span class="ph-sub">${sub}</span>`:""}<h2 class="ph-h">${title}</h2></div>
     ${o.search||`<button type="button" class="ph-search" data-act="gsearch" aria-label="Search every entry">${navIco("search")}<span>Search every entry</span><kbd>/</kbd></button>`}
     ${o.extra||""}<button type="button" class="btn ph-new" data-act="phNew">${o.newLabel?"+ "+esc(o.newLabel):"+ New entry"}</button><button type="button" class="btn primary ph-go" data-act="tmOpen" title="Open the Session Table (T)">Begin the session ❯</button></header>`}
 function vPrep(c){
@@ -2039,7 +2129,8 @@ function vPrep(c){
   // no sub-tab row: Board and Scenes are in the menu; the other prep pages open from the board and come back with this button
   const back=`<button type="button" class="btn ph-back" data-act="prepTab" data-v="board">‹ Prep Board</button>`;
   if(t==="board"){const n=boardN(),ng=nextGameText();
-    return pageHead(esc(ng||"No game date set"),`Prep for Session ${n}`,{extra:sessPicker(n)})+vPrepBoard(c)}
+    const board=vPrepBoard(c);  // loads the session's drafts first, so the status line is current
+    return pageHead(esc(ng||"No game date set"),`Prep for Session ${n}`,{extra:sessPicker(n)+`<span id="pp-state" class="scn-state" role="status" aria-live="polite">${esc(boardState())}</span>`,cls:"ph-c"})+board}
   const PREP_PAGES={notes:"Session notes",todos:"Prep to-dos",bestiary:"Bestiary",milestones:"Milestones",encounters:"Encounters",tables:"Roll tables",spotlight:"Spotlight",ideas:"Saved ideas"};
   return pageHead("Prep",PREP_PAGES[t]||"Prep",{extra:back})+`<div class="ph-page">`+(t==="notes"?toolsPanel():t==="todos"?vTodos():t==="bestiary"?vBestiary():t==="milestones"?vMilestones():t==="encounters"?vEncounters():t==="tables"?vTables():t==="ideas"?vBrainstorm():vSpotlight())+`</div>`;
 }
@@ -2091,7 +2182,9 @@ function prepLoad(n){
     if(PREP.n!==n){PREP.state="";PREP.dirty=false;PREP.pick=null}
     PREP.d=d||prepNorm(prepRec(n),n);PREP.ver=ver;PREP.n=n;
     if(held){PREP.dirty=true;PREP.state="Not saved yet";clearTimeout(PREP.timer);PREP.timer=setTimeout(prepFlush,1200)}}}
-function prepStatus(){const el=document.getElementById("pp-state");if(el)el.textContent=PREP.state}
+// one save status for the whole board: a problem in either the notes or the scenes shows first
+const boardState=()=>[PREP.state,SCN.state].find(x=>x&&x!=="Saved")||PREP.state||SCN.state||"";
+function prepStatus(){const el=document.getElementById("pp-state");if(el)el.textContent=boardState()}
 function prepTouch(redraw){PREP.dirty=true;PREP.state="Not saved yet";clearTimeout(PREP.timer);PREP.timer=setTimeout(prepFlush,1200);if(redraw)render();else prepStatus()}
 const PREP_TRIES=6;
 let prepQ=Promise.resolve(),prepSent=null;
@@ -2150,9 +2243,9 @@ async function prepMigrate(){
 /* ---- the board ---- */
 /* What each list-picker section reads from: the collection it points at, the entries it offers, and its wording. */
 const PP_KIND={
-  npcs:{col:"characters",src:()=>S.characters.filter(x=>x.kind!=="pc"),word:"NPC",label:"NPCs",search:"Search your NPCs",empty:"Nobody chosen yet.",name:x=>x.name,extra:x=>[x.race,x.meta],sub:x=>[x.cls,x.race].filter(Boolean).join(" · "),av:true,newPreset:{kind:"npc",status:"alive"}},
-  monsters:{col:"monsters",src:()=>S.monsters,word:"monster",label:"Monsters",search:"Search your Bestiary",empty:"No monsters chosen yet.",name:x=>x.name,extra:x=>[x.cr&&"cr "+x.cr],sub:x=>[x.cr&&"CR "+x.cr,x.meta].filter(Boolean).join(" · "),newPreset:{}},
-  handouts:{col:"notes",src:()=>S.notes.filter(n=>n.category==="handout"),word:"handout",label:"Handouts",search:"Search your handouts",empty:"No handouts chosen yet.",name:x=>x.title,extra:()=>[],sub:x=>libBlurb("notes",x),newPreset:{category:"handout"}}};
+  npcs:{col:"characters",src:()=>S.characters.filter(x=>x.kind!=="pc"),word:"NPC",label:"NPCs",search:"Search your NPCs",add:"Add NPC",name:x=>x.name,extra:x=>[x.race,x.meta],sub:x=>[x.cls,x.race].filter(Boolean).join(" · "),av:true,newPreset:{kind:"npc",status:"alive"}},
+  monsters:{col:"monsters",src:()=>S.monsters,word:"monster",label:"Monsters",search:"Search your Bestiary",add:"Add monster",pill:x=>x.cr?"CR "+x.cr:"",name:x=>x.name,extra:x=>[x.cr&&"cr "+x.cr],sub:x=>[x.cr&&"CR "+x.cr,x.meta].filter(Boolean).join(" · "),newPreset:{}},
+  handouts:{col:"notes",src:()=>S.notes.filter(n=>n.category==="handout"),word:"handout",label:"Handouts",search:"Search your handouts",add:"Add handout",name:x=>x.title,extra:()=>[],sub:x=>libBlurb("notes",x),newPreset:{category:"handout"}}};
 function prepPickList(kind,q){
   const K=PP_KIND[kind],used=new Set(PREP.d[kind]),src=K.src();q=String(q||"").trim().toLowerCase();
   const nm=x=>String(K.name(x)||"").toLowerCase();
@@ -2172,49 +2265,71 @@ function prepPickPaint(kind){
   const open=!!(PREP.pick&&PREP.pick.kind===kind&&PREP.pick.open);ul.innerHTML=open?prepListHtml(kind):"";ul.hidden=!open||!ul.innerHTML;
   inp.setAttribute("aria-expanded",String(!ul.hidden));
   const on=ul.querySelector(".on");if(on){inp.setAttribute("aria-activedescendant",on.id);on.scrollIntoView({block:"nearest"})}else inp.removeAttribute("aria-activedescendant")}
+const PP_ICO={chev:'<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>',
+  check:(n,w)=>`<svg class="${n}" width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>`,
+  plus:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  search:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>'};
 function prepPickRow(kind,id,i){
-  const K=PP_KIND[kind],x=rec(K.col,id),nm=x?(K.name(x)||"Unnamed"):"";
-  return `<div class="pp-pr">${x?`<button type="button" class="pp-ob" data-act="open" data-type="${K.col}" data-id="${esc(id)}">${K.av?avatar(x,28):""}<span><b>${esc(nm)}</b><small>${esc(prepSub(kind,x))}</small></span></button>`
-    :`<span class="pp-ob gone"><span><b>Entry not found</b><small>It was deleted. Remove it from this list.</small></span></span>`}<button type="button" class="btn icon" data-act="ppPickDel" data-kind="${kind}" data-i="${i}" aria-label="Remove ${esc(nm||"entry")} from this session">×</button></div>`}
+  const K=PP_KIND[kind],x=rec(K.col,id),nm=x?(K.name(x)||"Unnamed"):"",pill=x&&K.pill?K.pill(x):"";
+  return `<div class="pp-pr">${x?`<button type="button" class="pp-ob" data-act="open" data-type="${K.col}" data-id="${esc(id)}">${K.av?avatar(x,24):""}<span><b>${esc(nm)}</b>${K.av?`<small>${esc(prepSub(kind,x))}</small>`:""}</span></button>${pill?`<span class="pp-pill">${esc(pill)}</span>`:""}`
+    :`<span class="pp-ob gone"><span><b>Entry not found</b></span></span>`}<button type="button" class="pp-x" data-act="ppPickDel" data-kind="${kind}" data-i="${i}" aria-label="Remove ${esc(nm||"entry")} from this session" title="Remove">×</button></div>`}
 function prepPicker(kind){
   const K=PP_KIND[kind],open=PREP.pick&&PREP.pick.kind===kind&&PREP.pick.open,L=open?prepListHtml(kind):"";
-  return `<div class="pp-pickbar"><div class="pp-combo"><input id="pp-q-${kind}" class="scn-in" type="text" role="combobox" aria-autocomplete="list" aria-expanded="${!!L}" aria-controls="pp-lb-${kind}" aria-label="${K.search}" placeholder="${K.search}…" autocomplete="off" data-pp="q" data-kind="${kind}" value="${esc(PREP.q[kind])}">
-      <ul id="pp-lb-${kind}" class="pp-lb" role="listbox" aria-label="${K.label} that match" ${L?"":"hidden"}>${L}</ul></div>
-    <button type="button" class="btn" data-act="ppPickNew" data-kind="${kind}">New ${K.word}</button></div>
-    <div class="pp-list">${PREP.d[kind].map((id,i)=>prepPickRow(kind,id,i)).join("")||`<p class="vempty">${K.empty}</p>`}</div>`}
-const ppArea=(id,attrs,val,ph,label)=>`<textarea id="${id}" class="scn-in grow" rows="1" ${attrs} placeholder="${esc(ph||"")}" aria-label="${esc(label)}">${esc(val)}</textarea>`;
+  return `<div class="pp-list">${PREP.d[kind].map((id,i)=>prepPickRow(kind,id,i)).join("")}</div>
+    <div class="pp-pickbar">${PP_ICO.search}<div class="pp-combo"><input id="pp-q-${kind}" type="text" role="combobox" aria-autocomplete="list" aria-expanded="${!!L}" aria-controls="pp-lb-${kind}" aria-label="${K.search}" placeholder="${K.add}" autocomplete="off" data-pp="q" data-kind="${kind}" value="${esc(PREP.q[kind])}"></div>
+      <button type="button" class="pp-mv" data-act="ppPickNew" data-kind="${kind}" aria-label="New ${K.word}" title="New ${K.word}">New</button>
+      <ul id="pp-lb-${kind}" class="pp-lb" role="listbox" aria-label="${K.label} that match" ${L?"":"hidden"}>${L}</ul></div>`}
+const ppArea=(id,attrs,val,ph,label,cls)=>`<textarea id="${id}" class="pp-in grow${cls?" "+cls:""}" rows="1" ${attrs} placeholder="${esc(ph||"")}" aria-label="${esc(label)}">${esc(val)}</textarea>`;
+const ppX=(act,attrs,label)=>`<button type="button" class="pp-x" data-act="${act}" ${attrs} aria-label="${esc(label)}" title="Remove">×</button>`;
+const ppAdd=(act,label,attrs,cls)=>`<button type="button" class="pp-add${cls?" "+cls:""}" data-act="${act}" ${attrs||""}>${PP_ICO.plus}${label}</button>`;
+/* Which sections are folded: kept on this device (and in memory when storage is blocked) */
+const PP_FOLD_KEY="dmdesk-ppfold";
+let PP_FOLD={};try{const o=JSON.parse(localStorage.getItem(PP_FOLD_KEY)||"{}");if(o&&typeof o==="object")PP_FOLD=o}catch(e){}
+const ppFoldSave=()=>{try{localStorage.setItem(PP_FOLD_KEY,JSON.stringify(PP_FOLD))}catch(e){}};
+const PP_SHORT={opening:"Session Start",scenes:"Scenes",clues:"Secrets & Clues",locations:"Locations",npcs:"NPCs",monsters:"Monsters",items:"Magic Items",handouts:"Handouts"};
+const ppFound=d=>`${d.clues.filter(k=>k.found).length}/${d.clues.length} found`;
+// the ready toggles, the strip and its count follow d.checked without redrawing the page
+function ppReadyPaint(){
+  const d=PREP.d;if(!d)return;
+  PREP_SECS.forEach(([k,l])=>{const on=!!d.checked[k];
+    document.querySelector(`.pp-ready[data-k="${k}"]`)?.setAttribute("aria-pressed",String(on));
+    const c=document.querySelector(`.pp-chip[data-k="${k}"]`);if(c){c.classList.toggle("on",on);c.setAttribute("aria-label",`Go to ${l}${on?", ready":""}`)}});
+  const el=document.getElementById("pp-count");if(el)el.textContent=`${PREP_KEYS.filter(x=>d.checked[x]).length} of ${PREP_KEYS.length} ready`}
+function ppFoldPaint(k){const closed=!!PP_FOLD[k],sec=document.getElementById("pp-sec-"+k);if(!sec)return;
+  sec.classList.toggle("closed",closed);sec.querySelector(".pp-fold")?.setAttribute("aria-expanded",String(!closed));const b=document.getElementById("pp-b-"+k);if(b)b.hidden=closed}
 function vPrepBoard(c){
   const n=boardN();
   scnLoad(sessPlan(n));prepLoad(n);const d=PREP.d,done=PREP_KEYS.filter(k=>d.checked[k]).length;
-  const sec=(k,title,body,act)=>`<section class="pp-sec" id="pp-sec-${k}" aria-labelledby="pp-h-${k}"><div class="pp-sh"><h3 id="pp-h-${k}" tabindex="-1">${title}</h3>${act||""}</div>${body}</section>`;
-  const add=(a,label,extra)=>`<button type="button" class="btn sm pp-add" data-act="${a}" ${extra||""}>${label}</button>`;
-  // Scenes: one growing box per scene, edited right here
-  const pl=sessPlan(n);
+  const sec=(k,title,body,o={})=>{const closed=!!PP_FOLD[k],on=!!d.checked[k];
+    return `<section class="pp-sec${closed?" closed":""}" id="pp-sec-${k}" aria-labelledby="pp-h-${k}"><div class="pp-sh"><h3 id="pp-h-${k}" tabindex="-1"><button type="button" class="pp-fold" data-act="ppFold" data-k="${k}" aria-expanded="${!closed}" aria-controls="pp-b-${k}">${PP_ICO.chev}<span class="pp-t">${esc(title)}</span>${o.count!=null?`<span class="pp-n" id="pp-n-${k}">${o.count}</span>`:""}</button></h3>${o.act||""}<button type="button" class="pp-ready" data-act="ppReady" data-k="${k}" aria-pressed="${on}" aria-label="${esc(title)} ready" title="Ready">${PP_ICO.check("",13)}</button></div><div class="pp-bd" id="pp-b-${k}" ${closed?"hidden":""}>${body}</div></section>`};
+  const T=Object.fromEntries(PREP_SECS);
+  // Scenes: one compact growing row per scene, edited right here
+  const pl=sessPlan(n),nx=n+1;
+  const scenesAct=moreMenu([mi("planPlayed",pl.status==="played"?"Mark as planned":"Mark as played",`data-id="${pl.id}" ${pl.scenes.length?"":"disabled"}`),mi("scnMoveOpen",`Move unfinished scenes to Session ${nx}`,`data-id="${pl.id}" ${pl.scenes.some(x=>!x.done&&!x.played)?"":"disabled"}`),mi("copyR20","Copy for Roll20",`data-type="scenes" data-id="${pl.id}"`)]);
   const scenesBody=scnCards();
-  const scenesAct=`<span class="scn-acts"><span id="scn-state" class="scn-state" role="status" aria-live="polite">${esc(SCN.state)}</span>${moreMenu([mi("planPlayed",pl.status==="played"?"Mark as planned":"Mark as played",`data-id="${pl.id}" ${pl.scenes.length?"":"disabled"}`),mi("scnMoveOpen",`Move unfinished scenes to Session ${n+1}`,`data-id="${pl.id}" ${pl.scenes.some(x=>!x.done&&!x.played)?"":"disabled"}`),mi("copyR20","Copy for Roll20",`data-type="scenes" data-id="${pl.id}"`)])}</span>`;
-  const clues=d.clues.map((k,i)=>`<div class="pp-li"><input type="checkbox" class="scn-found" data-pp="found" data-i="${i}" ${k.found?"checked":""} aria-label="Clue ${i+1} revealed" title="Revealed to the players">${ppArea("pp-clue-"+i,`data-pp="clue" data-i="${i}"`,k.t,"A secret or clue","Secret or clue "+(i+1))}<button type="button" class="btn icon" data-act="ppClueDel" data-i="${i}" aria-label="Remove clue ${i+1}">×</button></div>`).join("");
-  const locs=d.locations.map((l,i)=>`<div class="pp-loc"><div class="pp-lh"><input id="pp-ln-${i}" class="scn-in pp-lname" data-pp="ln" data-i="${i}" value="${esc(l.name)}" placeholder="Location name" aria-label="Location ${i+1} name" autocomplete="off"><button type="button" class="btn icon" data-act="ppLocDel" data-i="${i}" aria-label="Remove ${esc(l.name||"location "+(i+1))}">×</button></div>
-      ${l.desc.map((t,j)=>`<div class="pp-ld">${ppArea(`pp-ld-${i}-${j}`,`data-pp="ld" data-i="${i}" data-j="${j}"`,t,"A descriptor, e.g. a smell, a sound, a strange detail",`${l.name||"Location "+(i+1)}: descriptor ${j+1}`)}<button type="button" class="btn icon" data-act="ppDescDel" data-i="${i}" data-j="${j}" aria-label="Remove descriptor ${j+1}">×</button></div>`).join("")}
-      ${add("ppDescAdd","+ Add descriptor",`data-i="${i}"`)}</div>`).join("");
-  const items=d.items.map((x,i)=>`<div class="pp-item"><div class="pp-ld">${ppArea("pp-item-"+i,`data-pp="item" data-i="${i}"`,x.name,"An item, e.g. Wand of Secrets (uncommon)","Magic item "+(i+1))}<button type="button" class="btn icon" data-act="ppItemDel" data-i="${i}" aria-label="Remove item ${i+1}">×</button></div>
-    <textarea id="pp-itemd-${i}" class="scn-in grow pp-idesc" rows="1" data-pp="itemd" data-i="${i}" placeholder="Description (optional)" aria-label="Magic item ${i+1} description">${esc(x.desc)}</textarea></div>`).join("");
-  const main7=
-    sec("opening","Session Start",`<label class="scn-f"><span class="label">Opening scene</span>${ppArea("pp-opening",`data-pp="opening"`,d.opening,"How the session opens: where the party is, what's happening, the first thing they see","Opening scene")}</label>`)
-    +sec("scenes","Scenes",scenesBody,scenesAct)
-    +sec("clues","Secrets &amp; Clues",`${clues}${add("ppClueAdd","+ Add a secret or clue")}`)
-    +sec("locations","Fantastic Locations",`${locs||`<p class="vempty">No locations yet.</p>`}${add("ppLocAdd","Add location")}`)
-    +sec("npcs","Important NPCs",prepPicker("npcs"))
-    +sec("monsters","Relevant Monsters",prepPicker("monsters"))
-    +sec("items","Magic Items",`${items}${add("ppItemAdd","+ Add item")}<p class="hint">Plain notes for this session. They aren't linked to Loot.</p>`)
-    +sec("handouts","Handouts",prepPicker("handouts"));
-  const check=`<section class="pp-check" aria-labelledby="pp-ck-h"><div class="pp-sh"><h3 id="pp-ck-h">Prep Checklist</h3><span class="pp-count" id="pp-count" aria-live="polite">${done} of ${PREP_KEYS.length}</span></div>
-    <ul>${PREP_SECS.map(([k,l])=>`<li><input type="checkbox" id="pp-ck-${k}" class="scn-found" data-pp="chk" data-k="${k}" ${d.checked[k]?"checked":""} aria-label="${l}: prepped"><button type="button" class="pp-jump ${d.checked[k]?"done":""}" data-act="ppJump" data-k="${k}">${l}</button></li>`).join("")}</ul>
-    <p class="hint">Tick each one yourself when it's ready.</p></section>`;
-  return `<div class="pp-wrap"><div class="pp"><div class="pp-main"><span id="pp-state" class="scn-state" role="status" aria-live="polite">${esc(PREP.state)}</span>${main7}</div><aside class="pp-side" aria-label="Prep checklist">${check}</aside></div></div>`;
+  const clues=d.clues.map((k,i)=>`<div class="pp-row"><input type="checkbox" data-pp="found" data-i="${i}" ${k.found?"checked":""} aria-label="Clue ${i+1} revealed" title="Revealed to the players">${ppArea("pp-clue-"+i,`data-pp="clue" data-i="${i}"`,k.t,"Clue","Secret or clue "+(i+1))}${ppX("ppClueDel",`data-i="${i}"`,"Remove clue "+(i+1))}</div>`).join("");
+  const locs=d.locations.map((l,i)=>`<div class="pp-loc"><div class="pp-lh"><input id="pp-ln-${i}" class="pp-in pp-lname" data-pp="ln" data-i="${i}" value="${esc(l.name)}" placeholder="Location" aria-label="Location ${i+1} name" autocomplete="off">${ppX("ppLocDel",`data-i="${i}"`,"Remove "+(l.name||"location "+(i+1)))}</div>
+      ${l.desc.map((t,j)=>`<div class="pp-ld">${ppArea(`pp-ld-${i}-${j}`,`data-pp="ld" data-i="${i}" data-j="${j}"`,t,"Descriptor",`${l.name||"Location "+(i+1)}: descriptor ${j+1}`)}${ppX("ppDescDel",`data-i="${i}" data-j="${j}"`,"Remove descriptor "+(j+1))}</div>`).join("")}
+      ${ppAdd("ppDescAdd","Descriptor",`data-i="${i}"`,"sm")}</div>`).join("");
+  const items=d.items.map((x,i)=>`<div class="pp-item"><div class="pp-ld">${ppArea("pp-item-"+i,`data-pp="item" data-i="${i}"`,x.name,"Item","Magic item "+(i+1))}${ppX("ppItemDel",`data-i="${i}"`,"Remove item "+(i+1))}</div>
+    ${ppArea("pp-itemd-"+i,`data-pp="itemd" data-i="${i}"`,x.desc,"Description","Magic item "+(i+1)+" description","pp-idesc")}</div>`).join("");
+  const cnt=k=>PREP.d[k].length;
+  const col1=sec("opening",T.opening,ppArea("pp-opening",`data-pp="opening"`,d.opening,"Opening","Opening scene","pp-open").replace('rows="1"','rows="2"'))
+    +sec("scenes",T.scenes,scenesBody,{count:SCN.d.length,act:scenesAct});
+  const col2=sec("clues",T.clues,`${clues}${ppAdd("ppClueAdd","Add clue")}`,{count:ppFound(d)})
+    +sec("locations",T.locations,`${locs}${ppAdd("ppLocAdd","Add location")}`,{count:d.locations.length});
+  const col3=sec("npcs",T.npcs,prepPicker("npcs"),{count:cnt("npcs")})
+    +sec("monsters",T.monsters,prepPicker("monsters"),{count:cnt("monsters")})
+    +sec("items",T.items,`${items}${ppAdd("ppItemAdd","Add item")}`,{count:d.items.length})
+    +sec("handouts",T.handouts,prepPicker("handouts"),{count:cnt("handouts")});
+  const strip=`<div class="pp-strip" role="group" aria-label="Prep progress"><span class="pp-prog" id="pp-count" role="status" aria-live="polite">${done} of ${PREP_KEYS.length} ready</span>${PREP_KEYS.map(k=>`<button type="button" class="pp-chip${d.checked[k]?" on":""}" data-act="ppJump" data-k="${k}" aria-label="Go to ${esc(T[k])}${d.checked[k]?", ready":""}">${PP_ICO.check("ck",12)}${esc(PP_SHORT[k])}</button>`).join("")}</div>`;
+  return `<div class="pp-wrap">${strip}<div class="pp-cols"><div class="pp-col pp-c1">${col1}</div><div class="pp-col pp-c2">${col2}</div><div class="pp-col pp-c3">${col3}</div></div></div>`;
 }
 function prepAct(a,t){
   const d=PREP.d;if(!d)return;const i=num(t.dataset.i),j=num(t.dataset.j),kind=t.dataset.kind;
-  if(a==="ppJump"){const s=document.getElementById("pp-sec-"+t.dataset.k);if(s){s.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});document.getElementById("pp-h-"+t.dataset.k)?.focus({preventScroll:true})}return}
+  if(a==="ppReady"){const k=t.dataset.k;if(d.checked[k])delete d.checked[k];else d.checked[k]=true;ppReadyPaint();prepTouch(false);return}
+  if(a==="ppFold"){const k=t.dataset.k;if(PP_FOLD[k])delete PP_FOLD[k];else PP_FOLD[k]=true;ppFoldSave();ppFoldPaint(k);return}
+  if(a==="ppJump"){const s=document.getElementById("pp-sec-"+t.dataset.k);if(s){if(PP_FOLD[t.dataset.k]){delete PP_FOLD[t.dataset.k];ppFoldSave();ppFoldPaint(t.dataset.k)}s.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});document.getElementById("pp-h-"+t.dataset.k)?.focus({preventScroll:true})}return}
   if(a==="ppClueAdd"){d.clues.push({t:"",found:false});FOCUS_NEXT="#pp-clue-"+(d.clues.length-1)}
   else if(a==="ppClueDel"){d.clues.splice(i,1);FOCUS_NEXT=d.clues.length?"#pp-clue-"+Math.min(i,d.clues.length-1):'[data-act="ppClueAdd"]'}
   else if(a==="ppLocAdd"){d.locations.push({id:uid(),name:"",desc:[]});FOCUS_NEXT="#pp-ln-"+(d.locations.length-1)}
@@ -2241,13 +2356,11 @@ document.addEventListener("input",e=>{const t=e.target,k=t.dataset&&t.dataset.pp
   if(k==="q"){const kind=t.dataset.kind;PREP.q[kind]=t.value;PREP.pick={kind,open:!!t.value.trim(),idx:0};prepPickPaint(kind);return}
   if(k==="opening")d.opening=t.value;
   else if(k==="clue"){if(d.clues[i])d.clues[i].t=t.value}
-  else if(k==="found"){if(d.clues[i])d.clues[i].found=t.checked}
+  else if(k==="found"){if(d.clues[i])d.clues[i].found=t.checked;const el=document.getElementById("pp-n-clues");if(el)el.textContent=ppFound(d)}
   else if(k==="ln"){if(d.locations[i])d.locations[i].name=t.value}
   else if(k==="ld"){const l=d.locations[i];if(l)l.desc[j]=t.value}
   else if(k==="item"){if(d.items[i])d.items[i].name=t.value}
   else if(k==="itemd"){if(d.items[i])d.items[i].desc=t.value}
-  else if(k==="chk"){if(t.checked)d.checked[t.dataset.k]=true;else delete d.checked[t.dataset.k];
-    const n=PREP_KEYS.filter(x=>d.checked[x]).length,el=document.getElementById("pp-count");if(el)el.textContent=`${n} of ${PREP_KEYS.length}`;t.parentNode.querySelector(".pp-jump")?.classList.toggle("done",t.checked)}
   else return;
   prepTouch(false)});
 // Enter adds the next line in a list; Backspace on an empty line takes it out. In the NPC and monster search, arrows and Enter pick.
@@ -2307,7 +2420,7 @@ function scnLoad(p){
     if(held){delete SCN.pending[p.id];SCN.dirty=true;SCN.state="Not saved yet";clearTimeout(SCN.timer);SCN.timer=setTimeout(scnFlush,1200)}}
   if(!SCN.d.find(s=>s.id===SCN.sel))SCN.sel=SCN.d[0]?.id||null}
 const scnCur=()=>SCN.d&&SCN.d.find(s=>s.id===SCN.sel);
-function scnStatus(){const el=document.getElementById("scn-state");if(el)el.textContent=SCN.state}
+function scnStatus(){const el=document.getElementById("pp-state");if(el)el.textContent=boardState()}
 function scnTouch(redraw){SCN.dirty=true;SCN.state="Not saved yet";clearTimeout(SCN.timer);SCN.timer=setTimeout(scnFlush,1200);if(redraw)render();else scnStatus()}
 /* Saves run one at a time. The draft is copied when the save is asked for, so switching plans mid-save keeps the old plan's edits.
    save() returns false when the write failed: the draft stays unsaved and tries again a few times, waiting longer each time.
@@ -2370,11 +2483,11 @@ window.addEventListener("pagehide",()=>{scnFlush()});
 // the scene boxes: one growing text box per scene, with delete and a way to push it to the next session
 function scnCards(){
   const nx=sessNum(SCN.pid)+1;
-  const card=x=>`<article class="scn-card" data-scsel="${x.id}"><div class="scn-eh"><span class="scn-kicker">Scene</span>
-      <span class="scn-acts"><button type="button" class="btn sm danger ${SCN.arm===x.id?"armed":""}" data-act="scnDel" data-id="${x.id}">${SCN.arm===x.id?"Yes, delete":"Delete"}</button></span></div>
-    <textarea class="scn-in scn-box-t grow" data-scf="note" data-id="${x.id}" rows="3" placeholder="What happens in this scene…" aria-label="Scene">${esc(x.note)}</textarea>
-    <div class="scn-foot"><button type="button" class="btn sm" data-act="scnMoveNext" data-id="${x.id}">Move to Session ${nx}</button></div></article>`;
-  return `<div class="scn">${SCN.d.map(card).join("")}<button type="button" class="btn primary" data-act="scnAdd">+ Add scene</button></div>`}
+  const row=(x,i)=>`<div class="pp-row" data-scsel="${x.id}"><span class="pp-i" aria-hidden="true">${i+1}</span>
+    <textarea class="pp-in grow" data-scf="note" data-id="${x.id}" rows="1" placeholder="Scene" aria-label="Scene ${i+1}">${esc(x.note)}</textarea>
+    <button type="button" class="pp-mv" data-act="scnMoveNext" data-id="${x.id}" title="Move to Session ${nx}" aria-label="Move scene ${i+1} to Session ${nx}">→ ${nx}</button>
+    <button type="button" class="pp-x ${SCN.arm===x.id?"armed":""}" data-act="scnDel" data-id="${x.id}" aria-label="${SCN.arm===x.id?`Yes, delete scene ${i+1}`:`Delete scene ${i+1}`}" title="Delete">${SCN.arm===x.id?"Delete?":"×"}</button></div>`;
+  return `${SCN.d.map(row).join("")}${ppAdd("scnAdd","Add scene")}`}
 document.addEventListener("input",e=>{const t=e.target;if(!t.dataset||t.dataset.scf!=="note")return;
   const s=SCN.d&&SCN.d.find(x=>x.id===t.dataset.id);if(!s)return;
   s.note=t.value;s.title=scnTitle(t.value);
@@ -3687,7 +3800,7 @@ document.addEventListener("submit",async e=>{const f=e.target.closest("[data-qno
 document.addEventListener("click",e=>{if(e.target.closest("[data-qclose]")){e.stopPropagation();closeQuick()}if(e.target.closest("[data-act=quickNote]")){e.stopPropagation();quickNote()}},true);
 
 /* shortcuts */
-const KEYS=[["/","Search"],["D","Dice tray"],["N","Quick note"],["K","Keep the open entry open"],["P","Show or hide Kept open"],["T","Table mode"],["B","Saved ideas"],["1–5","Jump to that menu item (Prep Board, Scenes, Party, NPCs, Library); in the player preview, 1–7 follow its tabs"],["1–9 (table mode)","Play a Music button"],["?","This list (or the keyboard button at the top)"],["Esc","Close"],["Alt + click","On a heading: collapse or expand that whole group"]];
+const KEYS=[["/","Search"],["D","Dice tray"],["N","Quick note"],["K","Keep the open entry open"],["P","Show or hide Kept open"],["T","Table mode"],["B","Saved ideas"],["1–8","Jump to that menu item, top to bottom (Prep Board, Party, NPCs, Notes, Sessions, Handouts, Bestiary, Tables); in the player preview, 1–5 follow its tabs"],["1–9 (table mode)","Play a Music button"],["?","This list (or the keyboard button at the top)"],["Esc","Close"],["Alt + click","On a heading: collapse or expand that whole group"]];
 function showKeys(){showSheet(`<div class="sheet" role="dialog" aria-label="Keyboard shortcuts"><h2>Keyboard shortcuts</h2><table class="keys">${KEYS.map(([k,l])=>`<tr><td><kbd>${k}</kbd></td><td>${l}</td></tr>`).join("")}</table><p class="vempty">Shortcuts work when you're not typing in a box. Forgot them? Click the keyboard button at the top of the page, or press <kbd>?</kbd>. Hover over a button to see its shortcut.</p><div class="foot"><span class="grow"></span><button type="button" class="btn primary" data-act="close">Done</button></div></div>`,true)}
 document.addEventListener("keydown",e=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;const a=document.activeElement;if(a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)))return;
@@ -3697,7 +3810,7 @@ document.addEventListener("keydown",e=>{
   if(k==="k"||k==="K"){if(OPEN&&(OPEN.kind==="view"||OPEN.kind==="monster")){e.preventDefault();pinToggle(OPEN.kind==="monster"?"monsters":OPEN.type,OPEN.id)}return}
   if(k==="p"||k==="P"){e.preventDefault();DOCK_OPEN=!DOCK_OPEN;pinsSave();renderDock();return}
   if((k==="t"||k==="T")&&isDM()){e.preventDefault();document.querySelector(TM?"[data-act=tmExit]":"[data-act=tmOpen]")?.click();return}
-  if(/^[1-7]$/.test(k)&&!TM){e.preventDefault();if(isDM()){const n=NAV_DM[+k-1];if(n)navGo(n[0]);return}const t=visibleTabs()[+k-1];if(t){closeSheet();location.hash=t[0]}return}
+  if(/^[1-8]$/.test(k)&&!TM){e.preventDefault();if(isDM()){const n=NAV_DM[+k-1];if(n)navGo(n[0]);return}const t=visibleTabs()[+k-1];if(t){closeSheet();location.hash=t[0]}return}
   if((k==="b"||k==="B")&&isDM()&&!TM){e.preventDefault();closeSheet();U.prepTab="ideas";if(location.hash!=="#prep")location.hash="prep";else render();return}
 
   if(k==="?"){e.preventDefault();showKeys();return}
@@ -4180,6 +4293,7 @@ function render(){
   const tabLinks=TABS.map(([k,l,sh])=>[k,`<a href="#${k}" ${U.tab===k?'aria-current="page"':""}><span class="full">${l}</span><span class="short">${sh}</span><span class="n">${counts[k]||""}</span></a>`]);
   // The DM's menu follows the design: Session, Prep Board, Scenes, Party, then The Library. Players keep their own short list.
   const linkHtml=list=>list.map(([,h])=>h).join("");
+  document.documentElement.toggleAttribute("data-navrail",isDM()&&NAV_RAIL);
   document.getElementById("tabs").innerHTML=isDM()?(sideMenu()?sideNav():phoneNav())
     :(sideMenu()?`<span class="nav-brand" aria-hidden="true">DM's Desk</span>`:"")+linkHtml(tabLinks);
   const banner=(S.live?"":`<div class="banner">Saving isn't available in this view, so changes last only until you close the page.</div>`);
@@ -4267,7 +4381,7 @@ function facBlock(n){
   return `<div class="facblock">${f.map(([l,v])=>`<div class="prop"><b>${l}.</b> ${linkify(esc(v),"notes:"+n.id)}</div>`).join("")}${n.goals?`<div class="prop full"><b>Goals.</b> ${linkify(esc(n.goals),"notes:"+n.id)}</div>`:""}${n.members?`<div class="full"><div class="prop"><b>Key members.</b></div><div class="prose vprose">${rich(n.members,"notes:"+n.id)}</div></div>`:""}</div>`;
 }
 /* Library: every entry sorted into groups. Notes read here; other entries open their own page. */
-const LIB_GROUPS=[["notes","Notes"],["sessions","Sessions"],["handouts","Handouts"],["party","Party"],["npcs","NPCs"],["bestiary","Bestiary"],["tables","Tables"]];
+const LIB_GROUPS=[["party","Party"],["npcs","NPCs"],["notes","Notes"],["sessions","Sessions"],["handouts","Handouts"],["bestiary","Bestiary"],["tables","Tables"]];
 /* Notes group: one list with filter chips. Session recaps stay under Sessions and monster notes under Bestiary. */
 const NOTE_GROUP={monster:"bestiary",session:"sessions",handout:"handouts"};
 const noteGroup=n=>NOTE_GROUP[n&&n.category]||"notes";
@@ -4321,7 +4435,7 @@ function vNotes(c){
   // pages that used to be their own tabs open from their Library group
   const goW=(v,l)=>`<button type="button" class="btn sm" data-act="pbWorld" data-v="${v}">${l}</button>`,goP=(v,l)=>`<button type="button" class="btn sm" data-act="libPrep" data-v="${v}">${l}</button>`;
   const more=q?"":{locations:goW("maps","Maps")+goW("rel","Relationships")+goW("places","Places")+goW("know","Party knows"),sessions:`<a class="btn sm" href="#calendar">Calendar</a>`+goP("notes","Session notes")+goP("milestones","Milestones"),bestiary:goP("bestiary","Bestiary page")+goP("encounters","Encounters"),tables:goP("tables","Roll tables"),lore:goP("ideas","Saved ideas")}[g==="notes"?chip:g]||"";
-  const groups=sideMenu()&&isDM()?"":`<div class="lib-groups" role="group" aria-label="Library groups">${LIB_GROUPS.map(([k,l])=>`<button type="button" class="lib-g" data-act="libGrp" data-v="${k}" aria-pressed="${!q&&g===k}">${l}<span class="n">${libItems(k).length}</span></button>`).join("")}</div>`;
+  const groups=sideMenu()&&isDM()?"":`<div class="lib-groups" role="group" aria-label="Library groups">${LIB_GROUPS.map(([k,l])=>isDM()&&(k==="party"||k==="npcs")?`<button type="button" class="lib-g" data-act="nav" data-v="${k}">${l}<span class="n">${libItems(k).length}</span></button>`:`<button type="button" class="lib-g" data-act="libGrp" data-v="${k}" aria-pressed="${!q&&g===k}">${l}<span class="n">${libItems(k).length}</span></button>`).join("")}</div>`;
   const cnts=chipCounts(),chipBtn=(k,l,n,act,cls,on)=>`<button type="button" class="lib-g ${cls||""}" data-act="${act}" data-v="${k}" aria-pressed="${on}">${esc(l)}<span class="n">${n}</span></button>`;
   const qs=S.quests.filter(x=>true),stCount=(arr,f)=>arr.filter(f).length;
   let chips="";
@@ -4678,6 +4792,7 @@ document.addEventListener("click",async e=>{
     case"del":if(!t.classList.contains("armed")){t.classList.add("armed");t.dataset.label="Delete";t.textContent="Confirm delete";return}
       await remove(t.dataset.type,t.dataset.id);closeSheet();toast("Deleted");break;
     case"nav":navGo(t.dataset.v);break;
+    case"navToggle":navToggle();break;
     case"charFilter":U.charFilter=t.dataset.v;render();break;
     case"libGrp":U.libGrp=t.dataset.v;U.noteQ="";U.noteReading=false;render();break;
     case"noteChip":U.noteChip=t.dataset.v;U.noteReading=false;render();break;
@@ -4760,7 +4875,7 @@ document.addEventListener("click",async e=>{
     case"newPlan":goBoard(nextSession());break;
     case"planPlayed":{const pid=t.dataset.id,on=sessPlan(sessNum(pid)).status!=="played";stScenePatch(pid,sc=>sc.forEach(s=>{s.played=on}));break}
     case"scnMoveOpen":{const p=sessPlan(sessNum(t.dataset.id));sessMoveScenes(p.scenes.filter(x=>!x.done&&!x.played).map(x=>x.id),p.session+1);break}
-    case"ppJump":case"ppClueAdd":case"ppClueDel":case"ppLocAdd":case"ppLocDel":case"ppDescAdd":case"ppDescDel":case"ppItemAdd":case"ppItemDel":case"ppPick":case"ppPickDel":case"ppPickNew":prepAct(a,t);break;
+    case"ppJump":case"ppReady":case"ppFold":case"ppClueAdd":case"ppClueDel":case"ppLocAdd":case"ppLocDel":case"ppDescAdd":case"ppDescDel":case"ppItemAdd":case"ppItemDel":case"ppPick":case"ppPickDel":case"ppPickNew":prepAct(a,t);break;
     case"scnAdd":case"scnDel":case"scnMoveNext":scnAct(a,t);break;
     case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stStart":case"stEqual":case"stTool":case"stDone":case"stSpot":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
     case"stTime":case"stShort":case"stLong":case"stUndo":case"stRoll":case"stAtt":case"stEdit":case"stClue":stAct(a,t);break;
