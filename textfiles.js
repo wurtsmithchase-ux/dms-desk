@@ -35,7 +35,7 @@ if(!MD5_OK)console.error("Desk text files: the MD5 self-test failed, so the text
 const HEAD="DM's Desk entry | keep this line | ";
 const HEAD_RE=/^DM's Desk entry \| keep this line \| ([a-z]+) \| ([A-Za-z0-9_-]+)\s*$/;
 const NEW_HEAD="DM's Desk new entries | keep this line";
-const FILE_COLS=["characters","notes","quests","events","threads","loot","maps","monsters","todos","clocks","tables"];
+const FILE_COLS=["characters","notes","quests","events","threads","loot","maps","monsters","todos","tables"];
 const MULTI=new Set(["textarea","textarea-tall","plain","plain-tall","checklist"]);
 const ID_SELECT=new Set(["pc","holder","parent","a","b"]);
 const LINKED="Linked (the Desk fills this in; edits here are ignored)";
@@ -219,7 +219,7 @@ function toRecord(col,base,vals){
   if(col==="events"&&"date" in d){if(d.date)Object.assign(d,d.date);delete d.date}
   return d}
 function newDefaults(col,vals){
-  const d={};if(col==="todos")d.kind="todo";if(col==="clocks"){d.segments="6";d.filled=0}
+  const d={};if(col==="todos")d.kind="todo";
   d.dmOnly=!((col==="characters"&&vals.kind==="pc")||(col==="notes"&&vals.category==="session")||col==="loot");return d}
 
 /* ---------- keeping Drive in step ---------- */

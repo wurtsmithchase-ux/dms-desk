@@ -203,7 +203,6 @@ td .clip{display:block;max-width:320px;color:var(--muted);overflow:hidden;text-o
 .pb-sp > :first-child{grid-row:span 2}
 .pb-sp small{color:var(--muted);font-size:14px}
 .pb-sp.warn small{color:var(--blood);font-weight:600}
-.clks.pb-clks{grid-template-columns:minmax(0,1fr)}
 /* Scene Editor */
 .ph-sess{width:auto;max-width:220px;min-height:44px}
 .pp-item{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}.pp-idesc{font-size:.92em;margin-left:0}
@@ -382,7 +381,6 @@ textarea.scn-box-t{resize:none;overflow:hidden;min-height:96px}
 .sx-tabs,.sx-tags{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
 .sx-tabs button[aria-pressed="true"],.sx-tags button[aria-pressed="true"]{background:var(--accent);border-color:#5e140b;color:#f6e8c6}
 .sx-tags small{flex:1 1 140px;font-size:13px;color:#b5a07e}
-.sx-clock{display:flex;flex-direction:column;gap:4px}.sx-kh{display:flex;justify-content:space-between;font-size:15px}.sx-kh span:last-child{color:#b5a07e;font-size:14px}
 .sx-segs{display:flex;gap:3px}.sx-segs button{flex:1;height:26px;min-width:0;border:1px solid var(--gilt-edge);border-radius:2px;background:#3e2c1b;cursor:pointer;padding:0}
 .sx-segs button.on{background:var(--accent);border-color:#5e140b}
 .sx-logf{display:flex;gap:6px}.sx-logf input{flex:1;min-width:0;min-height:44px;padding:0 10px;border-radius:4px;border:1px solid var(--gilt-edge);background:#efe0be;color:#2a1b10;font:inherit}
@@ -885,19 +883,6 @@ body.player .beats li:not(.done){display:none}
 .tm-phone{display:none}
 @media (max-width:640px){header .tm-btn{display:none}.tm-phone{display:inline-flex;justify-content:center}.nextgame{flex:1 1 100%;font-size:13px;text-align:center}}
 /* round 3 */
-.clks{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
-.clks.compact{grid-template-columns:minmax(0,1fr);gap:8px}
-.clk{display:flex;gap:12px;align-items:flex-start;background:var(--block);border:1px solid var(--line);border-top:4px solid var(--ink);padding:10px 12px}
-.clk.full{border-top-color:var(--blood);background:var(--blood-soft)}
-.clk.compact{padding:6px 8px;border-top-width:2px;align-items:center}
-.clk-svg{flex:none}
-.clk-b{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
-.clk-b b{font:700 17px/1.2 var(--display)}
-.clk.compact .clk-b b{font-size:15px}
-.clk-b small{color:var(--muted);font:500 13px var(--sc)}
-.clk-t{font-size:14px}
-.clk-acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
-.clk.compact .clk-acts .btn.icon{width:26px;height:26px}
 .off{background:var(--paper);border:1px solid var(--gold);border-left:5px solid var(--bar);padding:12px 14px;margin-bottom:16px;display:flex;flex-direction:column;gap:8px}
 .off h3{margin:0;font:700 20px var(--display);color:var(--accent)}
 .imp-f{font:13px/1.35 var(--ui);color:var(--muted);overflow-wrap:anywhere}
@@ -1281,12 +1266,6 @@ textarea.grow{display:block;overflow:hidden;resize:none;box-sizing:border-box;li
   .pp{grid-template-columns:minmax(0,1fr) 260px}
   .pp-side{position:sticky;top:12px}
 }
-/* clocks on the board: one line each (ring, name, + and −), like the design, not boxed cards */
-.pb-clks{gap:0}
-.pb-clks .clk{background:none;border:0;border-top:1px solid var(--line);padding:6px 0;align-items:center}
-.pb-clks .clk:first-child{border-top:0;padding-top:0}
-.pb-clks .clk-b{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:8px;align-items:center}
-.pb-clks .clk-acts{grid-column:2;grid-row:1/span 2;margin:0;flex-wrap:nowrap}
 /* active quests as a ruled list, as in the design */
 .pboard .pb-qs .pb-row{background:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:4px 2px}
 .pboard .pb-qs .pb-row:first-of-type{border-top:0}
@@ -1708,7 +1687,7 @@ const QSTAT={active:"Active",rumor:"Rumor",completed:"Completed",failed:"Failed"
 const EVKIND={session:"Session",festival:"Festival",deadline:"Deadline",travel:"Travel",event:"Event"};
 const TABS=[["home","Party page","Party"],["party","Characters","Cast"],["notes","Library","Library"],["calendar","Calendar","Calendar"],["world","World","World"],["prep","Prep","Prep"]];
 
-const S={characters:[],notes:[],quests:[],events:[],threads:[],plans:[],scenes:[],preps:[],links:[],loot:[],maps:[],logs:[],encounters:[],tables:[],clocks:[],chats:[],meta:[],monsters:[],todos:[],settings:{},loaded:false,live:false};
+const S={characters:[],notes:[],quests:[],events:[],threads:[],plans:[],scenes:[],preps:[],links:[],loot:[],maps:[],logs:[],encounters:[],tables:[],chats:[],meta:[],monsters:[],todos:[],settings:{},loaded:false,live:false};
 const U={tab:"party",charFilter:"pc",charQ:"",noteSel:null,noteQ:"",libGrp:"notes",noteChip:"all",questSt:"all",thrSt:"all",calY:null,calM:null,noteReading:false,calSel:null,preview:false,prepTab:"board",calView:"month",tableSel:null,worldTab:"maps",sess:null};
 const isPhone=()=>window.matchMedia("(max-width:640px)").matches;
 // Wood & Wax turns the tabs into a side menu at 1101px and wider (matches the CSS media query)
@@ -1786,7 +1765,7 @@ const shortDate=(c,dt)=>`${dt.d} ${(c.months[dt.m]?.name||"?").replace(/^The /,"
 
 /* ================= data layer: public + DM-only stores ================= */
 // "plans" is only read to convert old session plans into scenes (planMigrate); nothing else shows it
-const COLS=["characters","notes","quests","events","threads","plans","scenes","preps","links","loot","maps","logs","encounters","tables","clocks","chats","meta","monsters","todos"];
+const COLS=["characters","notes","quests","events","threads","plans","scenes","preps","links","loot","maps","logs","encounters","tables","chats","meta","monsters","todos"];
 const ALWAYS_DM=new Set(["threads","plans","scenes","preps","logs","encounters","tables","chats","meta","monsters","todos"]);
 const SECRET="dm/secret";
 const RAW={};COLS.forEach(c=>RAW[c]={pub:new Map(),dm:new Map(),x:new Map()});
@@ -1915,7 +1894,7 @@ function backlinks(type,id){
   ["characters","notes","quests","events","scenes","threads"].forEach(col=>S[col].forEach(x=>{if(col===type&&x.id===id)return;if(re.test(textOf(col,x)))out.push({col,x})}));
   return out;
 }
-const COL_LABEL={monsters:"Stat block",todos:"To-do",meta:"Check",chats:"Conversation",clocks:"Clock",encounters:"Encounter",tables:"Roll table",logs:"Session log",characters:"Character",notes:"Note",quests:"Quest",events:"Event",plans:"Session plan (old)",scenes:"Scene",preps:"Session prep",threads:"Loose thread",maps:"Map",loot:"Item"};
+const COL_LABEL={monsters:"Stat block",todos:"To-do",meta:"Check",chats:"Conversation",encounters:"Encounter",tables:"Roll table",logs:"Session log",characters:"Character",notes:"Note",quests:"Quest",events:"Event",plans:"Session plan (old)",scenes:"Scene",preps:"Session prep",threads:"Loose thread",maps:"Map",loot:"Item"};
 function backlinkBlock(type,id){
   const bl=backlinks(type,id);if(!bl.length)return "";
   return `<div class="taper"></div><h3 class="vh">Mentioned in</h3><div class="bl">${bl.map(({col,x})=>`<button class="bl-i" data-act="open" data-type="${col}" data-id="${x.id}"><b>${esc(titleOf(col,x)||"Untitled")}</b><small>${COL_LABEL[col]}${col==="notes"&&x.category?" · "+(NOTE_CATS[x.category]||""):""}</small></button>`).join("")}</div>`;
@@ -1944,7 +1923,6 @@ function openEntry(type,id){
   else if(type==="scenes"){const s=rec("scenes",id);if(!s)return;goBoard(num(s.session)||null,id)}
   else if(type==="threads"||type==="links"||type==="loot")openForm(type,id);
   else if(type==="encounters")openEncounter(id);
-  else if(type==="clocks")openForm("clocks",id);
   else if(type==="monsters")openMonster(id);
   else if(type==="todos")openForm("todos",id);
   else if(type==="tables"){U.prepTab="tables";U.tableSel=id;if(location.hash!=="#prep")location.hash="prep";else render()}
@@ -2072,8 +2050,8 @@ function vPrep(c){
   const back=`<button type="button" class="btn ph-back" data-act="prepTab" data-v="board">‹ Prep Board</button>`;
   if(t==="board"){const n=boardN(),ng=nextGameText();
     return pageHead(esc(ng||"No game date set"),`Prep for Session ${n}`,{extra:sessPicker(n)})+vPrepBoard(c)}
-  const PREP_PAGES={notes:"Session notes",todos:"Prep to-dos",bestiary:"Bestiary",milestones:"Milestones",encounters:"Encounters",clocks:"Clocks",tables:"Roll tables",spotlight:"Spotlight",ideas:"Saved ideas"};
-  return pageHead("Prep",PREP_PAGES[t]||"Prep",{extra:back})+`<div class="ph-page">`+(t==="notes"?toolsPanel():t==="todos"?vTodos():t==="bestiary"?vBestiary():t==="milestones"?vMilestones():t==="encounters"?vEncounters():t==="clocks"?vClocks():t==="tables"?vTables():t==="ideas"?vBrainstorm():vSpotlight())+`</div>`;
+  const PREP_PAGES={notes:"Session notes",todos:"Prep to-dos",bestiary:"Bestiary",milestones:"Milestones",encounters:"Encounters",tables:"Roll tables",spotlight:"Spotlight",ideas:"Saved ideas"};
+  return pageHead("Prep",PREP_PAGES[t]||"Prep",{extra:back})+`<div class="ph-page">`+(t==="notes"?toolsPanel():t==="todos"?vTodos():t==="bestiary"?vBestiary():t==="milestones"?vMilestones():t==="encounters"?vEncounters():t==="tables"?vTables():t==="ideas"?vBrainstorm():vSpotlight())+`</div>`;
 }
 /* Prep Board: seven sections for the next session (Session Start, Scenes, Secrets & Clues, Fantastic Locations, Important NPCs, Relevant Monsters, Magic Items)
    and a checklist you tick yourself. Each session has one DM-only record in "preps" (id "prep<n>"):
@@ -2736,7 +2714,7 @@ function stTravelHtml(){const mi=Math.min(parseFloat(ST.miles),ST_MAX_MILES);if(
   return `<p class="sx-tr">About <b>${lbl}</b> on the road${multi?` · ${days} days of travel at ${ST_DAY_H} hours a day`:""}.</p><button type="button" class="btn sm" data-act="stTime" data-n="${multi?Math.min(days*1440,ST_MAX_ADD):mins}">Advance time by ${multi?(days*1440>ST_MAX_ADD?ST_MAX_ADD/1440+" days (the most at once)":days+" days"):lbl}</button>`}
 /* ===== Session Table, as in the design canvas (screen A) =====
    Top bar: campaign and session clock, search with pins, in-game time, music, timed alerts, Prep & Library, End session.
-   Columns: path + party (dark) · the scene (parchment) · dice, clocks, log (dark) · rules, Oracle, travel (dark).
+   Columns: path + party (dark) · the scene (parchment) · dice, log (dark) · rules, Oracle, travel (dark).
    Windows inside the table: hero sheet (ST.sheet), NPC or foe (ST.entry), quick foe (ST.gen), recap (ST.recap). */
 const ST_ATT=[["hostile","Hostile"],["wary","Wary"],["neutral","Neutral"],["friendly","Friendly"],["ally","Ally"]];
 const ST_DICE=[["d4",4],["d6",6],["d8",8],["d10",10],["d12",12],["d20",20],["Adv","adv"],["Dis","dis"],["d100",100],["2d6","2d6"]];
@@ -2948,12 +2926,11 @@ function stWindow(n){
 function stRecapData(n){const plan=stPlan(),sc=stScenes(plan),items=stLogItems(n).reverse();
   const cl=prepClues(plan?plan.session:n).filter(k=>String(k.t||"").trim());
   return{played:sc.filter(s=>s.done).map(s=>s.title||"Untitled scene"),clues:cl.filter(k=>k.found).map(k=>k.t),hooks:cl.filter(k=>!k.found).map(k=>k.t),
-    spot:S.characters.filter(x=>x.kind==="pc").map(p=>[p.name,stSpotN(n,p.id)]).filter(x=>x[1]),log:items.map(o=>o.x),tally:items.map(o=>o.x).filter(t=>/^\[(Loot|Milestone)\]/i.test(t)),
-    clocks:S.clocks.map(k=>`${k.name||k.title||"Clock"}: ${num(k.filled)||0} of ${num(k.segments)||0}`)}}
+    spot:S.characters.filter(x=>x.kind==="pc").map(p=>[p.name,stSpotN(n,p.id)]).filter(x=>x[1]),log:items.map(o=>o.x),tally:items.map(o=>o.x).filter(t=>/^\[(Loot|Milestone)\]/i.test(t))}}
 function stRecapHtml(n,close){const d=stRecapData(n),li=(a,e)=>a.length?`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:`<p class="vempty">${e}</p>`;
   return `<div class="sx-wtabs"><span class="sx-kick">Drafted from tonight's play</span><span class="grow"></span>${close}</div><div class="sx-wb"><h2>Recap · Session ${n}</h2>
     <div class="sx-rc"><div><h3>Scenes played</h3>${li(d.played,"No scenes ticked done.")}<h3>Clues the party learned</h3>${li(d.clues,"None revealed.")}<h3>Spotlight tonight</h3><p>${d.spot.length?esc(d.spot.map(([a,b])=>`${a} ★${b}`).join(" · ")):"No moments marked."}</p></div>
-      <div><h3>From the log</h3>${li(d.log.slice(-12),"Nothing logged.")}<h3>Loot &amp; milestones</h3>${li(d.tally,"None tagged.")}<h3>Clocks</h3>${li(d.clocks,"No clocks.")}</div></div>
+      <div><h3>From the log</h3>${li(d.log.slice(-12),"Nothing logged.")}<h3>Loot &amp; milestones</h3>${li(d.tally,"None tagged.")}</div></div>
     <div class="sx-hooks"><div class="sx-bhr"><h3>Hooks for next time</h3>${d.hooks.length?`<button type="button" class="btn sm" data-act="stHooks" ${ST.hooksSent?"disabled":""}>${ST.hooksSent?"Added to Threads":"Add them as threads"}</button>`:""}</div><small>Clues the party hasn't found yet, ready to become threads on the Prep Board</small>${li(d.hooks,"Every clue was found.")}</div>
     <div class="foot"><button type="button" class="btn primary" data-act="stRecapNote">Save as the session recap note</button><button type="button" class="btn" data-act="wrapUp">Calendar, next game &amp; mark played…</button><span class="grow"></span><button type="button" class="btn" data-act="stClose">Close</button></div></div>`}
 // the Session Table's newer taps (design screen A); older ones stay in stAct
@@ -2978,7 +2955,6 @@ async function stAct2(a,t){const n=rcSession(),plan=stPlan();
     if(document.activeElement&&document.activeElement.id==="sx-q"){stRefreshResults();renderPending=true;return}return renderTable()}
   if(a==="stDone"){if(plan)return stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===t.dataset.id);if(s)s.done=!s.done});return}
   if(a==="stSpot")return stSpot(n,t.dataset.id,num(t.dataset.n)||1);
-  if(a==="stSeg"){const k=rec("clocks",t.dataset.id);if(!k)return;const v=num(t.dataset.n),f=num(k.filled)||0;await patchRec("clocks",k.id,{filled:v===f?v-1:v});return renderTable()}
   if(a==="stTag"){ST.tag=ST.tag===t.dataset.v?"":t.dataset.v;return renderTable()}
   if(a==="stRcat"){ST.rcat=t.dataset.v;return renderTable()}
   if(a==="stPace"){ST.pace=t.dataset.v;return renderTable()}
@@ -3054,26 +3030,6 @@ async function addFestivals(){
     await save("events",uid(),{title,kind:"festival",yearly:true,y:c.today.y,m,d:c.months[m].days,notes:desc+"\n\nPlaced on the last day of "+c.months[m].name+" because this calendar has no festival days between months.",dmOnly:false});n++;
   }
   toast(n?`Added ${n} festivals`:"The festivals are already on the calendar");
-}
-
-/* ---------- faction clocks ---------- */
-function clockSvg(seg,filled,size){
-  seg=Math.max(2,Math.min(12,num(seg)||4));filled=Math.max(0,Math.min(seg,num(filled)||0));const r=size/2-3,cx=size/2,cy=size/2;let p="";
-  for(let i=0;i<seg;i++){const a0=-Math.PI/2+i*2*Math.PI/seg,a1=a0+2*Math.PI/seg;const x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0),x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1);
-    p+=`<path d="M${cx} ${cy}L${x0.toFixed(2)} ${y0.toFixed(2)}A${r} ${r} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}Z" fill="${i<filled?"var(--accent)":"var(--surface)"}" stroke="var(--ink)" stroke-width="1.5"/>`}
-  return `<svg class="clock-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="${filled} of ${seg}">${p}</svg>`;
-}
-function clockCard(k,compact){
-  const seg=num(k.segments)||6,f=Math.min(seg,num(k.filled)||0),full=f>=seg;
-  return `<div class="clk ${full?"full":""} ${compact?"compact":""}">${clockSvg(seg,f,compact?44:72)}<div class="clk-b"><b>${esc(k.title||"Clock")}</b><small>${esc(k.faction||"")}${k.faction?" · ":""}${f} of ${seg}${full?` · <span class="t-bad">triggered</span>`:""} ${dmBadge(k)}</small>
-    ${!compact&&k.trigger?`<span class="clk-t"><b>When it fills:</b> ${linkify(esc(k.trigger),"")}</span>`:""}
-    <span class="clk-acts dm-only"><button class="btn icon" data-act="clkTick" data-id="${k.id}" data-n="-1" aria-label="Remove a segment">−</button><button class="btn icon" data-act="clkTick" data-id="${k.id}" data-n="1" aria-label="Fill a segment">+</button>${compact?"":`<button class="btn sm" data-act="edit" data-type="clocks" data-id="${k.id}">Edit</button>`}</span></div></div>`;
-}
-async function tickClock(id,n){const k=rec("clocks",id);if(!k)return;const seg=num(k.segments)||6;const f=Math.max(0,Math.min(seg,(num(k.filled)||0)+n));if(f===(num(k.filled)||0))return;const{id:_,...keep}=k;await save("clocks",id,{...keep,filled:f});if(f>=seg&&n>0)toast(`“${k.title}” has filled`)}
-function vClocks(){
-  const list=S.clocks.slice().sort((a,b)=>((num(b.filled)||0)/(num(b.segments)||1))-((num(a.filled)||0)/(num(a.segments)||1)));
-  return `<div class="sub-bar"><p class="tool-d">Progress clocks for what's happening offscreen. Fill segments as time passes or the party ignores a threat; when a clock fills, its consequence happens.</p><div class="tool-acts"><button class="btn primary" data-act="new" data-type="clocks">New clock</button></div></div>
-  ${list.length?`<div class="clks">${list.map(k=>clockCard(k)).join("")}</div>`:`<div class="empty">No clocks yet. Try "Rival gang finds the silver amulet" with 6 segments.</div>`}`;
 }
 
 /* ---------- shops ---------- */
@@ -4322,7 +4278,7 @@ function facBlock(n){
   return `<div class="facblock">${f.map(([l,v])=>`<div class="prop"><b>${l}.</b> ${linkify(esc(v),"notes:"+n.id)}</div>`).join("")}${n.goals?`<div class="prop full"><b>Goals.</b> ${linkify(esc(n.goals),"notes:"+n.id)}</div>`:""}${n.members?`<div class="full"><div class="prop"><b>Key members.</b></div><div class="prose vprose">${rich(n.members,"notes:"+n.id)}</div></div>`:""}</div>`;
 }
 /* Library: every entry sorted into groups. Notes read here; other entries open their own page. */
-const LIB_GROUPS=[["notes","Notes"],["sessions","Sessions"],["party","Party"],["npcs","NPCs"],["bestiary","Bestiary"],["tables","Tables & Clocks"]];
+const LIB_GROUPS=[["notes","Notes"],["sessions","Sessions"],["party","Party"],["npcs","NPCs"],["bestiary","Bestiary"],["tables","Tables"]];
 /* Notes group: one list with filter chips. Session recaps stay under Sessions and monster notes under Bestiary. */
 const NOTE_GROUP={monster:"bestiary",session:"sessions"};
 const noteGroup=n=>NOTE_GROUP[n&&n.category]||"notes";
@@ -4331,7 +4287,7 @@ const CHIP_CAT={hooks:"plot",locations:"location",shops:"shop",factions:"faction
 const chipOf=({col,x})=>col==="quests"?"quests":col==="threads"?"threads":Object.keys(CHIP_CAT).find(k=>CHIP_CAT[k]===x.category)||"other";
 const NOTE_NEW={all:["notes",{category:"lore"},"New note"],quests:["quests",{status:"active"},"New quest"],threads:["threads",{status:"open"},"New thread"],hooks:["notes",{category:"plot"},"New plot hook"],locations:["notes",{category:"location"},"New location"],shops:["notes",{category:"shop"},"New shop or inn"],factions:["notes",{category:"faction"},"New faction"],lore:["notes",{category:"lore"},"New lore note"],items:["notes",{category:"item"},"New item"],rules:["notes",{category:"rules"},"New ruling"],other:["notes",{category:"other"},"New note"]};
 const LIB_NEW={notes:NOTE_NEW.all,party:["characters",{kind:"pc",status:"alive"},"New character"],npcs:["characters",{kind:"npc",status:"alive"},"New NPC"],bestiary:["monsters",{},"New stat block"],tables:["tables",{},"New roll table"]};
-const LIB_COLS=["notes","characters","quests","threads","monsters","scenes","tables","clocks"];
+const LIB_COLS=["notes","characters","quests","threads","monsters","scenes","tables"];
 // everything in the Notes group, before any chip is applied
 const allNoteItems=()=>[...S.notes.filter(n=>noteGroup(n)==="notes").map(x=>({col:"notes",x})),...S.quests.map(x=>({col:"quests",x})),...S.threads.map(x=>({col:"threads",x}))];
 const chipCounts=()=>{const o={all:0};allNoteItems().forEach(i=>{o.all++;const k=chipOf(i);o[k]=(o[k]||0)+1});return o};
@@ -4347,7 +4303,7 @@ function libItems(g){const T=(col,f)=>(S[col]||[]).filter(f||(()=>true)).map(x=>
     case"npcs":return T("characters",x=>x.kind!=="pc");
     case"bestiary":return [...T("monsters"),...N("bestiary")];
     case"sessions":return N("sessions");
-    case"tables":return [...T("tables"),...T("clocks")];
+    case"tables":return T("tables");
     default:return []}}
 const libTag=(col,x)=>col==="notes"?(NOTE_CATS[x.category]||"Note"):col==="characters"?(x.kind==="pc"?"Player character":"NPC"):col==="quests"?"Quest · "+QSTAT[questStatus(x)]:col==="threads"?"Loose thread · "+(x.status==="resolved"?"Resolved":"Open"):(COL_LABEL[col]||"Entry");
 // only the start of a long body is needed for the one-line preview
@@ -4371,7 +4327,7 @@ function vNotes(c){
   let h=isDM()?pageHead(q?`Every entry matching “${esc(U.noteQ.trim())}”`:esc(gName||""),q?"Search":"The Library",{search:qBox,newLabel:nw?nw[2]:g==="sessions"?"New session plan":"",extra:extra.length?moreMenu(extra.map(([a,l])=>mi(a,l)),{label:"More ▾",title:"More ways to add",sm:false}):""}):`<div class="bar"><h2>Library</h2>${qBox}</div>`;
   // pages that used to be their own tabs open from their Library group
   const goW=(v,l)=>`<button type="button" class="btn sm" data-act="pbWorld" data-v="${v}">${l}</button>`,goP=(v,l)=>`<button type="button" class="btn sm" data-act="libPrep" data-v="${v}">${l}</button>`;
-  const more=q?"":{locations:goW("maps","Maps")+goW("rel","Relationships")+goW("places","Places")+goW("know","Party knows"),sessions:`<a class="btn sm" href="#calendar">Calendar</a>`+goP("notes","Session notes")+goP("milestones","Milestones"),bestiary:goP("bestiary","Bestiary page")+goP("encounters","Encounters"),tables:goP("tables","Roll tables")+goP("clocks","Clocks"),lore:goP("ideas","Saved ideas")}[g==="notes"?chip:g]||"";
+  const more=q?"":{locations:goW("maps","Maps")+goW("rel","Relationships")+goW("places","Places")+goW("know","Party knows"),sessions:`<a class="btn sm" href="#calendar">Calendar</a>`+goP("notes","Session notes")+goP("milestones","Milestones"),bestiary:goP("bestiary","Bestiary page")+goP("encounters","Encounters"),tables:goP("tables","Roll tables"),lore:goP("ideas","Saved ideas")}[g==="notes"?chip:g]||"";
   const groups=sideMenu()&&isDM()?"":`<div class="lib-groups" role="group" aria-label="Library groups">${LIB_GROUPS.map(([k,l])=>`<button type="button" class="lib-g" data-act="libGrp" data-v="${k}" aria-pressed="${!q&&g===k}">${l}<span class="n">${libItems(k).length}</span></button>`).join("")}</div>`;
   const cnts=chipCounts(),chipBtn=(k,l,n,act,cls,on)=>`<button type="button" class="lib-g ${cls||""}" data-act="${act}" data-v="${k}" aria-pressed="${on}">${esc(l)}<span class="n">${n}</span></button>`;
   const qs=S.quests.filter(x=>true),stCount=(arr,f)=>arr.filter(f).length;
@@ -4457,7 +4413,6 @@ const FORMS={
     ["saves","Saving throws","text",3],["skills","Skills","text",3],["resist","Resistances & immunities","text",6],["senses","Senses","text",3],["languages","Languages","text",3],
     ["traits","Traits","plain",6,null,"One per line: Name. What it does"],["actions","Actions","plain",6,null,"One per line: Name. Attack or effect"],["bonus","Bonus actions","plain",6],["reactions","Reactions","plain",6],["legendary","Legendary actions","plain",6],["notes","Phases & notes","plain",6,null,"e.g. Stage 2: mounts the Phantom Steed; six goblins rise"]]},
   todos:{title:"To-do",fields:c=>[["text","Item","text",6],["kind","Type","select",3,{todo:"To-do",goal:"Goal"}],["due","Due","date",3],["done","Done","check",6],["notes","Notes","textarea",6]]},
-  clocks:{title:"Clock",fields:c=>[["title","Clock","text",6,null,"e.g. Rival gang finds the silver amulet"],["faction","Faction or villain","text",3],["segments","Segments","select",3,{"4":"4","6":"6","8":"8","10":"10","12":"12"}],["filled","Filled so far","number",3],["trigger","When it fills","text",6,null,"What happens if nobody stops it"],["notes","Notes","textarea",6]]},
   tables:{title:"Roll table",fields:c=>[["title","Table name","text",6],["desc","What it's for","text",6,null],["entries","Entries","plain-tall",6,null,"One entry per line. The die matches the number of lines."]]},
   events:{title:"Event",fields:c=>[["title","Event","text",6],["kind","Kind","select",3,EVKIND],["yearly","Repeats every year","check",3],["date","Date","igdate",6],["realDates","Played on (real dates)","dates",6,null,"The real-world game nights this in-world day covered"],["notes","Notes","textarea",6],["secret","DM secrets","textarea",6]]},
   threads:{title:"Loose thread",fields:c=>[["text","Thread","text",6],["status","Status","select",3,{open:"Open",resolved:"Resolved"}],["notes","Notes","textarea",6,null,"Ideas for how it could come back"]]},
@@ -4469,7 +4424,6 @@ function igInputs(c,k,dt){dt=dt||c.today;return `<div style="display:flex;gap:6p
 function openForm(type,id,preset){
   const c=cal(),F=FORMS[type],row=id?S[type].find(x=>x.id===id):null,v={...(preset||{}),...(row||{})};
   if(!row&&type==="todos"&&!v.kind)v.kind="todo";
-  if(!row&&type==="clocks"){if(v.segments===undefined)v.segments="6";if(v.filled===undefined)v.filled=0}
   if(!row&&v.dmOnly===undefined)v.dmOnly=!((type==="characters"&&v.kind==="pc")||(type==="notes"&&v.category==="session")||type==="loot");
   if(type==="events"&&v.m!=null)v.date={y:v.y,m:v.m,d:v.d};
   const isNpc=type==="characters"&&v.kind!=="pc",isFac=(v.category||"")==="faction",isSess=(v.category||"")==="session",isShop=(v.category||"")==="shop",isPlace=["location","shop","lore"].includes(v.category||"");
@@ -4660,7 +4614,6 @@ function renderSearch(q){
     ["Encounters","encounters",x=>x.title,x=>{const m=encMath(x);return `${DIFF[m.diff][0]} · ${fmtN(m.xp)} XP`},x=>[(x.monsters||[]).map(m=>m.name).join(" "),x.notes]],
     ["Stat blocks","monsters",x=>x.name,x=>[x.meta,x.cr&&"CR "+x.cr].filter(Boolean).join(" · "),x=>[textOf("monsters",x)]],
     ["Goals & to-dos","todos",x=>plain(x.text||""),x=>(x.kind==="goal"?"Goal":"To-do")+(x.done?" · done":""),x=>[x.notes]],
-    ["Clocks","clocks",x=>x.title,x=>`${num(x.filled)||0} of ${num(x.segments)||6}${x.faction?" · "+x.faction:""}`,x=>[x.trigger,x.notes,x.faction]],
     ["Roll tables","tables",x=>x.title,x=>`d${tableEntries(x).length}`,x=>[x.desc,x.entries]],
   ];
   if(isDM())groups.forEach(g=>{const f=g[4];g[4]=x=>[...f(x),x.secret]});
@@ -4766,7 +4719,6 @@ document.addEventListener("click",async e=>{
     case"dateDel":t.closest(".date-row")?.remove();break;
     case"copyR20":{const ty=t.dataset.type;if(ty==="scenes"){const pl=sessPlan(sessNum(t.dataset.id));copyRoll20(`Session ${pl.session}`,pl.scenes.map(s=>"# "+(s.reserve?"Reserve: ":"")+(s.title||"Untitled scene")+"\n"+[s.note,s.read&&"Read aloud: "+s.read,s.when&&"When: "+s.when,...s.ifs.map(k=>"If they "+k.if+": "+k.then)].filter(Boolean).join("\n")).concat(prepClues(pl.session).filter(k=>String(k.t||"").trim()).length?["# Secrets & Clues\n"+prepClues(pl.session).filter(k=>String(k.t||"").trim()).map(k=>"Clue: "+k.t).join("\n")]:[]).join("\n\n"))}else{const n=rec("notes",t.dataset.id);if(n)copyRoll20(n.title,n.body)}break}
     case"festivals":await addFestivals();break;
-    case"clkTick":await tickClock(t.dataset.id,num(t.dataset.n));break;
     case"stockSell":await stockSell(t.dataset.id,num(t.dataset.i));break;
     case"tmExit":closeTableMode();render();break;
     case"tmRoll":rollTable(t.dataset.id);renderTable();break;
@@ -4820,7 +4772,7 @@ document.addEventListener("click",async e=>{
     case"scnMoveOpen":{const p=sessPlan(sessNum(t.dataset.id));sessMoveScenes(p.scenes.filter(x=>!x.done&&!x.played).map(x=>x.id),p.session+1);break}
     case"ppJump":case"ppClueAdd":case"ppClueDel":case"ppLocAdd":case"ppLocDel":case"ppDescAdd":case"ppDescDel":case"ppItemAdd":case"ppItemDel":case"ppPick":case"ppPickDel":case"ppPickNew":prepAct(a,t);break;
     case"scnAdd":case"scnDel":case"scnMoveNext":scnAct(a,t);break;
-    case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stStart":case"stEqual":case"stTool":case"stDone":case"stSpot":case"stSeg":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
+    case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stStart":case"stEqual":case"stTool":case"stDone":case"stSpot":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
     case"stTime":case"stShort":case"stLong":case"stUndo":case"stRoll":case"stAtt":case"stEdit":case"stClue":stAct(a,t);break;
     case"heroSel":case"heroTab":case"heroLvl":heroAct(a,t);break;
     case"pplSel":case"pplKind":case"pplTab":case"pplAtt":case"pplUnlink":case"genSave":case"genApply":pplAct(a,t);break;
