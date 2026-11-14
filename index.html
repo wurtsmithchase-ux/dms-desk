@@ -304,19 +304,8 @@ textarea.scn-box-t{resize:none;overflow:hidden;min-height:96px}
 .sx-link{border:0;background:none;color:#b5a07e;font:400 15px var(--sc);cursor:pointer;min-height:36px;padding:0}
 .sx-link:hover{color:var(--gold)}
 .sx-c1{gap:8px}
-.sx-path{display:flex;flex-direction:column;gap:6px}
-.sx-pr{display:flex;gap:6px;align-items:stretch}
 .sx-tick{flex:0 0 32px;display:flex;align-items:center;justify-content:center;border:1px solid var(--gilt-edge);border-radius:3px;background:#2e2015;color:var(--gold);cursor:pointer;min-height:44px}
-.sx-pr.done .sx-tick{background:var(--gilt-edge);color:#17100b}
-.sx-ps{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;text-align:left;padding:8px 10px;border:1px solid #5a4220;border-radius:3px;background:#241811;color:#ead9b5;cursor:pointer;font:inherit;min-height:44px}
-.sx-ps[aria-current="true"]{background:var(--accent);border-color:#5e140b;color:#f6e8c6}
-.sx-pr.done .sx-ps{opacity:.6}.sx-pr.done .sx-pt span:last-child{text-decoration:line-through}
-.sx-pt{display:flex;gap:8px;align-items:baseline;font-weight:600}.sx-pn{font:700 15px var(--drop);color:var(--gold)}
-.sx-ps[aria-current="true"] .sx-pn{color:#f6e8c6}
-.sx-ps small{font-size:14px;font-style:italic;opacity:.85}
-.sx-resb{display:flex;justify-content:space-between;align-items:center;min-height:40px;margin-top:6px;padding:0 10px;border:1px dashed #8a6a2c;border-radius:3px;background:none;color:#b5a07e;font:400 15px var(--sc);cursor:pointer}
-.sx-resl{display:flex;flex-direction:column;gap:6px}
-.sx-resl .sx-ps{background:transparent;border-style:dashed}
+.sx-sc.done .sx-tick{background:var(--gilt-edge);color:#17100b}
 .sx-party{display:flex;flex-direction:column;gap:4px;padding-top:8px;border-top:1px solid #3e2c1b}
 .sx-pg{display:grid;grid-template-columns:minmax(0,1fr) 34px 34px 34px 78px;gap:4px;align-items:center;font-size:15px;text-align:center}
 .sx-pgh{font:400 13px var(--sc);color:#b5a07e}.sx-pgh span:first-child{text-align:left}
@@ -335,32 +324,25 @@ textarea.scn-box-t{resize:none;overflow:hidden;min-height:96px}
 .sx-sh h1{margin:0;font:700 32px/1.15 var(--drop);color:#2a1b10}
 .sx-note{font-style:italic;color:#5e4630;white-space:pre-wrap}
 .sx-scene .btn{font:400 16px var(--sc);min-height:44px}
+.sx-sc{display:flex;gap:10px;align-items:flex-start}
+.sx-sc.done .sx-sc-main{opacity:.6}.sx-sc.done .sx-sc-main h3{text-decoration:line-through}
+.sx-sc+.sx-sc{border-top:1px solid var(--gilt-rule);padding-top:14px;margin-top:2px}
+.sx-sc-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.sx-sc-main h3{margin:0;font:700 22px/1.2 var(--drop);color:#2a1b10}
+.sx-sc-body{white-space:pre-wrap;color:#3c2a1a;line-height:1.5}
+.sx-scs{display:flex;flex-direction:column;gap:14px}
+.sx-scene .sx-tick{background:#f6ebd0;color:var(--accent);border-color:#b08e52}
 .sx-edit{background:#f6ebd0;border:1px solid #b08e52;color:#2a1b10}
-.sx-next{background:var(--accent);border:1px solid #5e140b;color:#f6e8c6}
-.sx-read{background:#e4cfa3;border:1px solid #b08e52;border-radius:3px;padding:12px 18px;display:flex;flex-direction:column;gap:6px}
-.sx-ph{display:flex;justify-content:space-between;align-items:center;gap:8px;font:400 17px var(--sc)}
-.sx-read .sx-ph span{color:var(--accent)}
-.sx-read .btn{min-height:36px;font-size:14px;background:#efe0be;border:1px solid #b08e52;color:#2a1b10}
-.sx-read p{margin:0;font-size:19px;font-style:italic;line-height:1.55}
-.sx-drop{float:left;font:700 3em/.85 var(--drop);font-style:normal;color:var(--accent);margin:.06em .1em 0 0}
 .sx-two{display:flex;flex-wrap:wrap;gap:22px}
 .sx-cl{flex:1 1 260px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .sx-wh{flex:1.2 1 300px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .sx-cl h2,.sx-wh h2{margin:0;font:400 20px var(--sc);color:var(--accent)}.sx-cl h2 small{font:400 14px var(--body);color:#5e4630}
-.sx-cl h2+h2,.sx-cl .sx-if+h2,.sx-cl .sx-clue+h2,.sx-cl .vempty+h2{margin-top:10px}
+.sx-cl h2+h2,.sx-cl .sx-clue+h2,.sx-cl .vempty+h2{margin-top:10px}
 .sx-clue{display:flex;align-items:center;gap:10px;text-align:left;min-height:44px;padding:8px 12px;border:1px dashed var(--accent);border-radius:3px;background:#f6ebd0;color:#2a1b10;cursor:pointer;font:inherit}
 .sx-dot{flex:0 0 12px;height:12px;border-radius:50%;border:2px solid var(--accent)}
 .sx-clue[aria-pressed="true"]{border-style:solid;border-color:var(--gilt-rule);color:#5e4630}
 .sx-clue[aria-pressed="true"] .sx-dot{background:var(--accent)}
 .sx-rev{margin-left:auto;font:400 13px var(--sc);color:var(--accent)}
-.sx-if{border:1px solid var(--gilt-rule);border-radius:3px;background:#f6ebd0}
-.sx-ifr{display:flex;align-items:center}
-.sx-ifc{flex:0 0 44px;min-height:44px;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
-.sx-cbx{width:20px;height:20px;border:2px solid var(--accent);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;color:#fff;background:#fff}
-.sx-ifc[aria-checked="true"] .sx-cbx{background:var(--accent)}
-.sx-if.done .sx-ifq{text-decoration:line-through;color:#5e4630}
-.sx-ifq{display:flex;gap:8px;flex:1;min-width:0;width:100%;padding-left:0 !important;text-align:left;min-height:44px;padding:8px 12px;border:0;background:none;color:#2a1b10;cursor:pointer;font:inherit;font-weight:600}
-.sx-if p{margin:0;padding:0 12px 10px 30px}
 .sx-npc,.sx-foe{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1px solid var(--gilt-rule);border-radius:3px;background:#f6ebd0;font-size:15px}
 .sx-foe{border-color:var(--accent)}
 .sx-nh{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px}
@@ -2382,18 +2364,14 @@ async function sessMoveScenes(ids,m){
 const scnUnsaved=pid=>(SCN.pid===pid&&SCN.dirty)||!!SCN.pending[pid];
 document.addEventListener("visibilitychange",()=>{if(document.hidden)scnFlush()});
 window.addEventListener("pagehide",()=>{scnFlush()});
-function scnMove(id,n){const i=SCN.d.findIndex(x=>x.id===id),j=i+n;if(i<0||j<0||j>=SCN.d.length)return;
-  [SCN.d[i],SCN.d[j]]=[SCN.d[j],SCN.d[i]];
-  // keep focus on the moved scene; the arrow at the end of the list turns off, so fall back to its text box
-  const end=j===0||j===SCN.d.length-1;FOCUS_NEXT=end?`[data-scsel="${CSS.escape(id)}"] textarea`:`[data-scsel="${CSS.escape(id)}"] [data-n="${n}"]`;scnTouch(true)}
-// the scene boxes: one growing text box per scene, with order, delete and a way to push it to the next session
+// the scene boxes: one growing text box per scene, with delete and a way to push it to the next session
 function scnCards(){
-  const N=SCN.d.length,nx=sessNum(SCN.pid)+1;
-  const card=(x,i)=>`<article class="scn-card" data-scsel="${x.id}"><div class="scn-eh"><span class="scn-kicker">Scene ${i+1}</span>
-      <span class="scn-acts"><button type="button" class="btn icon" data-act="scnMove" data-id="${x.id}" data-n="-1" aria-label="Move scene ${i+1} up" ${i===0?"disabled":""}>↑</button><button type="button" class="btn icon" data-act="scnMove" data-id="${x.id}" data-n="1" aria-label="Move scene ${i+1} down" ${i===N-1?"disabled":""}>↓</button><button type="button" class="btn sm danger ${SCN.arm===x.id?"armed":""}" data-act="scnDel" data-id="${x.id}">${SCN.arm===x.id?"Yes, delete":"Delete"}</button></span></div>
-    <textarea class="scn-in scn-box-t grow" data-scf="note" data-id="${x.id}" rows="3" placeholder="What happens in this scene…" aria-label="Scene ${i+1}">${esc(x.note)}</textarea>
+  const nx=sessNum(SCN.pid)+1;
+  const card=x=>`<article class="scn-card" data-scsel="${x.id}"><div class="scn-eh"><span class="scn-kicker">Scene</span>
+      <span class="scn-acts"><button type="button" class="btn sm danger ${SCN.arm===x.id?"armed":""}" data-act="scnDel" data-id="${x.id}">${SCN.arm===x.id?"Yes, delete":"Delete"}</button></span></div>
+    <textarea class="scn-in scn-box-t grow" data-scf="note" data-id="${x.id}" rows="3" placeholder="What happens in this scene…" aria-label="Scene">${esc(x.note)}</textarea>
     <div class="scn-foot"><button type="button" class="btn sm" data-act="scnMoveNext" data-id="${x.id}">Move to Session ${nx}</button></div></article>`;
-  return `<div class="scn">${SCN.d.map(card).join("")}<button type="button" class="btn primary" data-act="scnAdd">+ Add next scene</button></div>`}
+  return `<div class="scn">${SCN.d.map(card).join("")}<button type="button" class="btn primary" data-act="scnAdd">+ Add scene</button></div>`}
 document.addEventListener("input",e=>{const t=e.target;if(!t.dataset||t.dataset.scf!=="note")return;
   const s=SCN.d&&SCN.d.find(x=>x.id===t.dataset.id);if(!s)return;
   s.note=t.value;s.title=scnTitle(t.value);
@@ -2403,7 +2381,6 @@ document.addEventListener("change",e=>{
   if(e.target.id!=="scn-plan")return;scnFlush();prepFlush();U.prepSess=e.target.value==="new"?nextSession():num(e.target.value);render()});
 function scnAct(a,t){
   if(a==="scnMoveNext"){const n=SCN.pid?sessNum(SCN.pid):0;if(!n)return;return sessMoveScenes([t.dataset.id],n+1)}
-  if(a==="scnMove")return scnMove(t.dataset.id,num(t.dataset.n));
   if(a==="scnAdd"){if(!SCN.d)return;const s=scnNew();SCN.d.push(s);SCN.sel=s.id;SCN.arm=null;FOCUS_NEXT=`[data-scsel="${CSS.escape(s.id)}"] textarea`;return scnTouch(true)}
   if(a==="scnDel"){if(SCN.arm!==t.dataset.id){SCN.arm=t.dataset.id;render();return}SCN.d=SCN.d.filter(x=>x.id!==t.dataset.id);SCN.arm=null;SCN.sel=null;return scnTouch(true)}}
 function backlinksFrom(text){
@@ -2688,7 +2665,7 @@ function closeTableMode(){TM=false;const el=document.getElementById("tablemode")
 function typingInTable(){const a=document.activeElement;return !!a&&document.getElementById("tablemode").contains(a)&&(a.tagName==="TEXTAREA"||a.tagName==="INPUT"&&a.type!=="checkbox")}
 
 /* Session Table: four columns for game night (path and party · current scene · dice, clocks and log · rules and travel). It is what Table mode opens. */
-const ST={scene:null,rolls:[],undo:[],miles:"",pace:"normal",prevHide:false,open:new Set(["read"]),q:"",pins:[],resOpen:true,tag:"",rcat:"Conditions",improv:null,sheet:null,entry:null,gen:null,recap:false,hooksSent:false};
+const ST={rolls:[],undo:[],miles:"",pace:"normal",prevHide:false,open:new Set(["read"]),q:"",pins:[],tag:"",rcat:"Conditions",improv:null,sheet:null,entry:null,gen:null,recap:false,hooksSent:false};
 document.addEventListener("toggle",e=>{const d=e.target;if(d.matches&&d.matches("#tablemode details[data-k]"))d.open?ST.open.add(d.dataset.k):ST.open.delete(d.dataset.k)},true);
 function stPlan(){const l=sessList(),n=rcSession();return l.includes(U.sess)?sessPlan(U.sess):l.includes(n)?sessPlan(n):thNext()}
 // older or hand-edited scenes may be missing their lists, so fill them in before the Table reads them
@@ -2804,7 +2781,7 @@ const stRefreshResults=()=>{const r=document.getElementById("sx-results");if(r)r
 const stLogItems=n=>noteLines(rcNotesVal(n)).slice(-60).reverse().map(l=>{const s=l.replace(/^-\s*/,""),m=s.match(/^\[([^\]]+)\]\s*(.*)$/);return m&&/\d/.test(m[1])?{t:m[1],x:m[2]}:{t:"",x:s}});
 const stLogHtml=n=>{const it=stLogItems(n);return it.length?it.map(o=>`<li><span class="sx-lt">${esc(o.t)}</span><span>${esc(o.x)}</span></li>`).join(""):`<li class="vempty">Nothing logged yet. It goes into this session's notes for the recap.</li>`};
 function stMoon(){const c=cal(),mn=(c.moons||[]).find(x=>x&&x.cycle);if(!mn)return "";const st=moonStep(mn,toIdx(c,c.today));return `<span class="sx-moon" role="img" aria-label="${esc(mn.name)}: ${MOON_NAMES[st]}">${MOON_ICONS[st]}</span>`}
-function stHere(cur){const pl=cur&&cur.who.map(w=>w.col==="notes"&&rec("notes",w.id)).find(x=>x&&["location","shop"].includes(x.category));return pl?pl.title:""}
+function stHere(who){const pl=who.map(w=>w.col==="notes"&&rec("notes",w.id)).find(x=>x&&["location","shop"].includes(x.category));return pl?pl.title:""}
 function stImprov(k){const pcs=S.characters.filter(x=>x.kind==="pc"&&x.status!=="dead"),c=cal(),n=rcSession();
   if(k==="npc")return{kind:"Quick NPC",title:orPick(OR_NAMES),detail:`Species: ${orPick(OR_RACES)}\nDefining feature: ${orPick(OR_FEATURES)}\nQuirk: ${orPick(OR_QUIRKS)}\nWants: ${orPick(OR_WANTS)}`};
   if(k==="rumor")return{kind:"Rumor",title:"Overheard",detail:orPick(OR_RUMORS)};
@@ -2821,9 +2798,10 @@ function stFoeInfo(x){const ls=String(x.notes||"").split("\n").map(l=>plain(l).t
   return{fight:f(/^tactics?\s*[:.]\s*/i)||(ls[0]&&!/^(breaks?|flees?|morale|says?)\b/i.test(ls[0])?ls[0]:""),flee:f(/^(breaks? when|flees? when|flees?|morale)\s*[:.]\s*/i),say:f(/^says?\s*[:.]\s*/i)}}
 
 function renderSession(el){
-  const c=cal(),plan=stPlan(),n=rcSession(),scenes=stScenes(plan),legacy=false;
-  const main=scenes.filter(s=>!s.reserve),res=scenes.filter(s=>s.reserve);
-  const cur=scenes.find(s=>s.id===ST.scene)||main.find(s=>!s.done)||main[0]||res[0]||null;ST.scene=cur?cur.id:null;
+  const c=cal(),plan=stPlan(),n=rcSession(),scenes=stScenes(plan);
+  const doneN=scenes.filter(s=>s.done).length;
+  // older scenes still have separate read-aloud / "if they" / when fields: fold them into the note text for display only
+  const shown=scenes.map(s=>{const c={...s,ifs:(s.ifs||[]).map(k=>({...k}))};scnMerge(c);return c});
   const pcs=S.characters.filter(x=>x.kind==="pc").sort((a,b)=>(a.name||"").localeCompare(b.name||""));
   const keep=[...el.querySelectorAll(".sx-col")].map(x=>x.scrollTop),bodyY=el.querySelector(".sx-body")?.scrollTop||0,fsel=focusSel(document.activeElement,el);
   const ms=clockMs(),camp=S.settings.campaign?.name||"The Campaign";
@@ -2837,24 +2815,19 @@ function renderSession(el){
     <button type="button" class="btn sx-prep" data-act="stPrepLib">Prep &amp; Library</button><button type="button" class="btn primary sx-end" data-act="stRecap">End session</button>
     ${music?`<div class="sx-music">${music}</div>`:""}
     <div class="sx-alerts">${stAlerts()}</div></header>`;
-  // ---- column 1: the path and the party
-  const done=main.filter(s=>s.done).length;
-  const pRow=(s,i)=>{const open=!!cur&&s.id===cur.id;return `<div class="sx-pr ${s.done?"done":""} ${open?"open":""}">${legacy?"":`<button type="button" class="sx-tick" data-act="stDone" data-id="${esc(s.id)}" aria-pressed="${!!s.done}" aria-label="${esc(s.title||"Scene")}: ${s.done?"done, mark not done":"mark done"}">${s.done?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>':""}</button>`}<button type="button" class="sx-ps" data-act="stScene" data-id="${esc(s.id)}" aria-current="${open}"><span class="sx-pt">${s.reserve?"":`<span class="sx-pn">${i+1}</span>`}<span>${esc(s.title||"Untitled scene")}</span></span>${(s.reserve?s.when:open&&scnRest(s.note))?`<small>${esc(s.reserve?s.when:scnRest(s.note))}</small>`:""}</button></div>`};
-  const col1=`<nav class="sx-col sx-c1" aria-label="Tonight's scenes and party">
-    <div class="sx-ch"><h2>The Path Tonight</h2>${plan?`<button type="button" class="sx-link" data-act="stEdit" data-id="${plan.id}">${legacy?"Edit scenes":`${done} of ${main.length} done`} ›</button>`:""}</div>
-    <div class="sx-path">${plan?(main.map(pRow).join("")||`<p class="vempty">No scenes yet.</p>`):`<p class="vempty">No session plan yet. Make one in Prep.</p>`}
-      ${res.length?`<button type="button" class="sx-resb" data-act="stRes" aria-expanded="${ST.resOpen}"><span>In Reserve · if they stray</span><span>${res.length} ${ST.resOpen?"▴":"▾"}</span></button>${ST.resOpen?`<div class="sx-resl">${res.map(x=>pRow(x)).join("")}</div>`:""}`:""}</div>
+  // ---- column 1: the party
+  const col1=`<nav class="sx-col sx-c1" aria-label="Party">
     <section class="sx-party" aria-label="Party cheat sheet"><div class="sx-ch"><h2>The Party</h2><small>tap a name for the sheet</small></div>
       ${pcs.length?`<div class="sx-pg sx-pgh"><span>Passive</span><span title="Perception">Perc</span><span title="Insight">Ins</span><span title="Investigation">Inv</span><span title="Spotlight moments tonight">Spotlight</span></div>
       ${pcs.map(p=>{const v=stPass(p),k=stSpotN(n,p.id);return `<div class="sx-pg"><button type="button" class="sx-pcn" data-act="stSheet" data-id="${p.id}" aria-label="Open ${esc(p.name||"hero")}'s sheet"><b>${esc(p.name||"Unnamed")}</b></button><span>${v.pp??"–"}</span><span>${v.ins??"–"}</span><span>${v.inv??"–"}</span><span class="sx-spot"><button type="button" class="sx-sm" data-act="stSpot" data-id="${p.id}" data-n="-1" ${k?"":"disabled"} aria-label="One fewer spotlight moment for ${esc(p.name||"")}">−</button><button type="button" class="sx-sp ${k?"on":""}" data-act="stSpot" data-id="${p.id}" data-n="1" aria-label="Spotlight moment for ${esc(p.name||"")}, ${k} so far">★ ${k}</button></span></div>`}).join("")}`:`<p class="vempty">No heroes yet. Add them on the Party screen.</p>`}
       ${(S.settings.party||{}).languages?`<p class="sx-lang"><b>Languages:</b> ${esc(S.settings.party.languages)}</p>`:""}</section></nav>`;
   // ---- column 2: the scene
-  const who=cur?cur.who.map(w=>({w,x:rec(w.col,w.id)})).filter(o=>o.x):[];
+  const seen=new Set(),whoAll=[];scenes.forEach(s=>s.who.forEach(w=>{const k=w.col+":"+w.id;if(!seen.has(k)){seen.add(k);whoAll.push(w)}}));
+  const who=whoAll.map(w=>({w,x:rec(w.col,w.id)})).filter(o=>o.x);
   const ppl=who.filter(o=>o.w.col==="characters"&&o.x.kind!=="pc"),foes=who.filter(o=>o.w.col==="monsters"),other=who.filter(o=>!["characters","monsters"].includes(o.w.col));
   const pins=ST.pins.map(p=>({p,x:rec(p.col,p.id)})).filter(o=>o.x&&!who.some(w=>w.w.col===o.p.col&&w.w.id===o.p.id));
   
-  const rd=cur&&cur.read?plain(cur.read):"",readOpen=ST.open.has("read");
-  const sessClues=prepClues(plan?plan.session:n);
+    const sessClues=prepClues(plan?plan.session:n);
   const clue=(k,i)=>!String(k.t||"").trim()?"":`<button type="button" class="sx-clue" data-act="stClue" data-i="${i}" aria-pressed="${!!k.found}"><span class="sx-dot" aria-hidden="true"></span><span>${esc(k.t)}</span>${k.found?`<span class="sx-rev">revealed</span>`:""}</button>`;
   const npcCard=({x})=>{const a=stAtt(n,x),m=x.mon&&rec("monsters",x.mon);return `<div class="sx-npc"><div class="sx-nh"><button type="button" class="sx-nn" data-act="stEntry" data-col="characters" data-id="${x.id}" aria-label="More about ${esc(x.name||"")}">${esc(x.name||"Unnamed")} <span>more ›</span></button><span class="sx-role">${esc(x.cls||"NPC")}</span></div>
     ${x.voice?`<span><b>Voice:</b> ${esc(x.voice)}</span>`:""}${x.wants?`<span><b>Wants:</b> ${esc(x.wants)}</span>`:""}${x.secret?`<span class="sx-sec"><b>Secret:</b> ${esc(plain(String(x.secret)))}</span>`:""}${m?`<span><b>Stat block:</b> <button type="button" class="linkish" data-act="stEntry" data-col="characters" data-id="${x.id}" data-tab="block">${esc(m.name||"Monster")}</button></span>`:""}
@@ -2862,16 +2835,16 @@ function renderSession(el){
   const foeCard=({x})=>{const f=stFoeInfo(x);return `<div class="sx-foe"><div class="sx-nh"><button type="button" class="sx-nn" data-act="stEntry" data-col="monsters" data-id="${x.id}" aria-label="More about ${esc(x.name||"")}">${esc(x.name||"Monster")} <span>more ›</span></button><span class="sx-role">How they fight</span></div>
     <span class="sx-stat">${[x.cr&&"CR "+x.cr,x.ac&&"AC "+x.ac,x.hp&&"HP "+x.hp].filter(Boolean).map(esc).join(" · ")}</span>${f.fight?`<span><b>Tactics:</b> ${esc(f.fight)}</span>`:""}${f.flee?`<span><b>Breaks when:</b> ${esc(f.flee)}</span>`:""}${f.say?`<span class="sx-say">“${esc(f.say)}”</span>`:""}</div>`};
   const pinCard=({p,x})=>`<div class="sx-npc sx-pin"><div class="sx-nh"><button type="button" class="sx-nn" data-act="stEntry" data-col="${p.col}" data-type="${p.col}" data-id="${x.id}">${esc(titleOf(p.col,x)||"Untitled")} <span>more ›</span></button><button type="button" class="sx-unpin" data-act="stPin" data-col="${p.col}" data-id="${x.id}" aria-label="Unpin ${esc(titleOf(p.col,x)||"")}">Pinned · ${esc(libTag(p.col,x))} ×</button></div><span>${esc(libBlurb(p.col,x))}</span>${x.secret?`<span class="sx-sec"><b>Secret:</b> ${esc(plain(String(x.secret)).slice(0,200))}</span>`:""}</div>`;
-  const col2=`<main class="sx-col sx-scene" aria-label="Current scene">
-    ${cur?`<div class="sx-sh"><div class="sx-sht"><span class="sx-kick">${cur.reserve?"From reserve":`Scene ${main.indexOf(cur)+1} of ${main.length}`}</span><h1>${esc(cur.title||"Untitled scene")}</h1>${scnRest(cur.note)?`<span class="sx-note">${esc(scnRest(cur.note))}</span>`:""}</div>
-      ${plan?`<button type="button" class="btn sx-edit" data-act="stEdit" data-id="${plan.id}" aria-label="Edit this scene in the Scene Editor">Edit</button>`:""}${plan&&!legacy?`<button type="button" class="btn sx-edit" data-act="stMoveRes" aria-label="${cur.reserve?"Move this scene to the path":"Move this scene to reserve"}">${cur.reserve?"Move to path":"Move to reserve"}</button>`:""}${!legacy&&!cur.reserve?`<button type="button" class="btn primary sx-next" data-act="stNext">Scene done · next ❯</button>`:""}</div>
-    ${rd?`<section class="sx-read" aria-label="Read aloud"><div class="sx-ph"><span>Read aloud</span><button type="button" class="btn sm" data-act="stRead" aria-expanded="${readOpen}">${readOpen?"Hide":"Show"}</button></div>${readOpen?`<p><span class="sx-drop">${esc(rd.charAt(0))}</span>${esc(rd.slice(1))}</p>`:""}</section>`:""}
-    <div class="sx-two"><section class="sx-cl" aria-label="Secrets and clues"><h2>Secrets &amp; Clues${sessClues.length?` <small>${sessClues.filter(k=>k.found).length} of ${sessClues.length}</small>`:""}</h2>${sessClues.map(clue).join("")||`<p class="vempty">No secrets or clues for this session.</p>`}
-        <h2>If They…</h2>${cur.ifs.map((k,j)=>{const key="if-"+cur.id+"-"+j,o=ST.open.has(key),dn=!!k.done||ST.open.has("ifd-"+key);return `<div class="sx-if${dn?" done":""}"><div class="sx-ifr"><button type="button" class="sx-ifc" role="checkbox" aria-checked="${dn}" aria-label="Mark “if they ${esc(k.if||"…")}” as happened" data-act="stIfDone" data-i="${j}" data-k="${esc(key)}"><span class="sx-cbx" aria-hidden="true">${dn?"✓":""}</span></button><button type="button" class="sx-ifq" data-act="stIf" data-k="${esc(key)}" aria-expanded="${o}"><span aria-hidden="true">${o?"▾":"▸"}</span><span>If they ${esc(k.if||"…")}</span></button></div>${o?`<p>${esc(k.then||"")}</p>`:""}</div>`}).join("")||`<p class="vempty">Nothing planned.</p>`}</section>
-      <section class="sx-wh" aria-label="Characters in this scene"><h2>Who's Here</h2>${pins.map(pinCard).join("")}${ppl.map(npcCard).join("")}${foes.map(foeCard).join("")}
+  const tick=x=>`<button type="button" class="sx-tick" data-act="stDone" data-id="${esc(x.id)}" aria-pressed="${!!x.done}" aria-label="${esc(x.title||"Scene")}: ${x.done?"done, mark not done":"mark done"}">${x.done?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>':""}</button>`;
+  const scBlock=x=>`<div class="sx-sc ${x.done?"done":""}">${tick(x)}<div class="sx-sc-main"><h3>${esc(x.title||"Untitled scene")}</h3>${scnRest(x.note)?`<div class="sx-sc-body">${esc(scnRest(x.note))}</div>`:""}</div></div>`;
+  const col2=`<main class="sx-col sx-scene" aria-label="Tonight's scenes">
+    ${scenes.length?`<div class="sx-sh"><div class="sx-sht"><span class="sx-kick">${doneN} of ${scenes.length} done</span><h1>Tonight's Scenes</h1></div>
+      ${plan?`<button type="button" class="btn sx-edit" data-act="stEdit" data-id="${plan.id}" aria-label="Edit scenes on the Prep Board">Edit</button>`:""}</div>
+    <div class="sx-scs">${shown.map(scBlock).join("")}</div>
+    <div class="sx-two"><section class="sx-cl" aria-label="Secrets and clues"><h2>Secrets &amp; Clues${sessClues.length?` <small>${sessClues.filter(k=>k.found).length} of ${sessClues.length}</small>`:""}</h2>${sessClues.map(clue).join("")||`<p class="vempty">No secrets or clues for this session.</p>`}</section>
+      <section class="sx-wh" aria-label="Characters in tonight's scenes"><h2>Who's Here</h2>${pins.map(pinCard).join("")}${ppl.map(npcCard).join("")}${foes.map(foeCard).join("")}
         ${other.length?`<div class="sx-other">${other.map(({w,x})=>`<button type="button" class="chip" data-act="stEntry" data-col="${esc(w.col)}" data-id="${esc(x.id)}">${esc(titleOf(w.col,x)||"Untitled")}</button>`).join("")}</div>`:""}
-        ${!pins.length&&!ppl.length&&!foes.length&&!other.length?`<p class="vempty">Nobody added to this scene. Search above and pin someone.</p>`:""}</section></div>
-    ${legacy?`<p class="scn-note">This plan has no scenes yet, so this shows its opener and reveals. Add scenes on the Prep Board.</p>`:""}`
+        ${!pins.length&&!ppl.length&&!foes.length&&!other.length?`<p class="vempty">Nobody added yet. Search above and pin someone.</p>`:""}</section></div>`
     :`<div class="empty">No scenes for tonight. Add them on the Prep Board.</div>`}</main>`;
   // ---- column 3: dice, clocks, log
   const last=ST.rolls[0];
@@ -2884,7 +2857,7 @@ function renderSession(el){
       <ul class="sx-log">${stLogHtml(n)}</ul></section></aside>`;
   // ---- column 4: rules, Oracle, travel
   const RC=ST_RCATS();if(!RC[ST.rcat])ST.rcat="Conditions";
-  const im=ST.improv,here=stHere(cur),pace=stPace();
+  const im=ST.improv,here=stHere(whoAll),pace=stPace();
   const col4=`<aside class="sx-col" aria-label="Rules and improv">
     <section class="sx-box" aria-label="Rules at a glance"><div class="sx-bhr"><span class="sx-bh">Rules at a Glance</span><small>stays where you leave it</small></div>
       <div class="sx-tabs" role="group" aria-label="Rule categories">${Object.keys(RC).map(k=>`<button type="button" data-act="stRcat" data-v="${esc(k)}" aria-pressed="${ST.rcat===k}">${esc(k)}</button>`).join("")}</div>
@@ -2964,9 +2937,6 @@ async function stAct2(a,t){const n=rcSession(),plan=stPlan();
     if(document.activeElement&&document.activeElement.id==="sx-q"){stRefreshResults();renderPending=true;return}return renderTable()}
   if(a==="stAlertOk"){ST_ALERTS_DONE.add(t.dataset.k);stAlertsSave();return renderTable()}
   if(a==="stAlertAll"){for(const x of stAlertsDue())ST_ALERTS_DONE.add(x.key);stAlertsSave();return renderTable()}
-  if(a==="stRes"){ST.resOpen=!ST.resOpen;return renderTable()}
-  if(a==="stRead"){ST.open.has("read")?ST.open.delete("read"):ST.open.add("read");return renderTable()}
-  if(a==="stIf"){const k=t.dataset.k;ST.open.has(k)?ST.open.delete(k):ST.open.add(k);return renderTable()}
   if(a==="stDone"){if(plan)return stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===t.dataset.id);if(s)s.done=!s.done});return}
   if(a==="stSpot")return stSpot(n,t.dataset.id,num(t.dataset.n)||1);
   if(a==="stSeg"){const k=rec("clocks",t.dataset.id);if(!k)return;const v=num(t.dataset.n),f=num(k.filled)||0;await patchRec("clocks",k.id,{filled:v===f?v-1:v});return renderTable()}
@@ -2979,8 +2949,7 @@ async function stAct2(a,t){const n=rcSession(),plan=stPlan();
   if(a==="stLogIt"){const im=ST.improv;if(!im)return;const ln=`${im.kind}: ${im.title}${im.detail?` (${im.detail.replace(/\n/g,"; ")})`:""}`;await addSessionLine(ln);toast("Logged");return renderTable()}
   if(a==="stGenSave"){const nm=(document.getElementById("sx-genname")?.value||"").trim()||"Quick foe";const g=genMon(nm,GEN,false),id=uid();
     if(!await save("monsters",id,{...g,name:nm}))return;project();ST.gen=null;
-    if(plan&&Array.isArray(plan.scenes)&&ST.scene)await stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===ST.scene);if(s){s.who=s.who||[];s.who.push({col:"monsters",id})}});
-    else ST.pins.push({col:"monsters",id});
+    ST.pins.push({col:"monsters",id});
     toast(`${nm} saved to the Bestiary`);return renderTable()}}
 let ST_QT=null;document.addEventListener("input",e=>{if(e.target.id!=="sx-q")return;ST.q=e.target.value;clearTimeout(ST_QT);ST_QT=setTimeout(stRefreshResults,150)});
 // one way to shut a window over the Table; closing the recap without saving puts the clock back as it was
@@ -2995,19 +2964,12 @@ async function stAct(a,t){const plan=stPlan(),n=rcSession(),i=num(t.dataset.i);
   if(a==="stShort")return stTime(60,false,"Short rest.");
   if(a==="stLong")return stTime(0,true);
   if(a==="stUndo")return stUndo();
-  if(a==="stScene"){ST.scene=t.dataset.id;renderTable();document.querySelector("#tablemode .sx-scene")?.scrollTo({top:0});return}
   if(a==="stRoll")return stRoll(t.dataset.n);
   if(a==="stAtt")return stSetAtt(n,t.dataset.id,t.dataset.v);
-  if(a==="stEdit"){closeTableMode();U.sess=sessNum(t.dataset.id);goBoard(sessNum(t.dataset.id),ST.scene);return}
+  if(a==="stEdit"){closeTableMode();U.sess=sessNum(t.dataset.id);goBoard(sessNum(t.dataset.id));return}
   if(!plan)return;
-  if(a==="stMoveRes"){return stScenePatch(plan.id,sc=>{const k=sc.findIndex(x=>x.id===ST.scene);if(k<0)return;const s=sc.splice(k,1)[0];s.reserve=!s.reserve;sc.push(s)})}
-  if(a==="stIfDone"){const k="ifd-"+t.dataset.k,j=num(t.dataset.i);
-    if(!Array.isArray(plan.scenes)){ST.open.has(k)?ST.open.delete(k):ST.open.add(k);return renderTable()}
-    return stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===ST.scene);if(s&&s.ifs&&s.ifs[j])s.ifs[j].done=!s.ifs[j].done})}
   if(a==="stClue"){const cl=prepClues(plan.session);if(!cl[i])return;
-    await prepPatch(plan.session,d=>{if(d.clues[i])d.clues[i].found=!cl[i].found});return renderTable()}
-  if(a==="stNext"){const main=stScenes(plan).filter(s=>!s.reserve),k=main.findIndex(s=>s.id===ST.scene),nx=main.slice(k+1).find(s=>!s.done)||main.find((s,j)=>j!==k&&!s.done);
-    await stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===ST.scene);if(s)s.done=true});ST.scene=nx?nx.id:ST.scene;renderTable();if(!nx)toast("That was the last scene on tonight's path.");}}
+    await prepPatch(plan.session,d=>{if(d.clues[i])d.clues[i].found=!cl[i].found});return renderTable()}}
 document.addEventListener("change",e=>{const t=e.target;
   if(t.dataset&&t.dataset.stdone){const plan=stPlan();if(plan)stScenePatch(plan.id,sc=>{const s=sc.find(x=>x.id===t.dataset.stdone);if(s)s.done=t.checked});return}
   if(t.id==="sx-pace"){ST.pace=t.value;const r=document.getElementById("sx-tr");if(r)r.innerHTML=stTravelHtml()}});
@@ -4817,9 +4779,9 @@ document.addEventListener("click",async e=>{
     case"planPlayed":{const pid=t.dataset.id,on=sessPlan(sessNum(pid)).status!=="played";stScenePatch(pid,sc=>sc.forEach(s=>{s.played=on}));break}
     case"scnMoveOpen":{const p=sessPlan(sessNum(t.dataset.id));sessMoveScenes(p.scenes.filter(x=>!x.done&&!x.played).map(x=>x.id),p.session+1);break}
     case"ppJump":case"ppClueAdd":case"ppClueDel":case"ppLocAdd":case"ppLocDel":case"ppDescAdd":case"ppDescDel":case"ppItemAdd":case"ppItemDel":case"ppPick":case"ppPickDel":case"ppPickNew":prepAct(a,t);break;
-    case"scnAdd":case"scnMove":case"scnDel":case"scnMoveNext":scnAct(a,t);break;
-    case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stAlertOk":case"stAlertAll":case"stRes":case"stRead":case"stIf":case"stDone":case"stSpot":case"stSeg":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
-    case"stTime":case"stShort":case"stLong":case"stUndo":case"stScene": case"stRoll":case"stAtt":case"stEdit":case"stClue":case"stNext":case"stIfDone":case"stMoveRes":stAct(a,t);break;
+    case"scnAdd":case"scnDel":case"scnMoveNext":scnAct(a,t);break;
+    case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stAlertOk":case"stAlertAll":case"stDone":case"stSpot":case"stSeg":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
+    case"stTime":case"stShort":case"stLong":case"stUndo":case"stRoll":case"stAtt":case"stEdit":case"stClue":stAct(a,t);break;
     case"heroSel":case"heroTab":case"heroLvl":heroAct(a,t);break;
     case"pplSel":case"pplKind":case"pplTab":case"pplAtt":case"pplUnlink":case"genSave":case"genApply":pplAct(a,t);break;
     case"scnOpen":goBoard(sessNum(t.dataset.id));break;
