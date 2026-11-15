@@ -1258,10 +1258,15 @@ header.top .clock{display:none!important}
 .pp-chip:hover{color:var(--ink);box-shadow:inset 0 0 0 1px var(--accent)}
 .pp-chip.on{background:var(--ok-soft);color:var(--ok);box-shadow:none}
 .pp-chip .ck{display:none;flex:none}.pp-chip.on .ck{display:block}
-.pp-cols{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+.pp-cols{display:grid;grid-template-columns:var(--pp-cols,minmax(0,1.35fr) 14px minmax(0,1fr) 14px minmax(0,1fr));column-gap:0;row-gap:14px;align-items:start}
+.pp-c1,.pp-c2,.pp-c3{grid-row:1}.pp-c1{grid-column:1}.pp-c2{grid-column:3}.pp-c3{grid-column:5}
+.pp-split{position:relative;align-self:stretch;grid-row:1;touch-action:none;outline:none;cursor:col-resize}
+.pp-split[data-ppsplit="0"]{grid-column:2}.pp-split[data-ppsplit="1"]{grid-column:4}
+.pp-split::after{content:"";position:absolute;left:5px;width:4px;top:42px;bottom:42px;border-radius:2px;background:var(--line);opacity:.6}
+.pp-split:hover::after,.pp-split:focus-visible::after,.pp-split.on::after{background:var(--accent);opacity:1;top:4px;bottom:4px}
 .pp-col{display:flex;flex-direction:column;gap:10px;min-width:0}
-@container (max-width:900px){.pp-cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.pp-c3{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}}
-@container (max-width:560px){.pp-cols,.pp-c3{grid-template-columns:minmax(0,1fr)}.pp-c3{grid-column:auto;display:flex;align-items:stretch}}
+@container (max-width:900px){.pp-cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:14px}.pp-split{display:none}.pp-c1,.pp-c2,.pp-c3{grid-row:auto}.pp-c1,.pp-c2{grid-column:auto}.pp-c3{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}}
+@container (max-width:560px){.pp-cols,.pp-c3{grid-template-columns:minmax(0,1fr)}.pp-cols{column-gap:14px}.pp-split{display:none}.pp-c1,.pp-c2,.pp-c3{grid-row:auto}.pp-c1,.pp-c2{grid-column:auto}.pp-c3{grid-column:auto;display:flex;align-items:stretch}}
 .pp-sec{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);min-width:0;scroll-margin-top:12px}
 :root[data-skin="wood"] .pp-sec{background:var(--bg);border:0;box-shadow:var(--frame);margin:5px}
 .pp-sh{display:flex;align-items:center;gap:4px;min-height:44px;padding:0 8px 0 4px}
@@ -2278,13 +2283,18 @@ const PP_ICO={chev:'<svg class="chev" width="14" height="14" viewBox="0 0 24 24"
   check:(n,w)=>`<svg class="${n}" width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>`,
   plus:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
   search:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>'};
+/* The Prep Board's three column widths: dividers drag; sizes saved on this device only (none saved = the default) */
+const PP_COLS_KEY="desk.pp.cols",PP_COLS_DEF=[1.35,1,1],PP_SPLIT_W=14,PP_COL_MIN=220;
+function ppCols(){try{const a=JSON.parse(localStorage.getItem(PP_COLS_KEY)||"null");if(Array.isArray(a)&&a.length===3&&a.every(v=>typeof v==="number"&&isFinite(v)&&v>0))return a}catch(_){}return PP_COLS_DEF.slice()}
+function ppColsSave(a){try{a?localStorage.setItem(PP_COLS_KEY,JSON.stringify(a)):localStorage.removeItem(PP_COLS_KEY)}catch(_){}}
+const ppColsCss=a=>a.map(f=>`minmax(0,${+f.toFixed(4)}fr)`).join(` ${PP_SPLIT_W}px `);
 const ppGrip=(l,i,n,name)=>`<button type="button" class="pp-grip" data-ppl="${esc(l)}" data-i="${i}" aria-label="${esc(`Move ${name}, ${i+1} of ${n}`)}" title="Drag to reorder"><svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor" aria-hidden="true"><circle cx="3.5" cy="3" r="1.4"/><circle cx="8.5" cy="3" r="1.4"/><circle cx="3.5" cy="8" r="1.4"/><circle cx="8.5" cy="8" r="1.4"/><circle cx="3.5" cy="13" r="1.4"/><circle cx="8.5" cy="13" r="1.4"/></svg></button>`;
 const ppSortItems=(l,n,by)=>by.map(([b,t])=>mi("ppSort",t,`data-ppl="${l}" data-by="${b}" ${n<2?"disabled":""}`));
 const ppSortMenu=(l,n,by)=>moreMenu(ppSortItems(l,n,by),{label:"⇅",title:"Sort "+PP_SHORT[l]});
 function prepPickRow(kind,id,i){
   const K=PP_KIND[kind],x=rec(K.col,id),nm=x?(K.name(x)||"Unnamed"):"",pill=x&&K.pill?K.pill(x):"";
-  return `<div class="pp-pr">${ppGrip(kind,i,PREP.d[kind].length,nm||"entry")}${x?`<button type="button" class="pp-ob" data-act="open" data-type="${K.col}" data-id="${esc(id)}">${K.av?avatar(x,24):""}<span><b>${esc(nm)}</b>${K.av?`<small>${esc(prepSub(kind,x))}</small>`:""}</span></button>${pill?`<span class="pp-pill">${esc(pill)}</span>`:""}`
-    :`<span class="pp-ob gone"><span><b>Entry not found</b></span></span>`}<button type="button" class="pp-x" data-act="ppPickDel" data-kind="${kind}" data-i="${i}" aria-label="Remove ${esc(nm||"entry")} from this session" title="Remove">×</button></div>`}
+  return `<div class="pp-pr">${x?`<button type="button" class="pp-ob" data-act="open" data-type="${K.col}" data-id="${esc(id)}">${K.av?avatar(x,24):""}<span><b>${esc(nm)}</b>${K.av?`<small>${esc(prepSub(kind,x))}</small>`:""}</span></button>${pill?`<span class="pp-pill">${esc(pill)}</span>`:""}`
+    :`<span class="pp-ob gone"><span><b>Entry not found</b></span></span>`}${ppGrip(kind,i,PREP.d[kind].length,nm||"entry")}<button type="button" class="pp-x" data-act="ppPickDel" data-kind="${kind}" data-i="${i}" aria-label="Remove ${esc(nm||"entry")} from this session" title="Remove">×</button></div>`}
 function prepPicker(kind){
   const K=PP_KIND[kind],open=PREP.pick&&PREP.pick.kind===kind&&PREP.pick.open,L=open?prepListHtml(kind):"";
   return `<div class="pp-list" data-pplist="${kind}">${PREP.d[kind].map((id,i)=>prepPickRow(kind,id,i)).join("")}</div>
@@ -2319,11 +2329,11 @@ function vPrepBoard(c){
   const pl=sessPlan(n),nx=n+1;
   const scenesAct=moreMenu([mi("planPlayed",pl.status==="played"?"Mark as planned":"Mark as played",`data-id="${pl.id}" ${pl.scenes.length?"":"disabled"}`),mi("scnMoveOpen",`Move unfinished scenes to Session ${nx}`,`data-id="${pl.id}" ${pl.scenes.some(x=>!x.done&&!x.played)?"":"disabled"}`),mi("copyR20","Copy for Roll20",`data-type="scenes" data-id="${pl.id}"`),...ppSortItems("scenes",SCN.d.length,[["az","Sort scenes A–Z"],["open","Unfinished scenes first"]])]);
   const scenesBody=scnCards();
-  const clues=d.clues.map((k,i)=>`<div class="pp-row">${ppGrip("clues",i,d.clues.length,k.t||"clue "+(i+1))}<input type="checkbox" data-pp="found" data-i="${i}" ${k.found?"checked":""} aria-label="Clue ${i+1} revealed" title="Revealed to the players">${ppArea("pp-clue-"+i,`data-pp="clue" data-i="${i}"`,k.t,"Clue","Secret or clue "+(i+1))}${ppX("ppClueDel",`data-i="${i}"`,"Remove clue "+(i+1))}</div>`).join("");
-  const locs=d.locations.map((l,i)=>`<div class="pp-loc"><div class="pp-lh">${ppGrip("locations",i,d.locations.length,l.name||"location "+(i+1))}<input id="pp-ln-${i}" class="pp-in pp-lname" data-pp="ln" data-i="${i}" value="${esc(l.name)}" placeholder="Location" aria-label="Location ${i+1} name" autocomplete="off">${ppX("ppLocDel",`data-i="${i}"`,"Remove "+(l.name||"location "+(i+1)))}</div>
-      <div data-pplist="desc:${i}">${l.desc.map((t,j)=>`<div class="pp-ld">${ppGrip("desc:"+i,j,l.desc.length,"descriptor "+(j+1)+(l.name?" of "+l.name:""))}${ppArea(`pp-ld-${i}-${j}`,`data-pp="ld" data-i="${i}" data-j="${j}"`,t,"Descriptor",`${l.name||"Location "+(i+1)}: descriptor ${j+1}`)}${ppX("ppDescDel",`data-i="${i}" data-j="${j}"`,"Remove descriptor "+(j+1))}</div>`).join("")}</div>
+  const clues=d.clues.map((k,i)=>`<div class="pp-row"><input type="checkbox" data-pp="found" data-i="${i}" ${k.found?"checked":""} aria-label="Clue ${i+1} revealed" title="Revealed to the players">${ppArea("pp-clue-"+i,`data-pp="clue" data-i="${i}"`,k.t,"Clue","Secret or clue "+(i+1))}${ppGrip("clues",i,d.clues.length,k.t||"clue "+(i+1))}${ppX("ppClueDel",`data-i="${i}"`,"Remove clue "+(i+1))}</div>`).join("");
+  const locs=d.locations.map((l,i)=>`<div class="pp-loc"><div class="pp-lh"><input id="pp-ln-${i}" class="pp-in pp-lname" data-pp="ln" data-i="${i}" value="${esc(l.name)}" placeholder="Location" aria-label="Location ${i+1} name" autocomplete="off">${ppGrip("locations",i,d.locations.length,l.name||"location "+(i+1))}${ppX("ppLocDel",`data-i="${i}"`,"Remove "+(l.name||"location "+(i+1)))}</div>
+      <div data-pplist="desc:${i}">${l.desc.map((t,j)=>`<div class="pp-ld">${ppArea(`pp-ld-${i}-${j}`,`data-pp="ld" data-i="${i}" data-j="${j}"`,t,"Descriptor",`${l.name||"Location "+(i+1)}: descriptor ${j+1}`)}${ppGrip("desc:"+i,j,l.desc.length,"descriptor "+(j+1)+(l.name?" of "+l.name:""))}${ppX("ppDescDel",`data-i="${i}" data-j="${j}"`,"Remove descriptor "+(j+1))}</div>`).join("")}</div>
       ${ppAdd("ppDescAdd","Descriptor",`data-i="${i}"`,"sm")}</div>`).join("");
-  const items=d.items.map((x,i)=>`<div class="pp-item"><div class="pp-ld">${ppGrip("items",i,d.items.length,x.name||"item "+(i+1))}${ppArea("pp-item-"+i,`data-pp="item" data-i="${i}"`,x.name,"Item","Magic item "+(i+1))}${ppX("ppItemDel",`data-i="${i}"`,"Remove item "+(i+1))}</div>
+  const items=d.items.map((x,i)=>`<div class="pp-item"><div class="pp-ld">${ppArea("pp-item-"+i,`data-pp="item" data-i="${i}"`,x.name,"Item","Magic item "+(i+1))}${ppGrip("items",i,d.items.length,x.name||"item "+(i+1))}${ppX("ppItemDel",`data-i="${i}"`,"Remove item "+(i+1))}</div>
     ${ppArea("pp-itemd-"+i,`data-pp="itemd" data-i="${i}"`,x.desc,"Description","Magic item "+(i+1)+" description","pp-idesc")}</div>`).join("");
   const cnt=k=>PREP.d[k].length;
   const col1=sec("opening",T.opening,ppArea("pp-opening",`data-pp="opening"`,d.opening,"Opening","Opening scene","pp-open").replace('rows="1"','rows="2"'))
@@ -2335,8 +2345,26 @@ function vPrepBoard(c){
     +sec("items",T.items,`<div data-pplist="items">${items}</div>${ppAdd("ppItemAdd","Add item")}`,{count:d.items.length,act:ppSortMenu("items",d.items.length,[["az","A–Z"]])})
     +sec("handouts",T.handouts,prepPicker("handouts"),{count:cnt("handouts"),act:ppSortMenu("handouts",cnt("handouts"),[["az","A–Z"]])});
   const strip=`<div class="pp-strip" role="group" aria-label="Prep progress"><span class="pp-prog" id="pp-count" role="status" aria-live="polite">${done} of ${PREP_KEYS.length} ready</span>${PREP_KEYS.map(k=>`<button type="button" class="pp-chip${d.checked[k]?" on":""}" data-act="ppJump" data-k="${k}" aria-label="Go to ${esc(T[k])}${d.checked[k]?", ready":""}">${PP_ICO.check("ck",12)}${esc(PP_SHORT[k])}</button>`).join("")}</div>`;
-  return `<div class="pp-wrap">${strip}<div class="pp-cols"><div class="pp-col pp-c1">${col1}</div><div class="pp-col pp-c2">${col2}</div><div class="pp-col pp-c3">${col3}</div></div></div>`;
+  const split=i=>`<div class="pp-split" data-ppsplit="${i}" role="separator" aria-orientation="vertical" aria-label="Resize columns" title="Drag to resize · double-click to reset" tabindex="0"></div>`;
+  return `<div class="pp-wrap">${strip}<div class="pp-cols" style="--pp-cols:${ppColsCss(ppCols())}"><div class="pp-col pp-c1">${col1}</div>${split(0)}<div class="pp-col pp-c2">${col2}</div>${split(1)}<div class="pp-col pp-c3">${col3}</div></div></div>`;
 }
+// drag a column divider: the columns restyle as you go and the sizes save when you let go; a column never gets narrower than PP_COL_MIN
+(()=>{const setCols=(g,a)=>g.style.setProperty("--pp-cols",ppColsCss(a));
+  const room=g=>g.getBoundingClientRect().width-2*PP_SPLIT_W;
+  document.addEventListener("pointerdown",e=>{const sp=e.target.closest&&e.target.closest(".pp-split");if(!sp||e.button>0)return;
+    e.preventDefault();const g=sp.closest(".pp-cols"),i=+sp.dataset.ppsplit,arr=ppCols(),sum=arr.reduce((a,b)=>a+b,0),size=room(g);if(size<=0)return;
+    const x0=e.clientX,a0=arr[i],b0=arr[i+1],min=Math.min(sum*PP_COL_MIN/size,(a0+b0)/2);
+    try{sp.setPointerCapture(e.pointerId)}catch(_){}sp.classList.add("on");
+    const move=ev=>{let d=(ev.clientX-x0)/size*sum;d=Math.max(min-a0,Math.min(b0-min,d));arr[i]=a0+d;arr[i+1]=b0-d;setCols(g,arr)};
+    const up=()=>{window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",up);window.removeEventListener("pointercancel",up);
+      sp.classList.remove("on");ppColsSave(arr);growAll(g)};
+    window.addEventListener("pointermove",move);window.addEventListener("pointerup",up);window.addEventListener("pointercancel",up)});
+  document.addEventListener("dblclick",e=>{if(e.target.closest&&e.target.closest(".pp-split")){ppColsSave(null);render()}});
+  document.addEventListener("keydown",e=>{const sp=e.target.closest&&e.target.closest(".pp-split");if(!sp)return;
+    const dir={ArrowLeft:-1,ArrowRight:1}[e.key];if(!dir)return;e.preventDefault();
+    const g=sp.closest(".pp-cols"),i=+sp.dataset.ppsplit,a=ppCols(),sum=a.reduce((x,y)=>x+y,0),size=room(g),step=sum*.03*dir,min=Math.min(sum*PP_COL_MIN/size,(a[i]+a[i+1])/2);
+    if(size<=0||a[i]+step<min||a[i+1]-step<min)return;a[i]+=step;a[i+1]-=step;ppColsSave(a);setCols(g,a);growAll(g);sp.focus()});
+})();
 /* Reordering: ppMove is the one place a row changes position (drag, arrow keys and Alt+arrows all end here). */
 const ppArr=l=>{const d=PREP.d;if(l==="scenes")return SCN.d;if(!d)return null;if(String(l).startsWith("desc:")){const x=d.locations[num(l.slice(5))];return x&&x.desc}return Array.isArray(d[l])?d[l]:null};
 function ppMove(l,from,to,foc){const a=ppArr(l);if(!a||from===to||from<0||to<0||from>=a.length||to>=a.length)return;
@@ -2404,7 +2432,7 @@ function prepAct(a,t){
 // the entry form just saved something new while this board was asking for one: add it to the session
 function prepAdopt(type,id){const kind=Object.keys(PP_KIND).find(k=>PP_KIND[k].col===type);if(!kind)return;if(!PREP.d)return;if(!PREP.d[kind].includes(id))PREP.d[kind].push(id);project();prepTouch(true)}
 // text boxes grow with what's typed (and again when the width changes)
-function growEl(t){if(!t.offsetParent)return;t.style.height="auto";t.style.height=(t.scrollHeight+t.offsetHeight-t.clientHeight)+"px"}
+function growEl(t){if(!t.offsetParent)return;if(!t.value){t.style.height="";return}t.style.height="auto";t.style.height=(t.scrollHeight+t.offsetHeight-t.clientHeight)+"px"}
 const growAll=root=>(root||document).querySelectorAll("textarea.grow").forEach(growEl);
 let growT=null;
 addEventListener("resize",()=>{clearTimeout(growT);growT=setTimeout(()=>growAll(document.getElementById("app")),120)});
@@ -2541,9 +2569,10 @@ window.addEventListener("pagehide",()=>{scnFlush()});
 // the scene boxes: one growing text box per scene, with delete and a way to push it to the next session
 function scnCards(){
   const nx=sessNum(SCN.pid)+1;
-  const row=(x,i)=>`<div class="pp-row" data-scsel="${x.id}">${ppGrip("scenes",i,SCN.d.length,scnTitle(x.note)||"scene "+(i+1))}<span class="pp-i" aria-hidden="true">${i+1}</span>
+  const row=(x,i)=>`<div class="pp-row" data-scsel="${x.id}"><span class="pp-i" aria-hidden="true">${i+1}</span>
     <textarea class="pp-in grow" data-scf="note" data-id="${x.id}" rows="1" placeholder="Scene" aria-label="Scene ${i+1}">${esc(x.note)}</textarea>
     <button type="button" class="pp-mv" data-act="scnMoveNext" data-id="${x.id}" title="Move to Session ${nx}" aria-label="Move scene ${i+1} to Session ${nx}">→ ${nx}</button>
+    ${ppGrip("scenes",i,SCN.d.length,scnTitle(x.note)||"scene "+(i+1))}
     <button type="button" class="pp-x ${SCN.arm===x.id?"armed":""}" data-act="scnDel" data-id="${x.id}" aria-label="${SCN.arm===x.id?`Yes, delete scene ${i+1}`:`Delete scene ${i+1}`}" title="Delete">${SCN.arm===x.id?"Delete?":"×"}</button></div>`;
   return `<div data-pplist="scenes">${SCN.d.map(row).join("")}</div>${ppAdd("scnAdd","Add scene")}`}
 document.addEventListener("input",e=>{const t=e.target;if(!t.dataset||t.dataset.scf!=="note")return;
