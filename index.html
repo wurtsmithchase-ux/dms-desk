@@ -1330,6 +1330,9 @@ header.top .clock{display:none!important}
 .pp-ob:hover{background:var(--surface2)}.pp-ob.gone{cursor:default;color:var(--muted)}
 .pp-ob>span{display:flex;flex-direction:column;min-width:0;flex:1}.pp-ob b{font-weight:400;overflow-wrap:anywhere}.pp-ob small{color:var(--muted);font-size:13px;font-family:var(--ui)}
 .pp-ob .av{flex:none;border-width:1px}
+.pp-facts{display:flex;flex-direction:column;gap:1px;margin-top:2px;color:var(--muted);font:13px/1.35 var(--ui)}
+.pp-facts>span{position:relative;padding-left:12px;overflow-wrap:anywhere}.pp-facts>span::before{content:"•";position:absolute;left:2px}
+.pp-facts i{font-style:normal;font-weight:600;color:var(--ink)}
 .pp-pr{display:flex;align-items:center;gap:4px;border-top:1px solid var(--line)}
 .pp-pr:first-child{border-top:0}
 .pp-pr .pp-ob{flex:1 1 auto}
@@ -2291,9 +2294,13 @@ const ppColsCss=a=>a.map(f=>`minmax(0,${+f.toFixed(4)}fr)`).join(` ${PP_SPLIT_W}
 const ppGrip=(l,i,n,name)=>`<button type="button" class="pp-grip" data-ppl="${esc(l)}" data-i="${i}" aria-label="${esc(`Move ${name}, ${i+1} of ${n}`)}" title="Drag to reorder"><svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor" aria-hidden="true"><circle cx="3.5" cy="3" r="1.4"/><circle cx="8.5" cy="3" r="1.4"/><circle cx="3.5" cy="8" r="1.4"/><circle cx="8.5" cy="8" r="1.4"/><circle cx="3.5" cy="13" r="1.4"/><circle cx="8.5" cy="13" r="1.4"/></svg></button>`;
 const ppSortItems=(l,n,by)=>by.map(([b,t])=>mi("ppSort",t,`data-ppl="${l}" data-by="${b}" ${n<2?"disabled":""}`));
 const ppSortMenu=(l,n,by)=>moreMenu(ppSortItems(l,n,by),{label:"⇅",title:"Sort "+PP_SHORT[l]});
+// Important NPCs: archetype and connection as a short list under the name (spans, since a list can't sit inside a button)
+function ppNpcFacts(x){
+  const f=[["Archetype",x.archetype||x.cls],["Connection",x.hook]].filter(([,v])=>String(v||"").trim());
+  return f.length?`<span class="pp-facts" role="list">${f.map(([l,v])=>`<span role="listitem"><i>${l}:</i> ${esc(v)}</span>`).join("")}</span>`:""}
 function prepPickRow(kind,id,i){
   const K=PP_KIND[kind],x=rec(K.col,id),nm=x?(K.name(x)||"Unnamed"):"",pill=x&&K.pill?K.pill(x):"";
-  return `<div class="pp-pr">${x?`<button type="button" class="pp-ob" data-act="open" data-type="${K.col}" data-id="${esc(id)}">${K.av?avatar(x,24):""}<span><b>${esc(nm)}</b>${K.av?`<small>${esc(prepSub(kind,x))}</small>`:""}</span></button>${pill?`<span class="pp-pill">${esc(pill)}</span>`:""}`
+  return `<div class="pp-pr">${x?`<button type="button" class="pp-ob" data-act="open" data-type="${K.col}" data-id="${esc(id)}">${K.av?avatar(x,24):""}<span><b>${esc(nm)}</b>${kind==="npcs"?ppNpcFacts(x):K.av?`<small>${esc(prepSub(kind,x))}</small>`:""}</span></button>${pill?`<span class="pp-pill">${esc(pill)}</span>`:""}`
     :`<span class="pp-ob gone"><span><b>Entry not found</b></span></span>`}${ppGrip(kind,i,PREP.d[kind].length,nm||"entry")}<button type="button" class="pp-x" data-act="ppPickDel" data-kind="${kind}" data-i="${i}" aria-label="Remove ${esc(nm||"entry")} from this session" title="Remove">×</button></div>`}
 function prepPicker(kind){
   const K=PP_KIND[kind],open=PREP.pick&&PREP.pick.kind===kind&&PREP.pick.open,L=open?prepListHtml(kind):"";
