@@ -1666,16 +1666,13 @@ table.keys kbd{display:inline-block;min-width:28px;text-align:center;border:1px 
 .split{display:inline-flex;align-items:stretch}.split>.btn{border-top-right-radius:0;border-bottom-right-radius:0}.split .split-m>summary{border-top-left-radius:0;border-bottom-left-radius:0;margin-left:-1px;padding-left:9px;padding-right:9px;height:100%;box-sizing:border-box}
 .acts-r{display:inline-flex;gap:6px;align-items:center}
 @media (hover:none){.keys-btn{display:none!important}}
-.ms-card{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:14px 16px;margin:10px 0}.ms-head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap}.ms-head h3{margin:2px 0 8px}
-.ms-bar{height:8px;border-radius:99px;background:rgba(127,127,127,.2);overflow:hidden;margin:6px 0 10px}.ms-bar>span{display:block;height:100%;background:var(--gold,var(--acc,#b8860b))}
-.ms-list{list-style:none;margin:0;padding:0}.ms-list li{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(127,127,127,.15)}.ms-list li label{flex:1;display:flex;gap:8px;align-items:flex-start}.ms-list li.done span,.revl li.done span{text-decoration:line-through;opacity:.7}
-.ms-add,.lr-add{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}.ms-add input#ms-in,.lr-add input{flex:1;min-width:200px}.ms-h{font-size:.85em;color:var(--muted);display:flex;gap:4px;align-items:center}
-.ms-hist .ms-h1{margin:8px 0}.ms-hist ul{margin:4px 0 0 18px}
+.revl li.done span{text-decoration:line-through;opacity:.7}
+.lr-add{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}.lr-add input{flex:1;min-width:200px}
 .lr-list{list-style:none;margin:0;padding:0}.lr-list li{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(127,127,127,.15);flex-wrap:wrap}.lr-t{flex:1;min-width:200px}.lr-m{font-size:.82em;color:var(--muted)}.lr-list.sm li{padding:4px 0}.lr-list.sm .lr-t{min-width:0}
 .trv-g{display:grid;grid-template-columns:1fr 1fr;gap:10px}.trv-g label{display:flex;flex-direction:column;gap:4px;font-size:.9em}.trv-mi{display:flex;gap:6px}.trv-mi input{flex:1;min-width:0}@media (max-width:560px){.trv-g{grid-template-columns:1fr}}
 .trv-routes{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.trv-out{margin:12px 0}.trv-res{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:var(--r);background:rgba(127,127,127,.1)}.trv-res b{font-size:1.25em}
 .home-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}.home-c{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:14px 16px}.home-wide{grid-column:1/-1}.home-c h3{margin:2px 0 6px}.home-recap{max-height:340px;overflow:auto;margin-bottom:8px}.home-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.cal-sub{font:italic 400 .62em var(--serif,inherit);color:var(--muted)}.moon{font-size:12px;line-height:1;position:absolute;top:4px;right:5px}.day{position:relative}.moon-today{font-size:.88em;color:var(--muted);margin-left:auto}.lr-add input,.ms-add input#ms-in,.trv-g input,.trv-g select,.cs-q input{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--r);padding:7px 10px;font:15px var(--ui);min-width:0}.lr-add input::placeholder,.ms-add input::placeholder{color:var(--muted);opacity:1}
+.cal-sub{font:italic 400 .62em var(--serif,inherit);color:var(--muted)}.moon{font-size:12px;line-height:1;position:absolute;top:4px;right:5px}.day{position:relative}.moon-today{font-size:.88em;color:var(--muted);margin-left:auto}.lr-add input,.trv-g input,.trv-g select,.cs-q input{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--r);padding:7px 10px;font:15px var(--ui);min-width:0}.lr-add input::placeholder,.ms-add input::placeholder{color:var(--muted);opacity:1}
 .k-natural{background:transparent!important;color:var(--muted)!important;font-style:italic;border:1px dashed var(--line)}
 .moon{opacity:.45}.moon.key{opacity:1}.up.nat{cursor:default}.up.nat b{font-style:italic}
 .st-note{color:var(--muted);font:14px var(--ui);margin:4px 0 0}
@@ -1688,7 +1685,6 @@ input[type=checkbox],input[type=radio]{accent-color:var(--accent)}
 @media (max-width:640px){.cs-tabs{flex-wrap:wrap}.cs-tabs button{flex:1 1 40%;padding:7px 6px}}
 table.keys{min-width:0}
 table.keys kbd{white-space:nowrap}
-.ms-h{font:500 14px var(--ui);color:var(--muted);display:inline-flex;align-items:center;gap:6px}
 .home-recap{max-width:none}
 html{scrollbar-gutter:stable}
 input::placeholder,textarea::placeholder{color:var(--muted);opacity:.7;font-style:italic}
@@ -2131,8 +2127,8 @@ function vPrep(c){
   if(t==="board"){const n=boardN(),ng=nextGameText();
     const board=vPrepBoard(c);  // loads the session's drafts first, so the status line is current
     return pageHead(esc(ng||"No game date set"),`Prep for Session ${n}`,{extra:sessPicker(n)+`<span id="pp-state" class="scn-state" role="status" aria-live="polite">${esc(boardState())}</span>`,cls:"ph-c"})+board}
-  const PREP_PAGES={notes:"Session notes",todos:"Prep to-dos",bestiary:"Bestiary",milestones:"Milestones",encounters:"Encounters",tables:"Roll tables",spotlight:"Spotlight",ideas:"Saved ideas"};
-  return pageHead("Prep",PREP_PAGES[t]||"Prep",{extra:back})+`<div class="ph-page">`+(t==="notes"?toolsPanel():t==="todos"?vTodos():t==="bestiary"?vBestiary():t==="milestones"?vMilestones():t==="encounters"?vEncounters():t==="tables"?vTables():t==="ideas"?vBrainstorm():vSpotlight())+`</div>`;
+  const PREP_PAGES={notes:"Session notes",todos:"Prep to-dos",bestiary:"Bestiary",encounters:"Encounters",tables:"Roll tables",spotlight:"Spotlight",ideas:"Saved ideas"};
+  return pageHead("Prep",PREP_PAGES[t]||"Prep",{extra:back})+`<div class="ph-page">`+(t==="notes"?toolsPanel():t==="todos"?vTodos():t==="bestiary"?vBestiary():t==="encounters"?vEncounters():t==="tables"?vTables():t==="ideas"?vBrainstorm():vSpotlight())+`</div>`;
 }
 /* Prep Board: seven sections for the next session (Session Start, Scenes, Secrets & Clues, Fantastic Locations, Important NPCs, Relevant Monsters, Magic Items)
    and a checklist you tick yourself. Each session has one DM-only record in "preps" (id "prep<n>"):
@@ -2841,7 +2837,7 @@ function stTravelHtml(){const mi=Math.min(parseFloat(ST.miles),ST_MAX_MILES);if(
    Windows inside the table: hero sheet (ST.sheet), NPC or foe (ST.entry), quick foe (ST.gen), recap (ST.recap). */
 const ST_ATT=[["hostile","Hostile"],["wary","Wary"],["neutral","Neutral"],["friendly","Friendly"],["ally","Ally"]];
 const ST_DICE=[["d4",4],["d6",6],["d8",8],["d10",10],["d12",12],["d20",20],["Adv","adv"],["Dis","dis"],["d100",100],["2d6","2d6"]];
-const ST_TAGS=["Loot","Milestone"];
+const ST_TAGS=["Loot"];
 const ST_RCATS=()=>({
   "Conditions":Object.entries(RULES).filter(([k])=>CONDS.includes(k)).map(([k,v])=>[k,v]),
   "DCs & Cover":[["Very easy","DC 5"],["Easy","DC 10"],["Medium","DC 15"],["Hard","DC 20"],["Very hard","DC 25"],["Nearly impossible","DC 30"],["Half cover","+2 to AC and Dex saves"],["Three-quarters cover","+5 to AC and Dex saves"],["Total cover","Can't be targeted directly"]],
@@ -2958,7 +2954,7 @@ function renderSession(el){
     <section class="sx-box" aria-label="Dice"><div class="sx-roll"><div class="sx-big" aria-live="polite">${last?last.v:"–"}</div><div><span class="sx-rl">${last?esc(last.label):"Secret dice · only you see these"}</span><span class="sx-rh">${ST.rolls.slice(1,6).map(r=>`${esc(r.short)} ${r.v}`).join(" · ")}</span></div></div>
       <div class="sx-dice">${ST_DICE.map(([l,v])=>`<button type="button" data-act="stRoll" data-n="${v}">${l}</button>`).join("")}</div></section>
     <section class="sx-box" aria-label="Session log"><span class="sx-bh">Log a Moment</span><form data-stlog class="sx-logf"><input id="sx-log" placeholder="What happened? Press Enter" aria-label="What happened?" enterkeyhint="done"><button class="btn sm primary" type="submit">Log</button></form>
-      <div class="sx-tags">${ST_TAGS.map(t=>`<button type="button" data-act="stTag" data-v="${t}" aria-pressed="${ST.tag===t}">${t}</button>`).join("")}<small>Time is stamped for you. Loot and milestones also go to the recap.</small></div>
+      <div class="sx-tags">${ST_TAGS.map(t=>`<button type="button" data-act="stTag" data-v="${t}" aria-pressed="${ST.tag===t}">${t}</button>`).join("")}<small>Time is stamped for you. Loot also goes to the recap.</small></div>
       <ul class="sx-log">${stLogHtml(n)}</ul></section></nav>`;
   // ---- the six prep panels
   const seen=new Set(),whoAll=[];scenes.forEach(s=>s.who.forEach(w=>{const k=w.col+":"+w.id;if(!seen.has(k)){seen.add(k);whoAll.push(w)}}));
@@ -3049,11 +3045,11 @@ function stWindow(n){
 function stRecapData(n){const plan=stPlan(),sc=stScenes(plan),items=stLogItems(n).reverse();
   const cl=prepClues(plan?plan.session:n).filter(k=>String(k.t||"").trim());
   return{played:sc.filter(s=>s.done).map(s=>s.title||"Untitled scene"),clues:cl.filter(k=>k.found).map(k=>k.t),hooks:cl.filter(k=>!k.found).map(k=>k.t),
-    spot:S.characters.filter(x=>x.kind==="pc").map(p=>[p.name,stSpotN(n,p.id)]).filter(x=>x[1]),log:items.map(o=>o.x),tally:items.map(o=>o.x).filter(t=>/^\[(Loot|Milestone)\]/i.test(t))}}
+    spot:S.characters.filter(x=>x.kind==="pc").map(p=>[p.name,stSpotN(n,p.id)]).filter(x=>x[1]),log:items.map(o=>o.x),tally:items.map(o=>o.x).filter(t=>/^\[Loot\]/i.test(t))}}
 function stRecapHtml(n,close){const d=stRecapData(n),li=(a,e)=>a.length?`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:`<p class="vempty">${e}</p>`;
   return `<div class="sx-wtabs"><span class="sx-kick">Drafted from tonight's play</span><span class="grow"></span>${close}</div><div class="sx-wb"><h2>Recap · Session ${n}</h2>
     <div class="sx-rc"><div><h3>Scenes played</h3>${li(d.played,"No scenes ticked done.")}<h3>Clues the party learned</h3>${li(d.clues,"None revealed.")}<h3>Spotlight tonight</h3><p>${d.spot.length?esc(d.spot.map(([a,b])=>`${a} ★${b}`).join(" · ")):"No moments marked."}</p></div>
-      <div><h3>From the log</h3>${li(d.log.slice(-12),"Nothing logged.")}<h3>Loot &amp; milestones</h3>${li(d.tally,"None tagged.")}</div></div>
+      <div><h3>From the log</h3>${li(d.log.slice(-12),"Nothing logged.")}<h3>Loot</h3>${li(d.tally,"None tagged.")}</div></div>
     <div class="sx-hooks"><div class="sx-bhr"><h3>Hooks for next time</h3>${d.hooks.length?`<button type="button" class="btn sm" data-act="stHooks" ${ST.hooksSent?"disabled":""}>${ST.hooksSent?"Added to Threads":"Add them as threads"}</button>`:""}</div><small>Clues the party hasn't found yet, ready to become threads on the Prep Board</small>${li(d.hooks,"Every clue was found.")}</div>
     <div class="foot"><button type="button" class="btn primary" data-act="stRecapNote">Save as the session recap note</button><button type="button" class="btn" data-act="wrapUp">Calendar, next game &amp; mark played…</button><span class="grow"></span><button type="button" class="btn" data-act="stClose">Close</button></div></div>`}
 // the Session Table's newer taps (design screen A); older ones stay in stAct
@@ -3068,7 +3064,7 @@ async function stAct2(a,t){const n=rcSession(),plan=stPlan();
   if(a==="stRecap"){ST.clockWas=!!CLOCK.running;if(CLOCK.running){CLOCK.acc=clockMs();CLOCK.running=false;CLOCK.start=null;clockSave()}ST.recap=true;ST.hooksSent=false;return renderTable()}
   if(a==="stHooks"){if(ST.hooksSent||ST.hooksBusy)return;ST.hooksBusy=true;try{const d=stRecapData(n);for(const h of d.hooks)await save("threads",uid(),{text:h,status:"open",notes:`From session ${n}: a clue the party didn't find.`});project();ST.hooksSent=true;toast(`${d.hooks.length} thread${d.hooks.length===1?"":"s"} added to the Prep Board`);return renderTable()}finally{ST.hooksBusy=false}}
   if(a==="stRecapNote"){const d=stRecapData(n),sec=(h,l)=>l.length?`# ${h}\n${l.map(x=>"- "+x).join("\n")}\n\n`:"";ST.recap=false;renderTable();
-    return openForm("notes",null,{category:"session",session:n,title:`Session ${n}`,body:(sec("Scenes played",d.played)+sec("What the party learned",d.clues)+sec("Moments",d.log)+sec("Loot & milestones",d.tally)+sec("Threads for next time",d.hooks)).trim()})}
+    return openForm("notes",null,{category:"session",session:n,title:`Session ${n}`,body:(sec("Scenes played",d.played)+sec("What the party learned",d.clues)+sec("Moments",d.log)+sec("Loot",d.tally)+sec("Threads for next time",d.hooks)).trim()})}
   if(a==="stPrepLib"){closeTableMode();navGo("board");return}
   if(a==="stStart"){ST.start=!ST.start;renderTable();document.querySelector(ST.start?"#sx-start .btn.primary":"#tablemode .sx-startb")?.focus();return}
   if(a==="stEqual"){stLayoutSave(null);return renderTable()}
@@ -4124,7 +4120,7 @@ document.addEventListener("click",async e=>{const t=e.target.closest("[data-bssa
 document.addEventListener("change",async e=>{const el=e.target;
   if(el.dataset&&el.dataset.bslike){const[s,i]=el.dataset.bslike.split("|");await bsEditIdea(s,i,it=>{it.liked=el.checked})}
   else if(el.dataset&&el.dataset.bspick){const[s,i,k]=el.dataset.bspick.split("|");el.closest(".bs-xl")?.classList.toggle("on",el.checked);await bsEditIdea(s,i,it=>{const P=new Set(it.picks||[]);el.checked?P.add(+k):P.delete(+k);it.picks=[...P].sort((a,b)=>a-b)})}},true);
-/* ================= round 8: rests on +1 day, milestones, party knowledge, travel, player page ================= */
+/* ================= round 8: rests on +1 day, party knowledge, travel, player page ================= */
 /* ---- +1 day is a long rest: it moves the date and writes the rest into this session's notes ---- */
 let LAST_TIME_LINE=null;
 async function dayStep(n,quiet){
@@ -4139,40 +4135,6 @@ async function dayStep(n,quiet){
   const s=await addSessionLine(text);LAST_TIME_LINE={session:s,text};
   toast(n===1?`Long rest logged in session ${s} notes`:`${n} days logged in session ${s} notes`);
 }
-
-/* ---- milestones (DM copy in meta; what players may see is mirrored to settings/progress) ---- */
-const MS={undo:null};
-const msDoc=()=>rec("meta","milestones")||{items:[],history:[]};
-function partyLevel(){const lv=S.characters.filter(c=>c.kind==="pc"&&num(c.level)).map(c=>num(c.level));if(!lv.length)return num(msDoc().level)||1;const f={};lv.forEach(l=>f[l]=(f[l]||0)+1);return +Object.entries(f).sort((a,b)=>b[1]-a[1]||b[0]-a[0])[0][0]}
-async function msSave(d,lvSet){const{id,...keep}=d;await save("meta","milestones",keep);const lv=lvSet??partyLevel();
-  await save("settings","progress",{level:lv,next:lv+1,done:(d.items||[]).filter(x=>x.done).length,total:(d.items||[]).length,items:(d.items||[]).filter(x=>x.done||!x.hidden).map(x=>({text:x.text,done:!!x.done}))})}
-async function msAdd(text,hidden){text=String(text||"").trim();if(!text)return;const d=msDoc();const items=(d.items||[]).slice();items.push({id:uid(),text,done:false,hidden:!!hidden,added:Date.now()});await msSave({...d,items})}
-async function msToggle(id,key){const d=msDoc();const items=(d.items||[]).map(x=>x.id===id?{...x,[key]:!x[key],doneSession:key==="done"&&!x.done?rcSession():x.doneSession}:x);await msSave({...d,items})}
-async function msDel(id){const d=msDoc();await msSave({...d,items:(d.items||[]).filter(x=>x.id!==id)})}
-async function msLevelUp(){
-  const d=msDoc();const from=partyLevel(),to=from+1;
-  const pcs=S.characters.filter(c=>c.kind==="pc");const before=pcs.map(c=>({id:c.id,level:c.level}));
-  for(const c of pcs){const{id,...r}=c;await save("characters",id,{...r,level:to})}
-  const hist=(d.history||[]).slice();hist.unshift({level:to,at:Date.now(),session:rcSession(),items:(d.items||[]).map(x=>({text:x.text,done:!!x.done}))});
-  MS.undo={before,doc:JSON.parse(JSON.stringify(d))};
-  await msSave({...d,items:[],history:hist.slice(0,30),level:to},to);
-  toast(`The party is now level ${to}`);render();
-}
-async function msUndoLevel(){const u=MS.undo;if(!u)return;for(const b of u.before){const c=rec("characters",b.id);if(c){const{id,...r}=c;await save("characters",id,{...r,level:b.level})}}await msSave(u.doc,num(u.before[0]?.level)||undefined);MS.undo=null;toast("Level up undone");render()}
-function msBar(done,total){const p=total?Math.round(done/total*100):0;return `<div class="ms-bar" role="progressbar" aria-valuenow="${p}" aria-valuemin="0" aria-valuemax="100"><span style="width:${p}%"></span></div>`}
-function vMilestones(){
-  const d=msDoc(),items=d.items||[],lv=partyLevel(),done=items.filter(x=>x.done).length;
-  return `<div class="sub-bar"><p class="tool-d">The story beats that earn the party's next level. Tick them off as they happen; </p></div>
-  ${MS.undo?`<section class="off"><h3>The party is level ${lv}</h3><div class="tool-acts"><button class="btn sm" data-act="msUndoLevel">Undo level up</button><button class="btn sm" data-act="msUndoClose">OK</button></div></section>`:""}
-  <section class="ms-card"><div class="ms-head"><div><span class="label">Level ${lv} → ${lv+1}</span><h3>${done} of ${items.length||0} milestone${items.length===1?"":"s"}</h3></div>${items.length?`<button class="btn ${done===items.length?"primary":""}" data-act="msLevelUp">Level up to ${lv+1}</button>`:""}</div>
-    ${msBar(done,items.length)}
-    <ul class="ms-list">${items.map(x=>`<li class="${x.done?"done":""}"><label><input type="checkbox" data-ms="${x.id}" ${x.done?"checked":""}><span>${linkify(esc(x.text),"")}</span></label><button class="chip" data-act="msDel" data-id="${x.id}" aria-label="Remove">×</button></li>`).join("")||`<li class="vempty">No milestones yet.</li>`}</ul>
-    <form class="ms-add" data-msadd><input id="ms-in" placeholder="Add a milestone, e.g. Defeat the Ogre Chieftain" autocomplete="off"><label class="ms-h"><input type="checkbox" id="ms-hidden"> Hide from players</label><button class="btn sm primary">Add</button></form>
-  </section>
-  ${(d.history||[]).length?`<section class="ms-hist"><h3 class="section-h">Past levels</h3>${d.history.map(h=>`<div class="ms-h1"><b>Reached level ${h.level}</b>${h.session?` <span class="mono">session ${h.session}</span>`:""}<ul>${(h.items||[]).map(x=>`<li class="${x.done?"done":""}">${esc(x.text)}</li>`).join("")}</ul></div>`).join("")}</section>`:""}`;
-}
-document.addEventListener("change",e=>{const el=e.target.closest("[data-ms]");if(!el)return;el.closest("li")?.classList.toggle("done",el.checked);msToggle(el.dataset.ms,"done")},true);
-document.addEventListener("submit",e=>{const f=e.target.closest("[data-msadd]");if(!f)return;e.preventDefault();e.stopPropagation();const i=document.getElementById("ms-in");const h=document.getElementById("ms-hidden");const v=i.value;i.value="";i.blur();msAdd(v,h&&h.checked)},true);
 
 /* ---- what the party knows (settings/learned: players can read it) ---- */
 const LRN={q:""};
@@ -4434,7 +4396,7 @@ function vNotes(c){
   let h=isDM()?pageHead(q?`Every entry matching “${esc(U.noteQ.trim())}”`:esc(gName||""),q?"Search":"The Library",{search:qBox,newLabel:nw?nw[2]:g==="sessions"?"New session plan":"",extra:extra.length?moreMenu(extra.map(([a,l])=>mi(a,l)),{label:"More ▾",title:"More ways to add",sm:false}):""}):`<div class="bar"><h2>Library</h2>${qBox}</div>`;
   // pages that used to be their own tabs open from their Library group
   const goW=(v,l)=>`<button type="button" class="btn sm" data-act="pbWorld" data-v="${v}">${l}</button>`,goP=(v,l)=>`<button type="button" class="btn sm" data-act="libPrep" data-v="${v}">${l}</button>`;
-  const more=q?"":{locations:goW("maps","Maps")+goW("rel","Relationships")+goW("places","Places")+goW("know","Party knows"),sessions:`<a class="btn sm" href="#calendar">Calendar</a>`+goP("notes","Session notes")+goP("milestones","Milestones"),bestiary:goP("bestiary","Bestiary page")+goP("encounters","Encounters"),tables:goP("tables","Roll tables"),lore:goP("ideas","Saved ideas")}[g==="notes"?chip:g]||"";
+  const more=q?"":{locations:goW("maps","Maps")+goW("rel","Relationships")+goW("places","Places")+goW("know","Party knows"),sessions:`<a class="btn sm" href="#calendar">Calendar</a>`+goP("notes","Session notes"),bestiary:goP("bestiary","Bestiary page")+goP("encounters","Encounters"),tables:goP("tables","Roll tables"),lore:goP("ideas","Saved ideas")}[g==="notes"?chip:g]||"";
   const groups=sideMenu()&&isDM()?"":`<div class="lib-groups" role="group" aria-label="Library groups">${LIB_GROUPS.map(([k,l])=>isDM()&&(k==="party"||k==="npcs")?`<button type="button" class="lib-g" data-act="nav" data-v="${k}">${l}<span class="n">${libItems(k).length}</span></button>`:`<button type="button" class="lib-g" data-act="libGrp" data-v="${k}" aria-pressed="${!q&&g===k}">${l}<span class="n">${libItems(k).length}</span></button>`).join("")}</div>`;
   const cnts=chipCounts(),chipBtn=(k,l,n,act,cls,on)=>`<button type="button" class="lib-g ${cls||""}" data-act="${act}" data-v="${k}" aria-pressed="${on}">${esc(l)}<span class="n">${n}</span></button>`;
   const qs=S.quests.filter(x=>true),stCount=(arr,f)=>arr.filter(f).length;
@@ -4854,11 +4816,7 @@ document.addEventListener("click",async e=>{
     case"trvGo":t.disabled=true;await trvGo();break;
     case"trvSave":await trvSave();break;
     case"trvRoute":{const r=routes()[num(t.dataset.i)];if(r){TRV.from=r.from;TRV.to=r.to;TRV.miles=String(r.miles);trvSheet()}break}
-    case"msLevelUp":await msLevelUp();break;
-    case"msUndoLevel":await msUndoLevel();break;
-    case"msUndoClose":MS.undo=null;render();break;
-    case"msDel":await msDel(t.dataset.id);break;
-    case"learnDel":await learnDel(t.dataset.id);break;
+                    case"learnDel":await learnDel(t.dataset.id);break;
     case"setStyle":{const k=t.dataset.k,v=t.dataset.v;if(k==="reset"){STYLE={skin:"wood",fonts:"classic",size:"1",texture:"theme",texStrength:"0.8"};setStyle("size","1")}else if(k==="skin"||k==="fonts"||k==="texture"){/* fixed in the one look */}else setStyle(k,v)}break;
     case"exportGo":exportGo();break;
     case"importGo":t.disabled=true;await importGo();break;
