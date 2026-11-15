@@ -4890,7 +4890,8 @@ document.addEventListener("keydown",e=>{
 document.addEventListener("submit",async e=>{
   e.preventDefault();const f=e.target,k=f.dataset.form,c=cal();
   if(k==="item"){const type=f.dataset.type,id=f.dataset.id||uid(),data=readForm(type);
-    if(type==="characters"&&data.kind!=="pc")NPC_OLD.forEach(k=>{data[k]=["level","ac","hpMax","hp","pp"].includes(k)?null:""});  // folded into Notes when the form opened
+    if(type==="characters"&&data.kind!=="pc"){const was=f.dataset.id&&S.characters.find(x=>x.id===f.dataset.id);if(!was||was.kind==="pc")foldNpc(data);  // a PC switched to NPC here wasn't folded when the form opened
+      NPC_OLD.forEach(k=>{data[k]=["level","ac","hpMax","hp","pp"].includes(k)?null:""})}  // folded into Notes
     if(type==="characters"&&data.hp==null&&data.hpMax)data.hp=data.hpMax;
     if(type==="links"){if(!data.a||!data.b||data.a===data.b){toast("Pick two different characters.");return}}
     else if(type==="threads"){if(!data.text){toast("Describe the thread.");return}}
