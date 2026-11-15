@@ -1329,6 +1329,16 @@ header.top .clock{display:none!important}
 .pp-pr:first-child{border-top:0}
 .pp-pr .pp-ob{flex:1 1 auto}
 .pp-pr .pp-x{margin-top:0}
+.pp-grip{flex:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:28px;margin-top:3px;padding:0;border:0;border-radius:var(--r);background:none;color:var(--muted);cursor:grab;touch-action:none;opacity:.3}
+.pp-pr .pp-grip{margin-top:0}
+.pp-grip:hover,.pp-grip:focus-visible,:is(.pp-row,.pp-pr,.pp-ld,.pp-lh):hover>.pp-grip,:is(.pp-row,.pp-pr,.pp-ld,.pp-lh):focus-within>.pp-grip,.pp-item:hover .pp-ld:first-child>.pp-grip,.pp-item:focus-within .pp-ld:first-child>.pp-grip{opacity:1}
+.pp-grip:hover{background:var(--surface2);color:var(--ink)}
+.pp-grip:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+@media(hover:none){.pp-grip{opacity:.7}}
+.dragging{opacity:.4}
+.pp-drop-before{box-shadow:0 -2px 0 0 var(--accent)}
+.pp-drop-after{box-shadow:0 2px 0 0 var(--accent)}
+body.pp-dragging,body.pp-dragging *{cursor:grabbing!important;user-select:none;-webkit-user-select:none}
 .pp-pill{flex:none;font:500 12px var(--ui);color:var(--muted);background:var(--surface2);border-radius:999px;padding:1px 8px;white-space:nowrap}
 /* active quests as a ruled list, as in the design */
 .pboard .pb-qs .pb-row{background:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:4px 2px}
@@ -1869,7 +1879,7 @@ function project(){
 }
 let renderQ=false;
 /* don't redraw the page under someone who's typing in it; catch up once they leave the field */
-function typingInApp(){const a=document.activeElement;return !!a&&document.getElementById("app").contains(a)&&(a.tagName==="TEXTAREA"||(a.tagName==="INPUT"&&!/^(checkbox|radio|file|button|submit|hidden)$/.test(a.type)))}
+function typingInApp(){if(PPD&&PPD.on)return true;const a=document.activeElement;return !!a&&document.getElementById("app").contains(a)&&(a.tagName==="TEXTAREA"||(a.tagName==="INPUT"&&!/^(checkbox|radio|file|button|submit|hidden)$/.test(a.type)))}
 let renderPending=false;
 function queueRender(){if(renderQ)return;renderQ=true;requestAnimationFrame(()=>{renderQ=false;project();if(typingInApp()){renderPending=true;if(TM)renderTable()}else{renderPending=false;render()}refreshOpenSheet()})}
 document.addEventListener("focusout",e=>{if(!renderPending||!(document.getElementById("app").contains(e.target)||document.getElementById("tablemode").contains(e.target)))return;setTimeout(()=>{if(renderPending&&!typingInApp()&&!typingInTable()){renderPending=false;render()}},300)});
@@ -2268,13 +2278,16 @@ const PP_ICO={chev:'<svg class="chev" width="14" height="14" viewBox="0 0 24 24"
   check:(n,w)=>`<svg class="${n}" width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>`,
   plus:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
   search:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>'};
+const ppGrip=(l,i,n,name)=>`<button type="button" class="pp-grip" data-ppl="${esc(l)}" data-i="${i}" aria-label="${esc(`Move ${name}, ${i+1} of ${n}`)}" title="Drag to reorder"><svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor" aria-hidden="true"><circle cx="3.5" cy="3" r="1.4"/><circle cx="8.5" cy="3" r="1.4"/><circle cx="3.5" cy="8" r="1.4"/><circle cx="8.5" cy="8" r="1.4"/><circle cx="3.5" cy="13" r="1.4"/><circle cx="8.5" cy="13" r="1.4"/></svg></button>`;
+const ppSortItems=(l,n,by)=>by.map(([b,t])=>mi("ppSort",t,`data-ppl="${l}" data-by="${b}" ${n<2?"disabled":""}`));
+const ppSortMenu=(l,n,by)=>moreMenu(ppSortItems(l,n,by),{label:"⇅",title:"Sort "+PP_SHORT[l]});
 function prepPickRow(kind,id,i){
   const K=PP_KIND[kind],x=rec(K.col,id),nm=x?(K.name(x)||"Unnamed"):"",pill=x&&K.pill?K.pill(x):"";
-  return `<div class="pp-pr">${x?`<button type="button" class="pp-ob" data-act="open" data-type="${K.col}" data-id="${esc(id)}">${K.av?avatar(x,24):""}<span><b>${esc(nm)}</b>${K.av?`<small>${esc(prepSub(kind,x))}</small>`:""}</span></button>${pill?`<span class="pp-pill">${esc(pill)}</span>`:""}`
+  return `<div class="pp-pr">${ppGrip(kind,i,PREP.d[kind].length,nm||"entry")}${x?`<button type="button" class="pp-ob" data-act="open" data-type="${K.col}" data-id="${esc(id)}">${K.av?avatar(x,24):""}<span><b>${esc(nm)}</b>${K.av?`<small>${esc(prepSub(kind,x))}</small>`:""}</span></button>${pill?`<span class="pp-pill">${esc(pill)}</span>`:""}`
     :`<span class="pp-ob gone"><span><b>Entry not found</b></span></span>`}<button type="button" class="pp-x" data-act="ppPickDel" data-kind="${kind}" data-i="${i}" aria-label="Remove ${esc(nm||"entry")} from this session" title="Remove">×</button></div>`}
 function prepPicker(kind){
   const K=PP_KIND[kind],open=PREP.pick&&PREP.pick.kind===kind&&PREP.pick.open,L=open?prepListHtml(kind):"";
-  return `<div class="pp-list">${PREP.d[kind].map((id,i)=>prepPickRow(kind,id,i)).join("")}</div>
+  return `<div class="pp-list" data-pplist="${kind}">${PREP.d[kind].map((id,i)=>prepPickRow(kind,id,i)).join("")}</div>
     <div class="pp-pickbar">${PP_ICO.search}<div class="pp-combo"><input id="pp-q-${kind}" type="text" role="combobox" aria-autocomplete="list" aria-expanded="${!!L}" aria-controls="pp-lb-${kind}" aria-label="${K.search}" placeholder="${K.add}" autocomplete="off" data-pp="q" data-kind="${kind}" value="${esc(PREP.q[kind])}"></div>
       <button type="button" class="pp-mv" data-act="ppPickNew" data-kind="${kind}" aria-label="New ${K.word}" title="New ${K.word}">New</button>
       <ul id="pp-lb-${kind}" class="pp-lb" role="listbox" aria-label="${K.label} that match" ${L?"":"hidden"}>${L}</ul></div>`}
@@ -2304,31 +2317,77 @@ function vPrepBoard(c){
   const T=Object.fromEntries(PREP_SECS);
   // Scenes: one compact growing row per scene, edited right here
   const pl=sessPlan(n),nx=n+1;
-  const scenesAct=moreMenu([mi("planPlayed",pl.status==="played"?"Mark as planned":"Mark as played",`data-id="${pl.id}" ${pl.scenes.length?"":"disabled"}`),mi("scnMoveOpen",`Move unfinished scenes to Session ${nx}`,`data-id="${pl.id}" ${pl.scenes.some(x=>!x.done&&!x.played)?"":"disabled"}`),mi("copyR20","Copy for Roll20",`data-type="scenes" data-id="${pl.id}"`)]);
+  const scenesAct=moreMenu([mi("planPlayed",pl.status==="played"?"Mark as planned":"Mark as played",`data-id="${pl.id}" ${pl.scenes.length?"":"disabled"}`),mi("scnMoveOpen",`Move unfinished scenes to Session ${nx}`,`data-id="${pl.id}" ${pl.scenes.some(x=>!x.done&&!x.played)?"":"disabled"}`),mi("copyR20","Copy for Roll20",`data-type="scenes" data-id="${pl.id}"`),...ppSortItems("scenes",SCN.d.length,[["az","Sort scenes A–Z"],["open","Unfinished scenes first"]])]);
   const scenesBody=scnCards();
-  const clues=d.clues.map((k,i)=>`<div class="pp-row"><input type="checkbox" data-pp="found" data-i="${i}" ${k.found?"checked":""} aria-label="Clue ${i+1} revealed" title="Revealed to the players">${ppArea("pp-clue-"+i,`data-pp="clue" data-i="${i}"`,k.t,"Clue","Secret or clue "+(i+1))}${ppX("ppClueDel",`data-i="${i}"`,"Remove clue "+(i+1))}</div>`).join("");
-  const locs=d.locations.map((l,i)=>`<div class="pp-loc"><div class="pp-lh"><input id="pp-ln-${i}" class="pp-in pp-lname" data-pp="ln" data-i="${i}" value="${esc(l.name)}" placeholder="Location" aria-label="Location ${i+1} name" autocomplete="off">${ppX("ppLocDel",`data-i="${i}"`,"Remove "+(l.name||"location "+(i+1)))}</div>
-      ${l.desc.map((t,j)=>`<div class="pp-ld">${ppArea(`pp-ld-${i}-${j}`,`data-pp="ld" data-i="${i}" data-j="${j}"`,t,"Descriptor",`${l.name||"Location "+(i+1)}: descriptor ${j+1}`)}${ppX("ppDescDel",`data-i="${i}" data-j="${j}"`,"Remove descriptor "+(j+1))}</div>`).join("")}
+  const clues=d.clues.map((k,i)=>`<div class="pp-row">${ppGrip("clues",i,d.clues.length,k.t||"clue "+(i+1))}<input type="checkbox" data-pp="found" data-i="${i}" ${k.found?"checked":""} aria-label="Clue ${i+1} revealed" title="Revealed to the players">${ppArea("pp-clue-"+i,`data-pp="clue" data-i="${i}"`,k.t,"Clue","Secret or clue "+(i+1))}${ppX("ppClueDel",`data-i="${i}"`,"Remove clue "+(i+1))}</div>`).join("");
+  const locs=d.locations.map((l,i)=>`<div class="pp-loc"><div class="pp-lh">${ppGrip("locations",i,d.locations.length,l.name||"location "+(i+1))}<input id="pp-ln-${i}" class="pp-in pp-lname" data-pp="ln" data-i="${i}" value="${esc(l.name)}" placeholder="Location" aria-label="Location ${i+1} name" autocomplete="off">${ppX("ppLocDel",`data-i="${i}"`,"Remove "+(l.name||"location "+(i+1)))}</div>
+      <div data-pplist="desc:${i}">${l.desc.map((t,j)=>`<div class="pp-ld">${ppGrip("desc:"+i,j,l.desc.length,"descriptor "+(j+1)+(l.name?" of "+l.name:""))}${ppArea(`pp-ld-${i}-${j}`,`data-pp="ld" data-i="${i}" data-j="${j}"`,t,"Descriptor",`${l.name||"Location "+(i+1)}: descriptor ${j+1}`)}${ppX("ppDescDel",`data-i="${i}" data-j="${j}"`,"Remove descriptor "+(j+1))}</div>`).join("")}</div>
       ${ppAdd("ppDescAdd","Descriptor",`data-i="${i}"`,"sm")}</div>`).join("");
-  const items=d.items.map((x,i)=>`<div class="pp-item"><div class="pp-ld">${ppArea("pp-item-"+i,`data-pp="item" data-i="${i}"`,x.name,"Item","Magic item "+(i+1))}${ppX("ppItemDel",`data-i="${i}"`,"Remove item "+(i+1))}</div>
+  const items=d.items.map((x,i)=>`<div class="pp-item"><div class="pp-ld">${ppGrip("items",i,d.items.length,x.name||"item "+(i+1))}${ppArea("pp-item-"+i,`data-pp="item" data-i="${i}"`,x.name,"Item","Magic item "+(i+1))}${ppX("ppItemDel",`data-i="${i}"`,"Remove item "+(i+1))}</div>
     ${ppArea("pp-itemd-"+i,`data-pp="itemd" data-i="${i}"`,x.desc,"Description","Magic item "+(i+1)+" description","pp-idesc")}</div>`).join("");
   const cnt=k=>PREP.d[k].length;
   const col1=sec("opening",T.opening,ppArea("pp-opening",`data-pp="opening"`,d.opening,"Opening","Opening scene","pp-open").replace('rows="1"','rows="2"'))
     +sec("scenes",T.scenes,scenesBody,{count:SCN.d.length,act:scenesAct});
-  const col2=sec("clues",T.clues,`${clues}${ppAdd("ppClueAdd","Add clue")}`,{count:ppFound(d)})
-    +sec("locations",T.locations,`${locs}${ppAdd("ppLocAdd","Add location")}`,{count:d.locations.length});
-  const col3=sec("npcs",T.npcs,prepPicker("npcs"),{count:cnt("npcs")})
-    +sec("monsters",T.monsters,prepPicker("monsters"),{count:cnt("monsters")})
-    +sec("items",T.items,`${items}${ppAdd("ppItemAdd","Add item")}`,{count:d.items.length})
-    +sec("handouts",T.handouts,prepPicker("handouts"),{count:cnt("handouts")});
+  const col2=sec("clues",T.clues,`<div data-pplist="clues">${clues}</div>${ppAdd("ppClueAdd","Add clue")}`,{count:ppFound(d),act:ppSortMenu("clues",d.clues.length,[["open","Unrevealed first"],["az","A–Z"]])})
+    +sec("locations",T.locations,`<div data-pplist="locations">${locs}</div>${ppAdd("ppLocAdd","Add location")}`,{count:d.locations.length,act:ppSortMenu("locations",d.locations.length,[["az","A–Z"]])});
+  const col3=sec("npcs",T.npcs,prepPicker("npcs"),{count:cnt("npcs"),act:ppSortMenu("npcs",cnt("npcs"),[["az","A–Z"]])})
+    +sec("monsters",T.monsters,prepPicker("monsters"),{count:cnt("monsters"),act:ppSortMenu("monsters",cnt("monsters"),[["az","A–Z"],["cr","CR low to high"]])})
+    +sec("items",T.items,`<div data-pplist="items">${items}</div>${ppAdd("ppItemAdd","Add item")}`,{count:d.items.length,act:ppSortMenu("items",d.items.length,[["az","A–Z"]])})
+    +sec("handouts",T.handouts,prepPicker("handouts"),{count:cnt("handouts"),act:ppSortMenu("handouts",cnt("handouts"),[["az","A–Z"]])});
   const strip=`<div class="pp-strip" role="group" aria-label="Prep progress"><span class="pp-prog" id="pp-count" role="status" aria-live="polite">${done} of ${PREP_KEYS.length} ready</span>${PREP_KEYS.map(k=>`<button type="button" class="pp-chip${d.checked[k]?" on":""}" data-act="ppJump" data-k="${k}" aria-label="Go to ${esc(T[k])}${d.checked[k]?", ready":""}">${PP_ICO.check("ck",12)}${esc(PP_SHORT[k])}</button>`).join("")}</div>`;
   return `<div class="pp-wrap">${strip}<div class="pp-cols"><div class="pp-col pp-c1">${col1}</div><div class="pp-col pp-c2">${col2}</div><div class="pp-col pp-c3">${col3}</div></div></div>`;
 }
+/* Reordering: ppMove is the one place a row changes position (drag, arrow keys and Alt+arrows all end here). */
+const ppArr=l=>{const d=PREP.d;if(l==="scenes")return SCN.d;if(!d)return null;if(String(l).startsWith("desc:")){const x=d.locations[num(l.slice(5))];return x&&x.desc}return Array.isArray(d[l])?d[l]:null};
+function ppMove(l,from,to,foc){const a=ppArr(l);if(!a||from===to||from<0||to<0||from>=a.length||to>=a.length)return;
+  a.splice(to,0,a.splice(from,1)[0]);FOCUS_NEXT=foc||`.pp-grip[data-ppl="${l}"][data-i="${to}"]`;if(l==="scenes")scnTouch(true);else prepTouch(true)}
+function ppSortRun(l,by){const a=ppArr(l);if(!a||a.length<2)return;
+  const nm=l==="scenes"?x=>scnTitle(x.note):l==="clues"?x=>x.t:l==="locations"||l==="items"?x=>x.name:x=>{const K=PP_KIND[l],r=rec(K.col,x);return r?K.name(r):""};
+  const key=x=>String(nm(x)||"").trim().toLowerCase();
+  let cmp=(x,y)=>{const X=key(x),Y=key(y);return (!X)-(!Y)||X.localeCompare(Y,undefined,{numeric:true})},what="A–Z";
+  if(by==="open"){const f=l==="scenes"?x=>!!(x.done||x.played):x=>!!x.found;cmp=(x,y)=>f(x)-f(y);what=l==="scenes"?"unfinished first":"unrevealed first"}
+  else if(by==="cr"){const cr=x=>{const r=rec("monsters",x),s=String(r&&r.cr||"").trim(),m=s.match(/^(\d+)\s*\/\s*(\d+)$/),v=m?m[1]/m[2]:parseFloat(s);return Number.isFinite(v)?v:Infinity};
+    cmp=(x,y)=>{const X=cr(x),Y=cr(y);return X===Y?0:X<Y?-1:1};what="by CR, low to high"}
+  a.sort(cmp);toast(`Sorted ${PP_SHORT[l]||l} ${what}.`);if(l==="scenes")scnTouch(true);else prepTouch(true)}
+// dragging a grip with a mouse or finger: nothing moves on screen until the pointer is released
+let PPD=null;
+function ppDragClear(){if(!PPD)return;const rp=PPD.on&&renderPending;PPD.row.classList.remove("dragging");[...PPD.c.children].forEach(r=>r.classList.remove("pp-drop-before","pp-drop-after"));document.body.classList.remove("pp-dragging");PPD=null;if(rp)queueRender()}
+addEventListener("blur",ppDragClear);
+function ppDragAt(y){const D=PPD,rows=[...D.c.children];let t=rows.length;
+  for(let k=0;k<rows.length;k++){const b=rows[k].getBoundingClientRect();if(y<b.top+b.height/2){t=k;break}}
+  D.to=t>D.from?t-1:t;rows.forEach(r=>r.classList.remove("pp-drop-before","pp-drop-after"));
+  if(D.to!==D.from)(t<rows.length?rows[t].classList.add("pp-drop-before"):rows[t-1].classList.add("pp-drop-after"))}
+document.addEventListener("pointerdown",e=>{const g=e.target.closest&&e.target.closest(".pp-grip");if(!g||e.button>0||PPD)return;
+  const c=g.closest("[data-pplist]");if(!c)return;let row=g;while(row&&row.parentElement!==c)row=row.parentElement;if(!row)return;
+  PPD={g,c,row,l:g.dataset.ppl,from:num(g.dataset.i),x:e.clientX,y:e.clientY,on:false,to:num(g.dataset.i),id:e.pointerId};try{g.setPointerCapture(e.pointerId)}catch(_){}});
+document.addEventListener("pointermove",e=>{const D=PPD;if(!D||e.pointerId!==D.id)return;
+  if(!D.on){if(Math.hypot(e.clientX-D.x,e.clientY-D.y)<4)return;D.on=true;D.row.classList.add("dragging");document.body.classList.add("pp-dragging")}
+  e.preventDefault();ppDragAt(e.clientY)});
+document.addEventListener("pointerup",e=>{const D=PPD;if(!D||e.pointerId!==D.id)return;const go=D.on;ppDragClear();if(go&&D.to!==D.from)ppMove(D.l,D.from,D.to)});
+document.addEventListener("pointercancel",e=>{if(PPD&&e.pointerId===PPD.id)ppDragClear()});
+// arrows on a focused grip move its row; Alt+arrows do the same from inside a row's text box
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&PPD&&PPD.on){e.preventDefault();e.stopPropagation();ppDragClear();return}
+  const g=e.target.closest&&e.target.closest(".pp-grip");
+  if(g){const l=g.dataset.ppl,a=ppArr(l),i=num(g.dataset.i);if(!a)return;
+    const to=e.key==="ArrowUp"?i-1:e.key==="ArrowDown"?i+1:e.key==="Home"?0:e.key==="End"?a.length-1:null;if(to===null)return;
+    e.preventDefault();e.stopPropagation();if(to>=0&&to<a.length)ppMove(l,i,to);return}
+  if(!e.altKey||e.isComposing||(e.key!=="ArrowUp"&&e.key!=="ArrowDown"))return;
+  const t=e.target,k=t.dataset&&(t.dataset.pp||(t.dataset.scf==="note"?"scn":""));if(!k||k==="q")return;
+  const i=num(t.dataset.i),j=num(t.dataset.j),dn=e.key==="ArrowDown"?1:-1;let l,at,foc;
+  if(k==="clue"){l="clues";at=i;foc=n=>"#pp-clue-"+n}
+  else if(k==="item"||k==="itemd"){l="items";at=i;foc=n=>(k==="item"?"#pp-item-":"#pp-itemd-")+n}
+  else if(k==="ln"){l="locations";at=i;foc=n=>"#pp-ln-"+n}
+  else if(k==="ld"){l="desc:"+i;at=j;foc=n=>`#pp-ld-${i}-${n}`}
+  else if(k==="scn"){l="scenes";at=SCN.d?SCN.d.findIndex(x=>x.id===t.dataset.id):-1;foc=()=>`[data-scsel="${CSS.escape(t.dataset.id)}"] textarea`}
+  else return;
+  const a=ppArr(l);if(!a||at<0)return;e.preventDefault();if(at+dn>=0&&at+dn<a.length)ppMove(l,at,at+dn,foc(at+dn))},true);
 function prepAct(a,t){
   const d=PREP.d;if(!d)return;const i=num(t.dataset.i),j=num(t.dataset.j),kind=t.dataset.kind;
   if(a==="ppReady"){const k=t.dataset.k;if(d.checked[k])delete d.checked[k];else d.checked[k]=true;ppReadyPaint();prepTouch(false);return}
   if(a==="ppFold"){const k=t.dataset.k;if(PP_FOLD[k])delete PP_FOLD[k];else PP_FOLD[k]=true;ppFoldSave();ppFoldPaint(k);return}
   if(a==="ppJump"){const s=document.getElementById("pp-sec-"+t.dataset.k);if(s){if(PP_FOLD[t.dataset.k]){delete PP_FOLD[t.dataset.k];ppFoldSave();ppFoldPaint(t.dataset.k)}s.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});document.getElementById("pp-h-"+t.dataset.k)?.focus({preventScroll:true})}return}
+  if(a==="ppSort")return ppSortRun(t.dataset.ppl,t.dataset.by);
   if(a==="ppClueAdd"){d.clues.push({t:"",found:false});FOCUS_NEXT="#pp-clue-"+(d.clues.length-1)}
   else if(a==="ppClueDel"){d.clues.splice(i,1);FOCUS_NEXT=d.clues.length?"#pp-clue-"+Math.min(i,d.clues.length-1):'[data-act="ppClueAdd"]'}
   else if(a==="ppLocAdd"){d.locations.push({id:uid(),name:"",desc:[]});FOCUS_NEXT="#pp-ln-"+(d.locations.length-1)}
@@ -2482,11 +2541,11 @@ window.addEventListener("pagehide",()=>{scnFlush()});
 // the scene boxes: one growing text box per scene, with delete and a way to push it to the next session
 function scnCards(){
   const nx=sessNum(SCN.pid)+1;
-  const row=(x,i)=>`<div class="pp-row" data-scsel="${x.id}"><span class="pp-i" aria-hidden="true">${i+1}</span>
+  const row=(x,i)=>`<div class="pp-row" data-scsel="${x.id}">${ppGrip("scenes",i,SCN.d.length,scnTitle(x.note)||"scene "+(i+1))}<span class="pp-i" aria-hidden="true">${i+1}</span>
     <textarea class="pp-in grow" data-scf="note" data-id="${x.id}" rows="1" placeholder="Scene" aria-label="Scene ${i+1}">${esc(x.note)}</textarea>
     <button type="button" class="pp-mv" data-act="scnMoveNext" data-id="${x.id}" title="Move to Session ${nx}" aria-label="Move scene ${i+1} to Session ${nx}">→ ${nx}</button>
     <button type="button" class="pp-x ${SCN.arm===x.id?"armed":""}" data-act="scnDel" data-id="${x.id}" aria-label="${SCN.arm===x.id?`Yes, delete scene ${i+1}`:`Delete scene ${i+1}`}" title="Delete">${SCN.arm===x.id?"Delete?":"×"}</button></div>`;
-  return `${SCN.d.map(row).join("")}${ppAdd("scnAdd","Add scene")}`}
+  return `<div data-pplist="scenes">${SCN.d.map(row).join("")}</div>${ppAdd("scnAdd","Add scene")}`}
 document.addEventListener("input",e=>{const t=e.target;if(!t.dataset||t.dataset.scf!=="note")return;
   const s=SCN.d&&SCN.d.find(x=>x.id===t.dataset.id);if(!s)return;
   s.note=t.value;s.title=scnTitle(t.value);
@@ -4841,7 +4900,7 @@ document.addEventListener("click",async e=>{
     case"newPlan":goBoard(nextSession());break;
     case"planPlayed":{const pid=t.dataset.id,on=sessPlan(sessNum(pid)).status!=="played";stScenePatch(pid,sc=>sc.forEach(s=>{s.played=on}));break}
     case"scnMoveOpen":{const p=sessPlan(sessNum(t.dataset.id));sessMoveScenes(p.scenes.filter(x=>!x.done&&!x.played).map(x=>x.id),p.session+1);break}
-    case"ppJump":case"ppReady":case"ppFold":case"ppClueAdd":case"ppClueDel":case"ppLocAdd":case"ppLocDel":case"ppDescAdd":case"ppDescDel":case"ppItemAdd":case"ppItemDel":case"ppPick":case"ppPickDel":case"ppPickNew":prepAct(a,t);break;
+    case"ppJump":case"ppReady":case"ppFold":case"ppClueAdd":case"ppClueDel":case"ppLocAdd":case"ppLocDel":case"ppDescAdd":case"ppDescDel":case"ppItemAdd":case"ppItemDel":case"ppPick":case"ppPickDel":case"ppPickNew":case"ppSort":prepAct(a,t);break;
     case"scnAdd":case"scnDel":case"scnMoveNext":scnAct(a,t);break;
     case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stStart":case"stEqual":case"stTool":case"stDone":case"stSpot":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
     case"stTime":case"stShort":case"stLong":case"stUndo":case"stRoll":case"stAtt":case"stEdit":case"stClue":stAct(a,t);break;
