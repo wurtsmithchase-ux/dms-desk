@@ -226,7 +226,7 @@ textarea.scn-box-t{resize:none;overflow:hidden;min-height:96px}
 .scn-lrt small,.scn-who small{color:var(--muted);font-size:13px}
 .scn-acts{display:flex;flex-wrap:wrap;gap:6px}
 .scn-found{width:22px;height:22px;margin:0;accent-color:var(--accent)}
-/* NPCs & Enemies */
+/* NPCs */
 .ppl-tools{display:flex;flex-direction:column;gap:8px;padding:10px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:1;background:inherit}
 .ppl-tools .search{width:100%;max-width:none}
 .ppl-tools .tq select{min-height:36px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
@@ -1750,10 +1750,10 @@ const isPhone=()=>window.matchMedia("(max-width:640px)").matches;
 // Wood & Wax turns the tabs into a side menu at 1101px and wider (matches the CSS media query)
 const SIDE_MQ=window.matchMedia("(min-width:1101px)");
 const sideMenu=()=>SIDE_MQ.matches;
-/* The DM's menu: Session, Prep Board, then The Library (Party, NPCs & Enemies, Notes, Sessions, Handouts, Bestiary, Tables).
+/* The DM's menu: Session, Prep Board, then The Library (Party, NPCs, Notes, Sessions, Handouts, Bestiary, Tables).
    World and Calendar open from Library groups and the board; quests and threads are Notes chips.
    Number keys 1-8 follow NAV_DM from top to bottom; players keep the tab list. Phones show NAV_PHONE: Prep Board and The Library. */
-const NAV_DM=[["board","Prep Board"],["party","Party"],["npcs","NPCs & Enemies"],["lib:notes","Notes"],["lib:sessions","Sessions"],["lib:handouts","Handouts"],["lib:bestiary","Bestiary"],["lib:tables","Tables"]];
+const NAV_DM=[["board","Prep Board"],["party","Party"],["npcs","NPCs"],["lib:notes","Notes"],["lib:sessions","Sessions"],["lib:handouts","Handouts"],["lib:bestiary","Bestiary"],["lib:tables","Tables"]];
 const NAV_PHONE=[["board","Prep Board","Prep"],["library","The Library","Library"]];
 // Party and NPCs have their own pages, so the group list never offers them twice
 const NAV_GROUPS=()=>LIB_GROUPS.filter(g=>g[0]!=="all"&&g[0]!=="party"&&g[0]!=="npcs");
@@ -1798,7 +1798,7 @@ function sideNav(){
     +it("board","Prep Board","board")
     +`<span class="nav-h" role="presentation"><span class="nav-l">The Library</span></span>`
     +it("party","Party","party",cnt("party"),"nav-lib")
-    +it("npcs","NPCs &amp; Enemies","npcs",cnt("npcs"),"nav-lib")
+    +it("npcs","NPCs","npcs",cnt("npcs"),"nav-lib")
     +NAV_GROUPS().map(([k,l])=>it("lib:"+k,esc(l),k,cnt(k),"nav-lib")).join("")
     +`<span class="nav-fill" aria-hidden="true"></span>`
     +`<button type="button" class="nav-camp" data-act="campaign" title="Campaign settings" aria-label="${rail?"Campaign settings":cname}">${navIco("camp")}<span class="nav-camp-t"><b>${cname}</b><small>${pcs.length} player${pcs.length===1?"":"s"}${one?` · level ${lv[0]}`:""}</small></span></button>`
@@ -1951,7 +1951,7 @@ function linkify(html,selfKey){
 const rich=(t,selfKey,raw)=>linkify(mdLite(t,raw),selfKey);
 function textOf(col,x){
   switch(col){
-    case"characters":return [x.notes,x.cls,x.location,x.faction,x.backstory,x.sheet].join("\n");
+    case"characters":return [x.notes,x.archetype,x.hook,x.cls,x.location,x.faction,x.backstory,x.sheet].join("\n");
     case"notes":return [x.body,x.leader,x.allies,x.enemies,x.members,x.goals,x.base].join("\n");
     case"quests":return [x.notes,x.giver,x.location,x.reward].join("\n");
     case"events":return x.notes||"";
@@ -2239,7 +2239,7 @@ async function prepMigrate(){
 /* ---- the board ---- */
 /* What each list-picker section reads from: the collection it points at, the entries it offers, and its wording. */
 const PP_KIND={
-  npcs:{col:"characters",src:()=>S.characters.filter(x=>x.kind!=="pc"),word:"NPC",label:"NPCs",search:"Search your NPCs",add:"Add NPC",name:x=>x.name,extra:x=>[x.race,x.meta],sub:x=>[x.cls,x.race].filter(Boolean).join(" · "),av:true,newPreset:{kind:"npc",status:"alive"}},
+  npcs:{col:"characters",src:()=>S.characters.filter(x=>x.kind!=="pc"),word:"NPC",label:"NPCs",search:"Search your NPCs",add:"Add NPC",name:x=>x.name,extra:x=>[x.race,x.meta],sub:x=>[x.archetype||x.cls,x.hook||x.race].filter(Boolean).join(" · "),av:true,newPreset:{kind:"npc",status:"alive"}},
   monsters:{col:"monsters",src:()=>S.monsters,word:"monster",label:"Monsters",search:"Search your Bestiary",add:"Add monster",pill:x=>x.cr?"CR "+x.cr:"",name:x=>x.name,extra:x=>[x.cr&&"cr "+x.cr],sub:x=>[x.cr&&"CR "+x.cr,x.meta].filter(Boolean).join(" · "),newPreset:{}},
   handouts:{col:"notes",src:()=>S.notes.filter(n=>n.category==="handout"),word:"handout",label:"Handouts",search:"Search your handouts",add:"Add handout",name:x=>x.title,extra:()=>[],sub:x=>libBlurb("notes",x),newPreset:{category:"handout"}}};
 function prepPickList(kind,q){
@@ -2967,8 +2967,8 @@ function renderSession(el){
   const sessClues=prepClues(pn);
   const unpin=(col,x)=>`<button type="button" class="sx-unpin" data-act="stPin" data-col="${col}" data-id="${x.id}" aria-label="Unpin ${esc(titleOf(col,x)||"")}">Pinned ×</button>`;
   const clue=(k,i)=>!String(k.t||"").trim()?"":`<button type="button" class="sx-clue" data-act="stClue" data-i="${i}" aria-pressed="${!!k.found}"><span class="sx-dot" aria-hidden="true"></span><span>${esc(k.t)}</span>${k.found?`<span class="sx-rev">revealed</span>`:""}</button>`;
-  const npcCard=({x,pin})=>{const a=stAtt(n,x),m=x.mon&&rec("monsters",x.mon);return `<div class="sx-npc"><div class="sx-nh"><button type="button" class="sx-nn" data-act="stEntry" data-col="characters" data-id="${x.id}" aria-label="More about ${esc(x.name||"")}">${esc(x.name||"Unnamed")} <span>more ›</span></button><span class="sx-role">${pin?unpin("characters",x):esc(x.cls||"NPC")}</span></div>
-    ${x.voice?`<span><b>Voice:</b> ${esc(x.voice)}</span>`:""}${x.wants?`<span><b>Wants:</b> ${esc(x.wants)}</span>`:""}${m?`<span><b>Stat block:</b> <button type="button" class="linkish" data-act="stEntry" data-col="characters" data-id="${x.id}" data-tab="block">${esc(m.name||"Monster")}</button></span>`:""}
+  const npcCard=({x,pin})=>{const a=stAtt(n,x),m=x.mon&&rec("monsters",x.mon);return `<div class="sx-npc"><div class="sx-nh"><button type="button" class="sx-nn" data-act="stEntry" data-col="characters" data-id="${x.id}" aria-label="More about ${esc(x.name||"")}">${esc(x.name||"Unnamed")} <span>more ›</span></button><span class="sx-role">${pin?unpin("characters",x):esc(x.archetype||x.cls||"NPC")}</span></div>
+    ${x.hook?`<span><b>Connection:</b> ${esc(x.hook)}</span>`:""}${m?`<span><b>Stat block:</b> <button type="button" class="linkish" data-act="stEntry" data-col="characters" data-id="${x.id}" data-tab="block">${esc(m.name||"Monster")}</button></span>`:""}
     <div class="sx-att" role="group" aria-label="Attitude of ${esc(x.name||"")}">${ST_ATT.map(([k,l])=>`<button type="button" data-act="stAtt" data-id="${x.id}" data-v="${k}" aria-pressed="${a===k}">${l}</button>`).join("")}</div></div>`};
   const foeCard=({x,pin})=>{const f=stFoeInfo(x);return `<div class="sx-foe"><div class="sx-nh"><button type="button" class="sx-nn" data-act="stEntry" data-col="monsters" data-id="${x.id}" aria-label="More about ${esc(x.name||"")}">${esc(x.name||"Monster")} <span>more ›</span></button><span class="sx-role">${pin?unpin("monsters",x):x.cr?"CR "+esc(x.cr):""}</span></div>
     <span class="sx-stat">${[x.ac&&"AC "+x.ac,x.hp&&"HP "+x.hp].filter(Boolean).map(esc).join(" · ")}</span>${f.fight?`<span><b>Tactics:</b> ${esc(f.fight)}</span>`:""}${f.flee?`<span><b>Breaks when:</b> ${esc(f.flee)}</span>`:""}${f.say?`<span class="sx-say">“${esc(f.say)}”</span>`:""}</div>`};
@@ -3034,12 +3034,12 @@ function stWindow(n){
     const npc=col==="characters",m=npc?(x.mon&&rec("monsters",x.mon)):x,tab=ST.entry.tab||(npc?"notes":"block");
     const tabs=[["notes","Notes"],["block","Stat block"]].map(([k,l])=>`<button type="button" data-act="stEntryTab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join("");
     let body;
-    if(tab==="block")body=m?statBlock(m):`<p class="vempty">${esc(x.name||"This NPC")} has no stat block yet. Link or make one on the NPCs &amp; Enemies screen.</p>`;
-    else if(npc){const a=stAtt(n,x),att=ST_ATT.find(t=>t[0]===a);const sec=[["Attitude now",att?att[1]:""],["Role",x.cls],["Where",x.location],["Faction",x.faction],["Voice",x.voice],["Wants",x.wants]].filter(s=>s[1]);
+    if(tab==="block")body=m?statBlock(m):`<p class="vempty">${esc(x.name||"This NPC")} has no stat block yet. Link or make one on the NPCs screen.</p>`;
+    else if(npc){const a=stAtt(n,x),att=ST_ATT.find(t=>t[0]===a);const sec=[["Attitude now",att?att[1]:""],["Archetype",x.archetype||x.cls],["Connection",x.hook]].filter(s=>s[1]);
       body=`${sec.length?`<dl class="sx-dl">${sec.map(([l,v])=>`<div><dt>${l}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`:""}${x.notes?`<h3 class="cs-h">Notes</h3><div class="prose vprose">${rich(x.notes,"characters:"+x.id)}</div>`:""}${backlinkBlock("characters",x.id)}`}
     else{const f=stFoeInfo(x);body=`${f.fight||f.flee||f.say?`<dl class="sx-dl">${[["Tactics",f.fight],["Breaks when",f.flee],["Says",f.say]].filter(s=>s[1]).map(([l,v])=>`<div><dt>${l}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`:""}${x.notes?`<h3 class="cs-h">Notes</h3>${blockLines(x.notes)}`:`<p class="vempty">No notes yet.</p>`}`}
     return wrap(x.name||"Entry",`<div class="sx-wtabs">${tabs}<span class="grow"></span><button type="button" class="btn sm" data-act="stFull" data-col="${col}" data-id="${x.id}">Full page</button>${close}</div>
-      <div class="sx-wb"><span class="sx-kick">${npc?esc(["NPC",x.cls].filter(Boolean).join(" · ")):`Foe${x.cr?" · CR "+esc(x.cr):""}`}</span><h2>${esc(x.name||"Unnamed")}</h2>${body}</div>`,"sx-wentry")}
+      <div class="sx-wb"><span class="sx-kick">${npc?esc(["NPC",x.archetype||x.cls].filter(Boolean).join(" · ")):`Foe${x.cr?" · CR "+esc(x.cr):""}`}</span><h2>${esc(x.name||"Unnamed")}</h2>${body}</div>`,"sx-wentry")}
   if(ST.recap)return wrap("Session recap",stRecapHtml(n,close),"sx-wrecap");
   return ""}
 function stRecapData(n){const plan=stPlan(),sc=stScenes(plan),items=stLogItems(n).reverse();
@@ -3298,67 +3298,58 @@ function genMon(name,o,isPerson){  // isPerson: the stat block is for a named NP
     traits:traits.join("\n"),actions:actions.join("\n"),bonus:bonus.join("\n"),reactions:reactions.join("\n")}}
 const GEN={cr:"1",role:"brute",type:"humanoid",dmg:"slashing"};
 
-/* NPCs & Enemies: NPCs (characters, kind npc) and stat blocks (monsters) in one list */
-function pplItems(){const q=String(U.pplQ||"").trim().toLowerCase(),k=isDM()?(U.pplKind||"all"):"all",out=[];
-  if(k!=="foe")S.characters.filter(x=>x.kind!=="pc").forEach(x=>out.push({col:"characters",x}));
-  if(k!=="npc")S.monsters.forEach(x=>out.push({col:"monsters",x}));
-  return out.filter(({col,x})=>!q||((x.name||"")+" "+textOf(col,x)).toLowerCase().includes(q)).sort((a,b)=>(a.x.name||"").localeCompare(b.x.name||""))}
+/* NPCs: the characters whose kind is npc. Stat blocks live in the Bestiary and link from here. */
+function pplItems(){const q=String(U.pplQ||"").trim().toLowerCase();
+  return S.characters.filter(x=>x.kind!=="pc").map(x=>({col:"characters",x}))
+    .filter(({col,x})=>!q||((x.name||"")+" "+textOf(col,x)+" "+(x.archetype||"")+" "+(x.hook||"")).toLowerCase().includes(q)).sort((a,b)=>(a.x.name||"").localeCompare(b.x.name||""))}
 function vPeople(){
   const list=pplItems();let sel=U.pplSel&&rec(U.pplSel.col,U.pplSel.id)?U.pplSel:null;
   if(!sel||!list.some(i=>i.col===sel.col&&i.x.id===sel.id))sel=list[0]?{col:list[0].col,id:list[0].x.id}:null;U.pplSel=sel;
-  // stat blocks are DM-only, so players get the notes tab and no Foes filter
-  const dm=isDM(),kind=dm?(U.pplKind||"all"):"all",x=sel&&rec(sel.col,sel.id),npc=sel&&sel.col==="characters",tab=dm?(U.pplTab||"notes"):"notes";
-  const kinds=!dm?"":`<div class="seg">${[["all","All"],["npc","NPCs"],["foe","Foes"]].map(([k,l])=>`<button type="button" data-act="pplKind" data-v="${k}" aria-pressed="${(U.pplKind||"all")===k}">${l}</button>`).join("")}</div>`;
-  const row=({col,x:r})=>`<button class="nitem" data-act="pplSel" data-col="${col}" data-id="${r.id}" aria-current="${!!sel&&sel.col===col&&sel.id===r.id}"><b>${esc(r.name||"Unnamed")}</b><small>${col==="characters"?["NPC",r.cls,r.location].filter(Boolean).map(esc).join(" · "):`Foe${r.cr?" · CR "+esc(r.cr):""}${r.meta?" · "+esc(r.meta):""}`}</small></button>`;
-  const left=`<div class="nlist"><div class="ppl-tools"><input class="search" id="pplq" data-in="pplQ" type="search" placeholder="Search NPCs and foes" aria-label="Search NPCs and foes" value="${esc(U.pplQ||"")}">${kinds}
-    <form data-ppladd class="tq dm-only"><input id="ppl-add" placeholder="Add by name" aria-label="Name of a new NPC or foe"><select id="ppl-addk" aria-label="Add as"><option value="npc" ${kind==="foe"?"":"selected"}>NPC</option><option value="foe" ${kind==="foe"?"selected":""}>Foe</option></select><button class="btn sm primary" type="submit">Add</button></form></div>
-    <div class="lib-lh"><h3>${{all:"NPCs & Enemies",npc:"NPCs",foe:"Foes"}[kind]}</h3><span>${list.length}</span></div>${list.length?list.map(row).join(""):`<div class="empty">${U.pplQ?"Nothing matches that search.":"No one here yet. Add someone by name."}</div>`}</div>`;
-  if(!x)return `<div class="notes lib ppl ${U.noteReading?"reading":""}">${left}<div class="empty lib-pick">Pick someone to see their notes and stat block.</div></div>`;
-  const m=npc?(x.mon&&rec("monsters",x.mon)):x;
+  // stat blocks are DM-only, so players get the notes tab only
+  const dm=isDM(),x=sel&&rec(sel.col,sel.id),tab=dm?(U.pplTab||"notes"):"notes";
+  const row=({col,x:r})=>`<button class="nitem" data-act="pplSel" data-col="${col}" data-id="${r.id}" aria-current="${!!sel&&sel.col===col&&sel.id===r.id}"><b>${esc(r.name||"Unnamed")}</b><small>${["NPC",r.archetype||r.cls].filter(Boolean).map(esc).join(" · ")}</small></button>`;
+  const left=`<div class="nlist"><div class="ppl-tools"><input class="search" id="pplq" data-in="pplQ" type="search" placeholder="Search NPCs" aria-label="Search NPCs" value="${esc(U.pplQ||"")}">
+    <form data-ppladd class="tq dm-only"><input id="ppl-add" placeholder="Add by name" aria-label="Name of a new NPC"><button class="btn sm primary" type="submit">Add</button></form></div>
+    <div class="lib-lh"><h3>NPCs</h3><span>${list.length}</span></div>${list.length?list.map(row).join(""):`<div class="empty">${U.pplQ?"Nothing matches that search.":"No one here yet. Add someone by name."}</div>`}</div>`;
+  if(!x)return `<div class="notes lib ppl ${U.noteReading?"reading":""}">${left}<div class="empty lib-pick">Pick an NPC to see their notes and stat block.</div></div>`;
+  const m=x.mon&&rec("monsters",x.mon);
   const tabs=!dm?"":`<div class="seg ppl-tabs">${[["notes","Notes"],["block","Stat block"],["gen","Quick stat block"]].map(([k,l])=>`<button type="button" data-act="pplTab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join("")}</div>`;
   let body="";
-  if(tab==="notes"&&npc){
-    const fl=[["Role",x.cls],["Where",x.location],["Faction",x.faction],["Voice",x.voice],["Status",x.status&&x.status!=="alive"?CAP(x.status):""]].filter(f=>f[1]);
+  if(tab==="notes"){
+    const fl=[["Archetype",x.archetype||x.cls],["Connection",x.hook],["Status",x.status&&x.status!=="alive"?CAP(x.status):""]].filter(f=>f[1]);
     body=`${fl.length?`<dl class="le-fields">${fl.map(([l,v])=>`<div><dt>${l}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`:""}
       ${dm?`<div class="ppl-att"><span class="label">Starting attitude</span><div class="seg">${[["friendly","Friendly"],["neutral","Neutral"],["hostile","Hostile"]].map(([k,l])=>`<button type="button" data-act="pplAtt" data-v="${k}" aria-pressed="${x.attitude===k}">${l}</button>`).join("")}</div></div>`:""}
-      <div class="le-cols"><div class="le-main">${dm&&x.wants?`<section><h4 class="le-h">What they want</h4><p class="ppl-wants">${linkify(esc(x.wants),"characters:"+x.id)}</p></section>`:""}<section><h4 class="le-h">Notes</h4>${x.notes?`<div class="prose vprose">${rich(x.notes,"characters:"+x.id)}</div>`:`<p class="vempty">No notes yet. Use Edit to add them.</p>`}</section></div>
+      <div class="le-cols"><div class="le-main"><section><h4 class="le-h">Notes</h4>${x.notes?`<div class="prose vprose">${rich(x.notes,"characters:"+x.id)}</div>`:`<p class="vempty">No notes yet. Use Edit to add them.</p>`}</section></div>
       <div class="le-side">${backlinkBlock("characters",x.id)}</div></div>`}
-  else if(tab==="notes"){
-    body=`<div class="le-cols"><div class="le-main"><section><h4 class="le-h">Phases & notes</h4>${x.notes?blockLines(x.notes):`<p class="vempty">Nothing yet. Edit the stat block to add phases or tactics.</p>`}</section></div><div class="le-side">${backlinkBlock("monsters",x.id)}</div></div>`}
   else if(tab==="block"){
-    body=m?`${statBlock(m)}<div class="ppl-acts dm-only"><button type="button" class="btn sm" data-act="edit" data-type="monsters" data-id="${m.id}">Edit stat block</button>${npc?`<button type="button" class="btn sm" data-act="pplUnlink">Unlink from ${esc(x.name||"this NPC")}</button>`:""}</div>`
+    body=m?`${statBlock(m)}<div class="ppl-acts dm-only"><button type="button" class="btn sm" data-act="edit" data-type="monsters" data-id="${m.id}">Edit stat block</button><button type="button" class="btn sm" data-act="pplUnlink">Unlink from ${esc(x.name||"this NPC")}</button></div>`
       :`<p class="vempty">${esc(x.name||"This NPC")} has no stat block yet.</p><label class="scn-f dm-only"><span class="label">Use one from the Bestiary</span><select class="scn-in" id="ppl-link"><option value="">— Pick a stat block —</option>${S.monsters.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(k=>`<option value="${k.id}">${esc(k.name||"Monster")}${k.cr?` (CR ${esc(k.cr)})`:""}</option>`).join("")}</select></label><p class="vempty">Or make one in Quick stat block.</p>`}
   else{
-    const g=genMon(x.name,GEN,npc),opt=(k,vals,lab)=>`<label class="scn-f"><span class="label">${lab}</span><select class="scn-in" data-gen="${k}">${vals.map(([v,l])=>`<option value="${v}" ${GEN[k]===v?"selected":""}>${esc(l)}</option>`).join("")}</select></label>`;
+    const g=genMon(x.name,GEN,true),opt=(k,vals,lab)=>`<label class="scn-f"><span class="label">${lab}</span><select class="scn-in" data-gen="${k}">${vals.map(([v,l])=>`<option value="${v}" ${GEN[k]===v?"selected":""}>${esc(l)}</option>`).join("")}</select></label>`;
     body=`<p class="pb-sub">Numbers come from simple rules of thumb for the CR. Adjust anything after saving.</p>
       <div class="ppl-gen">${opt("cr",CRS.map(c=>[c,"CR "+c]),"Challenge")}${opt("role",Object.entries(GEN_ROLES),"Role")}${opt("type",GEN_TYPES.map(t=>[t,CAP(t)]),"Type")}${opt("dmg",GEN_DMG.map(t=>[t,CAP(t)]),"Damage")}</div>
-      <div class="ppl-acts dm-only">${npc?`<button type="button" class="btn primary" data-act="genSave">${m?"Save as a new stat block and link it":"Save and link to "+esc(x.name||"this NPC")}</button>`:`<button type="button" class="btn danger ${U.genArm===x.id?"armed":""}" data-act="genApply">${U.genArm===x.id?"Yes, replace numbers and abilities":"Replace numbers and abilities"}</button><button type="button" class="btn" data-act="genSave">Save as a new stat block</button>`}</div>
+      <div class="ppl-acts dm-only"><button type="button" class="btn primary" data-act="genSave">${m?"Save as a new stat block and link it":"Save and link to "+esc(x.name||"this NPC")}</button></div>
       ${statBlock(g)}`}
-  const crumb=npc?esc(["NPC",dm&&x.attitude?CAP(x.attitude):""].filter(Boolean).join(" · ")):`Foe${x.cr?" · CR "+esc(x.cr):""}`;
+  const crumb=esc(["NPC",dm&&x.attitude?CAP(x.attitude):""].filter(Boolean).join(" · "));
   return `<div class="notes lib ppl ${U.noteReading?"reading":""}">${left}<article class="reader lib-entry"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ Back to the list</button></div>
-    <div class="le-head"><div class="le-t"><span class="le-crumb">${crumb}</span><h3 class="t">${esc(x.name||"Unnamed")}</h3></div><span class="dm-only acts-r"><button type="button" class="btn sm" data-act="${npc?"view":"open"}" data-type="${sel.col}" data-id="${x.id}">Full page</button><button type="button" class="btn sm" data-act="edit" data-type="${sel.col}" data-id="${x.id}">Edit</button></span></div>
+    <div class="le-head"><div class="le-t"><span class="le-crumb">${crumb}</span><h3 class="t">${esc(x.name||"Unnamed")}</h3></div><span class="dm-only acts-r"><button type="button" class="btn sm" data-act="view" data-type="${sel.col}" data-id="${x.id}">Full page</button><button type="button" class="btn sm" data-act="edit" data-type="${sel.col}" data-id="${x.id}">Edit</button></span></div>
     ${tabs}${body}</article></div>`;
 }
 // one helper for small field changes; project() right after so a quick second tap reads the new values
 async function patchRec(col,id,patch){const r=rec(col,id);if(!r)return false;const{id:_,...keep}=r;const ok=await save(col,id,{...keep,...patch});project();return ok}
 async function pplAct(a,t){const sel=U.pplSel,x=sel&&rec(sel.col,sel.id);
-  if(a==="pplSel"){U.pplSel={col:t.dataset.col,id:t.dataset.id};U.genArm=null;U.noteReading=true;render();if(isPhone())window.scrollTo({top:0});return}
-  if(a==="pplKind"){U.pplKind=t.dataset.v;U.noteReading=false;render();return}
-  if(a==="pplTab"){U.pplTab=t.dataset.v;U.genArm=null;render();return}
+  if(a==="pplSel"){U.pplSel={col:t.dataset.col,id:t.dataset.id};U.noteReading=true;render();if(isPhone())window.scrollTo({top:0});return}
+  if(a==="pplTab"){U.pplTab=t.dataset.v;render();return}
   if(!x)return;
   if(a==="pplAtt"){await patchRec("characters",x.id,{attitude:x.attitude===t.dataset.v?"":t.dataset.v});return}
   if(a==="pplUnlink"){await patchRec("characters",x.id,{mon:""});return}
-  if(a==="genSave"){const id=uid(),g=genMon(x.name,GEN,sel.col==="characters");await save("monsters",id,g);if(sel.col==="characters")await patchRec("characters",x.id,{mon:id});else U.pplSel={col:"monsters",id};U.pplTab="block";toast(`Saved a CR ${g.cr} stat block for ${g.name}`);project();render();return}
-  if(a==="genApply"){if(U.genArm!==x.id){U.genArm=x.id;render();return}U.genArm=null;const{name:_,...g}=genMon(x.name,GEN,false);
-    // clear the fields the maker doesn't fill so old values don't sit next to new numbers; keep legendary actions and notes
-    await patchRec("monsters",x.id,{acNote:"",resist:"",...g});U.pplTab="block";toast("Numbers and abilities replaced");render()}}
+  if(a==="genSave"){const id=uid(),g=genMon(x.name,GEN,true);await save("monsters",id,g);await patchRec("characters",x.id,{mon:id});U.pplTab="block";toast(`Saved a CR ${g.cr} stat block for ${g.name}`);project();render();return}}
 document.addEventListener("change",e=>{const t=e.target;
-  if(t.dataset&&t.dataset.gen){GEN[t.dataset.gen]=t.value;U.genArm=null;if(TM)renderTable();else render();return}
+  if(t.dataset&&t.dataset.gen){GEN[t.dataset.gen]=t.value;if(TM)renderTable();else render();return}
   if(t.id==="ppl-link"&&t.value&&U.pplSel&&U.pplSel.col==="characters")patchRec("characters",U.pplSel.id,{mon:t.value})});
 document.addEventListener("submit",async e=>{const f=e.target.closest("[data-ppladd]");if(!f)return;e.preventDefault();e.stopPropagation();const i=document.getElementById("ppl-add"),v=i.value.trim();if(!v)return;
-  const foe=document.getElementById("ppl-addk").value==="foe",id=uid();
-  const col=foe?"monsters":"characters",ok=await save(col,id,foe?{name:v,cr:"1"}:{name:v,kind:"npc",status:"alive"});project();
-  if(ok&&rec(col,id)){U.pplSel={col,id};U.pplTab=foe?"gen":"notes";U.pplQ="";U.noteReading=true}render()});
+  const id=uid(),col="characters",ok=await save(col,id,{name:v,kind:"npc",status:"alive"});project();
+  if(ok&&rec(col,id)){U.pplSel={col,id};U.pplTab="notes";U.pplQ="";U.noteReading=true}render()});
 /* Party: player characters with their sheet and story, whole-party level, and the party's languages */
 const pcList=()=>S.characters.filter(x=>x.kind==="pc");
 const heroLevelSet=()=>[...new Set(pcList().map(p=>num(p.level)||0))].sort((a,b)=>a-b);  // 0 means no level set
@@ -3901,7 +3892,7 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 function genNPC(c){c=c||NPCCULT;const f=pick(NPCGEN.first[c]);const ln=c==="thrikreen"?"":(c==="elf"?pick(["Moonwhisper","Silverfrond","Amastacia","Galanodel","Liadon","Holimion"]):c==="dwarf"?pick(["Ironfist","Battlehammer","Fireforge","Gorunn","Holderhek","Rumnaheim"]):c==="halfling"||c==="gnome"?pick(["Tealeaf","Goodbarrel","Brushgather","Underbough","Thorngage","Nackle"]):pick(NPCGEN.last));
   NPCLAST={culture:c,name:(f+" "+ln).trim(),job:pick(NPCGEN.jobs),look:pick(NPCGEN.looks),voice:pick(NPCGEN.voices),quirk:pick(NPCGEN.quirks),want:pick(NPCGEN.wants)};return NPCLAST}
 document.addEventListener("click",async e=>{if(e.target.closest("[data-ngen]")){e.stopPropagation();const s=document.getElementById("ng-cult");if(s)NPCCULT=s.value;genNPC();if(TM)renderTable();return}
-  if(e.target.closest("[data-nsave]")&&NPCLAST){e.stopPropagation();const n=NPCLAST;const id=uid();await save("characters",id,{kind:"npc",dmOnly:true,name:n.name,race:NPCGEN.cultures[n.culture],cls:CAP(n.job),voice:CAP(n.voice),status:"alive",location:"",notes:`Looks: ${n.look}. Quirk: ${n.quirk}. Wants ${n.want}. (Met in session ${rcSession()}.)`});await addSessionLine(`Met ${n.name}, ${n.job}.`);toast(`${n.name} saved to the Desk`);NPCLAST=null;if(TM)renderTable()}},true);
+  if(e.target.closest("[data-nsave]")&&NPCLAST){e.stopPropagation();const n=NPCLAST;const id=uid();await save("characters",id,{kind:"npc",dmOnly:true,name:n.name,archetype:CAP(n.job),status:"alive",notes:`Species: ${NPCGEN.cultures[n.culture]}. Voice: ${CAP(n.voice)}. Looks: ${n.look}. Quirk: ${n.quirk}. Wants ${n.want}. (Met in session ${rcSession()}.)`});await addSessionLine(`Met ${n.name}, ${n.job}.`);toast(`${n.name} saved to the Desk`);NPCLAST=null;if(TM)renderTable()}},true);
 document.addEventListener("change",e=>{if(e.target.id==="ng-cult")NPCCULT=e.target.value},true);
 
 
@@ -4262,6 +4253,8 @@ function render(){
   const views={party:vParty,notes:vNotes,calendar:vCalendar,world:vWorld,prep:vPrep};
   const y=window.scrollY,ta=aid&&ae.tagName==="TEXTAREA"?ae.scrollTop:0;
   renderPending=false;
+  // the library list scrolls on its own: remember where, and put it back if the redrawn list is the same one (same screen, group and search)
+  const lsKey=[U.tab,U.libGrp,U.charFilter,U.noteQ].join("|"),lsOld=document.querySelector("#app .nlist"),lsTop=lsOld?lsOld.scrollTop:0,lsKeyPrev=lsOld?lsOld.dataset.lk:null;
   const hs=[...document.querySelectorAll("#app .sub-tabs, #app .seg, #app .lib-groups, #app .lib-chips, #app .table-wrap, #app .spot-wrap, #app .graph-wrap, #app .calgrid-wrap")].map(e=>e.scrollLeft);
   // keep the comment panel where you were reading when the page redraws behind it
   const popEl=null,popKey=popEl&&popEl.getAttribute("aria-label"),popS=popEl?[popEl.scrollTop,popEl.querySelector(".bs-thread")?.scrollTop||0]:null;
@@ -4270,6 +4263,7 @@ function render(){
   document.getElementById("app").innerHTML=banner+(isDM()&&OLD_PAGES[U.tab]?pageHead("The Library",OLD_PAGES[U.tab])+`<div class="ph-page">${views[U.tab](c)}</div>`:views[U.tab](c));
   growAll(document.getElementById("app"));
   [...document.querySelectorAll("#app .sub-tabs, #app .seg, #app .lib-groups, #app .lib-chips, #app .table-wrap, #app .spot-wrap, #app .graph-wrap, #app .calgrid-wrap")].forEach((e,i)=>{if(hs[i])e.scrollLeft=hs[i]});
+  {const nl=document.querySelector("#app .nlist");if(nl){if(lsTop&&lsKeyPrev===lsKey)nl.scrollTop=lsTop;nl.dataset.lk=lsKey}}
   if(popS){const np=document.querySelector("#app .bs-pop");if(np&&np.getAttribute("aria-label")===popKey){np.scrollTop=popS[0];const t=np.querySelector(".bs-thread");if(t)t.scrollTop=popS[1]}}
   if(aid&&!FOCUS_NEXT){const el=document.getElementById(aid);if(el){el.focus({preventScroll:true});try{if(sel!=null)el.setSelectionRange(sel,sel)}catch(_){}if(ta)el.scrollTop=ta}}
   else focusAfter(document.getElementById("app"),fsel);
@@ -4286,14 +4280,14 @@ function render(){
 
 function vParty(){
   const q=U.charQ.toLowerCase();
-  const match=x=>!q||[x.name,x.cls,x.player,x.location,x.faction,x.race,x.notes].join(" ").toLowerCase().includes(q);
+  const match=x=>!q||[x.name,x.archetype,x.hook,x.cls,x.player,x.location,x.faction,x.race,x.notes].join(" ").toLowerCase().includes(q);
   const pcs=S.characters.filter(x=>x.kind==="pc"&&match(x)).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
   const npcs=S.characters.filter(x=>x.kind!=="pc"&&match(x)).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
-  // the DM gets the design's two screens (Party, NPCs & Enemies) from the menu; players keep the whole cast list
-  if(isDM()){if(U.charFilter==="npc")return pageHead("The Library","NPCs &amp; Enemies")+vPeople();return pageHead("Prep","The Party")+vHeroes()+`<div class="ph-page ph-gap">${treasury()}</div>`}
+  // the DM gets the design's two screens (Party, NPCs) from the menu; players keep the whole cast list
+  if(isDM()){if(U.charFilter==="npc")return pageHead("The Library","NPCs")+vPeople();return pageHead("Prep","The Party")+vHeroes()+`<div class="ph-page ph-gap">${treasury()}</div>`}
   const f=U.charFilter;
   let h=`<div class="bar"><h2>Characters</h2>
-    <div class="seg">${[["all","All"],["pc","Party"],["npc","NPCs & Enemies"]].map(([k,l])=>`<button data-act="charFilter" data-v="${k}" aria-pressed="${f===k}">${l}</button>`).join("")}</div>
+    <div class="seg">${[["all","All"],["pc","Party"],["npc","NPCs"]].map(([k,l])=>`<button data-act="charFilter" data-v="${k}" aria-pressed="${f===k}">${l}</button>`).join("")}</div>
     <button class="btn primary dm-only" data-act="new" data-type="characters">Add character</button></div>`;
   h+=whatsNew();
   if(f==="npc")return h+vPeople();
@@ -4303,8 +4297,8 @@ function vParty(){
     h+=pcs.length?`<div class="pcs">${pcs.map(pcCard).join("")}</div>`:`<div class="empty" style="margin-bottom:28px">No player characters yet.${isDM()?" Use <b>Add character</b> and set the type to Player character.":""}</div>`;
     h+=treasury();
     h+=`<h3 class="section-h">Dramatis Personae · ${npcs.length}</h3>`;
-    h+=npcs.length?`<div class="table-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Where</th><th>Faction</th><th>Attitude</th><th>Notes</th></tr></thead><tbody>${npcs.map(n=>`<tr data-act="view" data-type="characters" data-id="${n.id}"><td><span class="namecell">${avatar(n,28)}<b>${esc(n.name)}</b>${n.pronounce?`<small class="muted">(${esc(n.pronounce)})</small>`:""} ${dmBadge(n)}</span>${n.status&&n.status!=="alive"?` <span class="pill ${n.status==="dead"?"bad":"warn"}">${esc(n.status)}</span>`:""}</td><td>${esc(n.cls)}</td><td>${esc(n.location)}</td><td>${esc(n.faction)}</td><td>${n.attitude?`<span class="pill ${n.attitude==="friendly"?"ok":n.attitude==="hostile"?"bad":""}">${esc(n.attitude)}</span>`:""}</td><td><span class="clip">${esc(plain(n.notes))}</span></td></tr>`).join("")}</tbody></table></div>
-      <div class="npc-list">${npcs.map(n=>`<button class="npc" data-act="view" data-type="characters" data-id="${n.id}"><span class="npc-top">${avatar(n,26)}<b>${esc(n.name)}</b>${n.status&&n.status!=="alive"?`<span class="pill ${n.status==="dead"?"bad":"warn"}">${esc(n.status)}</span>`:""}${n.attitude?`<span class="pill ${n.attitude==="friendly"?"ok":n.attitude==="hostile"?"bad":""}">${esc(n.attitude)}</span>`:""}</span>${n.cls?`<small class="npc-role">${esc(n.cls)}</small>`:""}${n.location||n.faction?`<small>${esc([n.location,n.faction].filter(Boolean).join(" · "))}</small>`:""}</button>`).join("")}</div>`
+    h+=npcs.length?`<div class="table-wrap"><table><thead><tr><th>Name</th><th>Archetype</th><th>Connection</th><th>Attitude</th><th>Notes</th></tr></thead><tbody>${npcs.map(n=>`<tr data-act="view" data-type="characters" data-id="${n.id}"><td><span class="namecell">${avatar(n,28)}<b>${esc(n.name)}</b>${n.pronounce?`<small class="muted">(${esc(n.pronounce)})</small>`:""} ${dmBadge(n)}</span>${n.status&&n.status!=="alive"?` <span class="pill ${n.status==="dead"?"bad":"warn"}">${esc(n.status)}</span>`:""}</td><td>${esc(n.archetype||n.cls)}</td><td>${esc(n.hook)}</td><td>${n.attitude?`<span class="pill ${n.attitude==="friendly"?"ok":n.attitude==="hostile"?"bad":""}">${esc(n.attitude)}</span>`:""}</td><td><span class="clip">${esc(plain(n.notes))}</span></td></tr>`).join("")}</tbody></table></div>
+      <div class="npc-list">${npcs.map(n=>`<button class="npc" data-act="view" data-type="characters" data-id="${n.id}"><span class="npc-top">${avatar(n,26)}<b>${esc(n.name)}</b>${n.status&&n.status!=="alive"?`<span class="pill ${n.status==="dead"?"bad":"warn"}">${esc(n.status)}</span>`:""}${n.attitude?`<span class="pill ${n.attitude==="friendly"?"ok":n.attitude==="hostile"?"bad":""}">${esc(n.attitude)}</span>`:""}</span>${n.archetype||n.cls?`<small class="npc-role">${esc(n.archetype||n.cls)}</small>`:""}${n.hook?`<small>${esc(n.hook)}</small>`:""}</button>`).join("")}</div>`
       :`<div class="empty">${isDM()?"No NPCs yet. Add the innkeeper, the villain, and everyone in between.":"No one here yet. People the party meets will show up here."}</div>`;
   return h;
 }
@@ -4459,17 +4453,17 @@ function agenda(c,y,m){
 }
 /* ---------- forms ---------- */
 const charOpts=()=>Object.fromEntries([["","— Choose —"],...S.characters.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(x=>[x.id,x.name])]);
-const FAC={fac:true},NPCF={npc:true};
+const FAC={fac:true},NPCF={npc:true},PCF={pc:true};
 const HO={nohand:true};
 const FORMS={
   characters:{title:"Character",fields:c=>[
-    ["name","Name","text",6],["pronounce","Pronunciation","text",3,null,"e.g. Ah-LAR-ick"],["voice","Voice & mannerisms","text",3,null,"e.g. hissing, slow, never blinks"],["wants","What they want","text",6,null,"e.g. to buy back the family farm",NPCF],["mon","Stat block","select",6,Object.fromEntries([["","— None —"],...S.monsters.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(m=>[m.id,m.name||"Monster"])]),null,NPCF],["kind","Type","select",3,{pc:"Player character",npc:"NPC"}],["status","Status","select",3,{alive:"Alive",missing:"Missing",dead:"Dead",unknown:"Unknown"}],
-    ["img","Portrait","image",6],
-    ["player","Player","text",3],["race","Species","text",3],["cls","Class / role","text",4,null,"e.g. Tempest Cleric, or Blacksmith"],["level","Level","number",2],
-    ["ac","AC","number",2],["hpMax","Max HP","number",2],["hp","Current HP","number",2],["pp","Passive Perception","number",2],
-    ["attitude","Starting attitude","select",4,{"":"—",friendly:"Friendly",neutral:"Neutral",hostile:"Hostile"},null,NPCF],
-    ["location","Location","text",3],["faction","Faction","text",3],["notes","Notes","textarea",6,null,"Backstory hooks, items, what they want"],
-    ["backstory","Backstory","textarea",6,null,"The character's full backstory, personality, ideals, bonds and flaws"],["sheet","Character sheet","textarea",6,null,"Abilities, skills, features, spells and inventory"]]},
+    ["name","Name","text",6],["hook","Connection to the adventure","text",6,null,"e.g. Owes the party's patron money",NPCF],["archetype","Character archetype","text",6,null,"e.g. Grumpy mentor, Scheming noble",NPCF],
+    ["pronounce","Pronunciation","text",3,null,"e.g. Ah-LAR-ick",PCF],["voice","Voice & mannerisms","text",3,null,"e.g. hissing, slow, never blinks",PCF],["kind","Type","select",3,{pc:"Player character",npc:"NPC"},null,PCF],["status","Status","select",3,{alive:"Alive",missing:"Missing",dead:"Dead",unknown:"Unknown"},null,PCF],
+    ["img","Portrait","image",6,null,null,PCF],
+    ["player","Player","text",3,null,null,PCF],["race","Species","text",3,null,null,PCF],["cls","Class / role","text",4,null,"e.g. Tempest Cleric, or Blacksmith",PCF],["level","Level","number",2,null,null,PCF],
+    ["ac","AC","number",2,null,null,PCF],["hpMax","Max HP","number",2,null,null,PCF],["hp","Current HP","number",2,null,null,PCF],["pp","Passive Perception","number",2,null,null,PCF],
+    ["location","Location","text",3,null,null,PCF],["faction","Faction","text",3,null,null,PCF],["notes","Notes","textarea",6,null,"Backstory hooks, items, what they want"],
+    ["backstory","Backstory","textarea",6,null,"The character's full backstory, personality, ideals, bonds and flaws",PCF],["sheet","Character sheet","textarea",6,null,"Abilities, skills, features, spells and inventory",PCF]]},
   notes:{title:"Note",fields:c=>[["title","Title","text",6],["category","Category","select",3,NOTE_CATS],["session","Session #","number",3,null,null,HO],["ig","In-game date","igdate",6,null,null,HO],
     ["img","Image or map","image",6,null,null,HO],
     ["leader","Leader","text",3,null,null,FAC],["alignment","Alignment","text",3,null,null,FAC],["base","Based in","text",6,null,null,FAC],["goals","Goals","text",6,null,null,FAC],["allies","Allies","text",3,null,null,FAC],["enemies","Enemies","text",3,null,null,FAC],["members","Key members","textarea",6,null,"One per line, e.g. Mara Vell: cell leader",FAC],
@@ -4489,14 +4483,25 @@ const FORMS={
   maps:{title:"Map",fields:c=>[["title","Map name","text",6],["img","Map image","image",6],["notes","Notes","textarea",6]]},
 };
 function igInputs(c,k,dt){dt=dt||c.today;return `<div style="display:flex;gap:6px;flex-wrap:wrap"><input id="f-${k}-d" type="number" min="1" style="width:74px" value="${dt.d}" aria-label="Day"><select id="f-${k}-m" aria-label="Month">${c.months.map((mo,i)=>`<option value="${i}" ${i===dt.m?"selected":""}>${esc(mo.name)}</option>`).join("")}</select><input id="f-${k}-y" type="number" style="width:96px" value="${dt.y}" aria-label="Year"></div>`}
+/* Old NPC records used the player-character form. The first time one is edited, its extra details move into Notes (and Class into Archetype); saving then clears the old keys. */
+const NPC_OLD=["pronounce","voice","wants","race","cls","level","ac","hpMax","hp","pp","location","faction","player","backstory","sheet"];
+function foldNpc(v){
+  const has=k=>v[k]!=null&&String(v[k]).trim()!=="",t=k=>String(v[k]).trim();
+  if(!has("archetype")&&has("cls")){v.archetype=t("cls");v.cls=""}
+  const items=[["Pronunciation","pronounce"],["Voice","voice"],["Wants","wants"],["Species","race"],["Class / role","cls"],["Level","level"],["AC","ac"],["Max HP","hpMax"],["Passive Perception","pp"],["Location","location"],["Faction","faction"],["Player","player"]].filter(([,k])=>has(k));
+  const paras=[["Backstory","backstory"],["Character sheet","sheet"]].filter(([,k])=>has(k));
+  if(!items.length&&!paras.length)return;
+  v.notes=[String(v.notes||"").trim(),"**Earlier details**",items.map(([l,k])=>`- ${l}: ${t(k)}`).join("\n"),...paras.map(([l,k])=>`**${l}**\n${t(k)}`)].filter(Boolean).join("\n\n");
+}
 function openForm(type,id,preset){
   const c=cal(),F=FORMS[type],row=id?S[type].find(x=>x.id===id):null,v={...(preset||{}),...(row||{})};
   if(!row&&type==="todos"&&!v.kind)v.kind="todo";
   if(!row&&v.dmOnly===undefined)v.dmOnly=!((type==="characters"&&v.kind==="pc")||(type==="notes"&&v.category==="session")||type==="loot");
   if(type==="events"&&v.m!=null)v.date={y:v.y,m:v.m,d:v.d};
   const isNpc=type==="characters"&&v.kind!=="pc",isFac=(v.category||"")==="faction",isSess=(v.category||"")==="session",isShop=(v.category||"")==="shop",isPlace=["location","shop","lore"].includes(v.category||""),isHand=(v.category||"")==="handout";
+  if(row&&isNpc)foldNpc(v);
   const fs=F.fields(c).map(([k,l,t,span,opts,hint,fl])=>{
-    const val=v[k]??"",cls=`field ${span===2?"s2":span===3?"s3":span===4?"s3":""} ${fl&&fl.fac?"fac-only":""} ${fl&&fl.sess?"sess-only":""} ${fl&&fl.shop?"shop-only":""} ${fl&&fl.place?"place-only":""} ${fl&&fl.npc?"npc-only":""} ${fl&&fl.nohand?"nohand-only":""}`,hid=(fl&&fl.nohand&&isHand)||(fl&&fl.npc&&!isNpc)||(fl&&fl.fac&&!isFac)||(fl&&fl.sess&&!isSess)||(fl&&fl.shop&&!isShop)||(fl&&fl.place&&!isPlace)?" hidden":"";
+    const val=v[k]??"",cls=`field ${span===2?"s2":span===3?"s3":span===4?"s3":""} ${fl&&fl.fac?"fac-only":""} ${fl&&fl.sess?"sess-only":""} ${fl&&fl.shop?"shop-only":""} ${fl&&fl.place?"place-only":""} ${fl&&fl.npc?"npc-only":""} ${fl&&fl.pc?"pc-only":""} ${fl&&fl.nohand?"nohand-only":""}`,hid=(fl&&fl.nohand&&isHand)||(fl&&fl.npc&&!isNpc)||(fl&&fl.pc&&isNpc)||(fl&&fl.fac&&!isFac)||(fl&&fl.sess&&!isSess)||(fl&&fl.shop&&!isShop)||(fl&&fl.place&&!isPlace)?" hidden":"";
     let input;
     if(t==="checklist")return `<div class="${cls} cl-field"${hid}><span class="label">${l}</span><div class="cl-rows" id="f-${k}">${beatList({beats:val}).map(b=>clRow(b.text,b.done)).join("")}</div><button type="button" class="btn sm cl-add" data-act="clAdd" data-k="${k}">Add a beat</button></div>`;
     if(t==="plain"||t==="plain-tall")return `<label class="${cls}"${hid}><span class="label">${l}</span><textarea id="f-${k}" class="plain-ta ${t==="plain-tall"?"tall":""}">${esc(val)}</textarea>${hint?`<span class="hint">${hint}</span>`:""}</label>`;
@@ -4559,15 +4564,15 @@ function openView(type,id){
     body=`<div class="vblock"><div class="v-hero">${avatar(x,96)}<div><h2>${esc(x.name||"Unnamed")}</h2>${x.pronounce?`<div class="pron">“${esc(x.pronounce)}”</div>`:""}${x.voice?`<div class="voice"><b>Voice.</b> ${esc(x.voice)}</div>`:""}
       <div class="vsub">${pc?"Player character":"Non-player character"} ${st} ${att} ${dmBadge(x)}</div></div></div>
       <div class="taper"></div>
-      <div class="stats"><div class="stat"><b>${x.ac??"–"}</b><span>Armor Class</span></div><div class="stat"><b>${hp}</b><span>Hit Points</span></div><div class="stat"><b>${x.pp??"–"}</b><span>Pass. Perc.</span></div></div>
+      ${pc||x.ac!=null||x.hpMax||x.pp!=null?`<div class="stats"><div class="stat"><b>${x.ac??"–"}</b><span>Armor Class</span></div><div class="stat"><b>${hp}</b><span>Hit Points</span></div><div class="stat"><b>${x.pp??"–"}</b><span>Pass. Perc.</span></div></div>`:""}
       ${isDM()?condRow(x):""}
       ${x.sheet?sheetPanel(x):""}
       <div class="taper"></div>
       <div class="props">
       ${pc?propAll("Played by",x.player):""}
-      ${propAll("Species",x.race)}${propAll(pc?"Class":"Class / role",x.cls)}${propAll("Level",x.level)}
+      ${pc?`${propAll("Species",x.race)}${propAll("Class",x.cls)}${propAll("Level",x.level)}`:`${propAll("Archetype",x.archetype||x.cls)}${propAll("Connection",x.hook)}${x.race?propAll("Species",x.race):""}${x.level?propAll("Level",x.level):""}`}
       ${propAll("Status",CAP(x.status||"alive"))}${propAll("Starting attitude",CAP(x.attitude))}
-      ${propAll("Location",x.location)}${propAll("Faction",x.faction)}
+      ${pc||x.location?propAll("Location",x.location):""}${pc||x.faction?propAll("Faction",x.faction):""}
       ${!pc&&x.player?propAll("Player",x.player):""}
       </div>
       ${notesBlock(x.notes)}${x.backstory?`<div class="taper"></div><h3 class="vh">Backstory</h3><div class="prose vprose">${rich(x.backstory,key)}</div>`:""}
@@ -4671,7 +4676,7 @@ function renderSearch(q){
   const hl=s=>{const t=esc(s),re=new RegExp("("+esc(qq).replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","ig");return t.replace(re,"<mark>$1</mark>")};
   const snip=txt=>{const p=plain(txt).replace(/\s+/g," "),i=p.toLowerCase().indexOf(qq);if(i<0)return"";const a=Math.max(0,i-60),b=Math.min(p.length,i+qq.length+90);return (a?"…":"")+hl(p.slice(a,b))+(b<p.length?"…":"")};
   const groups=[
-    ["Characters","characters",x=>x.name,x=>[x.kind==="pc"?"Party":"NPC",x.cls,x.location].filter(Boolean).join(" · "),x=>[x.cls,x.race,x.player,x.location,x.faction,x.notes]],
+    ["Characters","characters",x=>x.name,x=>[x.kind==="pc"?"Party":"NPC",x.archetype||x.cls,x.location].filter(Boolean).join(" · "),x=>[x.archetype,x.hook,x.cls,x.race,x.player,x.location,x.faction,x.notes]],
     ["Notes","notes",x=>x.title,x=>[NOTE_CATS[x.category]||"Note",x.session?`Session ${x.session}`:""].filter(Boolean).join(" · "),x=>[x.body]],
     ["Quests","quests",x=>x.title,x=>[QSTAT[x.status]||"Rumor",x.giver].filter(Boolean).join(" · "),x=>[x.giver,x.location,x.reward,x.notes]],
     ["Calendar","events",x=>x.title,x=>fmtDate(c,{y:x.y??c.today.y,m:x.m,d:x.d}),x=>[x.notes]],
@@ -4838,7 +4843,7 @@ document.addEventListener("click",async e=>{
     case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stStart":case"stEqual":case"stTool":case"stDone":case"stSpot":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
     case"stTime":case"stShort":case"stLong":case"stUndo":case"stRoll":case"stAtt":case"stEdit":case"stClue":stAct(a,t);break;
     case"heroSel":case"heroTab":case"heroLvl":heroAct(a,t);break;
-    case"pplSel":case"pplKind":case"pplTab":case"pplAtt":case"pplUnlink":case"genSave":case"genApply":pplAct(a,t);break;
+    case"pplSel":case"pplTab":case"pplAtt":case"pplUnlink":case"genSave":pplAct(a,t);break;
     case"scnOpen":goBoard(sessNum(t.dataset.id));break;
     case"pbCal":if(location.hash!=="#calendar")location.hash="calendar";else render();break;
     case"libPrep":U.prepTab=t.dataset.v;if(location.hash!=="#prep")location.hash="prep";else render();window.scrollTo(0,0);break;
@@ -4861,7 +4866,7 @@ document.addEventListener("change",async e=>{
   if(el.dataset.coin){const purse={...(S.settings.purse||{})};purse[el.dataset.coin]=num(el.value)||0;save("settings","purse",purse);return}
   if(el.id==="imp-file"&&el.files[0]){importPreview(el.files[0]);return}
   if(el.id==="rc-n"){render();return}
-  if(el.id==="f-kind"){document.querySelectorAll(".npc-only").forEach(n=>n.hidden=el.value==="pc");return}
+  if(el.id==="f-kind"){document.querySelectorAll(".npc-only").forEach(n=>n.hidden=el.value==="pc");document.querySelectorAll(".pc-only").forEach(n=>n.hidden=el.value!=="pc");return}
   if(el.id==="f-category"){const fac=el.value==="faction";document.querySelectorAll(".fac-only").forEach(n=>n.hidden=!fac);document.querySelectorAll(".sess-only").forEach(n=>n.hidden=el.value!=="session");document.querySelectorAll(".shop-only").forEach(n=>n.hidden=el.value!=="shop");document.querySelectorAll(".place-only").forEach(n=>n.hidden=!["location","shop","lore"].includes(el.value));document.querySelectorAll(".nohand-only").forEach(n=>n.hidden=el.value==="handout");const bl=document.getElementById("f-body-l");if(bl)bl.textContent=el.value==="handout"?"Handout text":"Note";return}
   if(el.dataset.todo){const td=rec("todos",el.dataset.todo);if(td){const{id,...r}=td;save("todos",id,{...r,done:el.checked})}return}
   if(el.dataset.spot){const [pc,ss]=el.dataset.spot.split("|");toggleSpot(pc,num(ss),el.checked);return}
@@ -4885,6 +4890,7 @@ document.addEventListener("keydown",e=>{
 document.addEventListener("submit",async e=>{
   e.preventDefault();const f=e.target,k=f.dataset.form,c=cal();
   if(k==="item"){const type=f.dataset.type,id=f.dataset.id||uid(),data=readForm(type);
+    if(type==="characters"&&data.kind!=="pc")NPC_OLD.forEach(k=>{data[k]=["level","ac","hpMax","hp","pp"].includes(k)?null:""});  // folded into Notes when the form opened
     if(type==="characters"&&data.hp==null&&data.hpMax)data.hp=data.hpMax;
     if(type==="links"){if(!data.a||!data.b||data.a===data.b){toast("Pick two different characters.");return}}
     else if(type==="threads"){if(!data.text){toast("Describe the thread.");return}}
