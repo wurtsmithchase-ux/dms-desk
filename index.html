@@ -2300,7 +2300,7 @@ function ppNpcFacts(x){
   return f.length?`<span class="pp-facts" role="list">${f.map(([l,v])=>`<span role="listitem"><i>${l}:</i> ${esc(v)}</span>`).join("")}</span>`:""}
 function prepPickRow(kind,id,i){
   const K=PP_KIND[kind],x=rec(K.col,id),nm=x?(K.name(x)||"Unnamed"):"",pill=x&&K.pill?K.pill(x):"";
-  return `<div class="pp-pr">${x?`<button type="button" class="pp-ob" data-act="open" data-type="${K.col}" data-id="${esc(id)}">${K.av?avatar(x,24):""}<span><b>${esc(nm)}</b>${kind==="npcs"?ppNpcFacts(x):K.av?`<small>${esc(prepSub(kind,x))}</small>`:""}</span></button>${pill?`<span class="pp-pill">${esc(pill)}</span>`:""}`
+  return `<div class="pp-pr">${x?`<button type="button" class="pp-ob" data-act="${kind==="handouts"?"ppOpenNote":"open"}" data-type="${K.col}" data-id="${esc(id)}">${K.av?avatar(x,24):""}<span><b>${esc(nm)}</b>${kind==="npcs"?ppNpcFacts(x):K.av?`<small>${esc(prepSub(kind,x))}</small>`:""}</span></button>${pill?`<span class="pp-pill">${esc(pill)}</span>`:""}`
     :`<span class="pp-ob gone"><span><b>Entry not found</b></span></span>`}${ppGrip(kind,i,PREP.d[kind].length,nm||"entry")}<button type="button" class="pp-x" data-act="ppPickDel" data-kind="${kind}" data-i="${i}" aria-label="Remove ${esc(nm||"entry")} from this session" title="Remove">×</button></div>`}
 function prepPicker(kind){
   const K=PP_KIND[kind],open=PREP.pick&&PREP.pick.kind===kind&&PREP.pick.open,L=open?prepListHtml(kind):"";
@@ -2694,7 +2694,7 @@ function refreshOpenSheet(){
   const sc=document.querySelector("#modal .sheet");const top=sc?sc.scrollTop:0;
   const ae=document.activeElement,ek=ae&&ae.dataset&&ae.dataset.entin,es=ek?ae.selectionStart:0;
   if(OPEN.kind==="view")openView(OPEN.type,OPEN.id,true);
-  if(ek){const i=document.querySelector(`#modal [data-entin="${CSS.escape(ek)}"]`);if(i){i.focus({preventScroll:true});try{i.setSelectionRange(es,es)}catch(_){}}}else if(OPEN.kind==="map")openMap(OPEN.id);else if(OPEN.kind==="monster")openMonster(OPEN.id);
+  if(ek){const i=document.querySelector(`#modal [data-entin="${CSS.escape(ek)}"]`);if(i){i.focus({preventScroll:true});try{i.setSelectionRange(es,es)}catch(_){}}}else if(OPEN.kind==="map")openMap(OPEN.id);else if(OPEN.kind==="monster")openMonster(OPEN.id);else if(OPEN.kind==="note")openNotePopup(OPEN.id);
   const sc2=document.querySelector("#modal .sheet");if(sc2)sc2.scrollTop=top;
 }
 
@@ -3501,6 +3501,14 @@ function vBestiary(){
   return `<div class="sub-bar"><p class="tool-d">Your own stat blocks. Names link everywhere, encounters can pull them in, and table mode shows them when a plan mentions them.</p><button class="btn primary" data-act="new" data-type="monsters">New stat block</button></div>
   ${list.length?`<div class="encs">${list.map(m=>`<button class="enc-card" data-act="open" data-type="monsters" data-id="${m.id}"><span class="enc-ct-h"><b>${esc(m.name||"Monster")}</b>${m.cr?`<span class="pill">CR ${esc(m.cr)}</span>`:""}</span><small>${esc(m.meta||"")}</small><span class="enc-ms">${[m.ac&&"AC "+m.ac,m.hp&&"HP "+m.hp].filter(Boolean).join(" · ")}</span></button>`).join("")}</div>`
   :`<div class="empty">No stat blocks yet. Start with your Ogre Chieftain and its stage-two changes.</div>`}`;
+}
+// a note (used for Prep Board handouts) shown in a popup over the current page
+function openNotePopup(id){
+  const n=rec("notes",id);if(!n)return;
+  showSheet(`<div class="sheet" role="dialog" aria-label="${esc(n.title||"Handout")}">${backBtn()}${noteView(n)}
+    ${backlinkBlock("notes",id)}
+    <div class="foot"><span class="grow"></span><button type="button" class="btn" data-act="close">Close</button><button type="button" class="btn primary" data-act="edit" data-type="notes" data-id="${id}">Edit</button></div></div>`,true);
+  OPEN={kind:"note",type:"notes",id};
 }
 function openMonster(id){
   const m=rec("monsters",id);if(!m)return;
@@ -4880,6 +4888,7 @@ document.addEventListener("click",async e=>{
     case"calToday":U.calY=c.today.y;U.calM=c.today.m;render();break;
     case"calSettings":calSettings();break;
     case"open":followLink(t.dataset.type,t.dataset.id);break;
+    case"ppOpenNote":openNotePopup(t.dataset.id);break;
     case"tmOpen":openTableMode();break;
     case"hist":openHistory(t.dataset.type,t.dataset.id);break;
     case"histRestore":await histRestore(t.dataset.id);break;
