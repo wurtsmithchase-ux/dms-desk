@@ -1247,6 +1247,9 @@ header.top .clock{display:none!important}
 .ph-c .ph-sess{width:auto;padding:0 10px;font-size:15px}
 .ph-c .ph-go{font-size:16px!important;padding:0 14px}
 .ph-c .ph-search{flex:0 1 280px}
+/* prep board: the title doesn't stretch and the save status takes the spare room, so the search and session picker stay put when the status text changes */
+.ph-c .ph-t{flex:0 1 auto}
+.ph-c .scn-state{flex:1 1 120px;min-width:0}
 .pp-state,#pp-state{font:italic 400 14px var(--body);min-height:0;white-space:nowrap}
 .pp-strip{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:6px 10px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r)}
 :root[data-skin="wood"] .pp-strip{background:var(--bg);border:0;box-shadow:var(--frame);margin:5px}
