@@ -2325,7 +2325,7 @@ function ppReadyPaint(){
     const c=document.querySelector(`.pp-chip[data-k="${k}"]`);if(c){c.classList.toggle("on",on);c.setAttribute("aria-label",`Go to ${l}${on?", ready":""}`)}});
   const el=document.getElementById("pp-count");if(el)el.textContent=`${PREP_KEYS.filter(x=>d.checked[x]).length} of ${PREP_KEYS.length} ready`}
 function ppFoldPaint(k){const closed=!!PP_FOLD[k],sec=document.getElementById("pp-sec-"+k);if(!sec)return;
-  sec.classList.toggle("closed",closed);sec.querySelector(".pp-fold")?.setAttribute("aria-expanded",String(!closed));const b=document.getElementById("pp-b-"+k);if(b)b.hidden=closed}
+  sec.classList.toggle("closed",closed);sec.querySelector(".pp-fold")?.setAttribute("aria-expanded",String(!closed));const b=document.getElementById("pp-b-"+k);if(b){b.hidden=closed;if(!closed)growAll(b)}}
 function vPrepBoard(c){
   const n=boardN();
   scnLoad(sessPlan(n));prepLoad(n);const d=PREP.d,done=PREP_KEYS.filter(k=>d.checked[k]).length;
