@@ -778,6 +778,7 @@ textarea.bk{width:100%;min-height:160px;font:12px var(--ui)}
 .sub-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
 .plain-ta{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:8px 10px;font:15px/1.45 var(--ui);resize:vertical;min-height:110px}
 .plain-ta.tall{min-height:300px}
+.plain-ta.grow-ta{min-height:0;resize:none;overflow:hidden}
 
 /* encounters */
 .enc-party{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--side);padding:8px 12px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
@@ -2470,6 +2471,7 @@ function prepAdopt(type,id,kind){kind=kind||Object.keys(PP_KIND).find(k=>PP_KIND
 // text boxes grow with what's typed (and again when the width changes)
 function growEl(t){if(!t.offsetParent)return;if(!t.value){t.style.height="";return}t.style.height="auto";t.style.height=(t.scrollHeight+t.offsetHeight-t.clientHeight)+"px"}
 const growAll=root=>(root||document).querySelectorAll("textarea.grow").forEach(growEl);
+document.addEventListener("input",e=>{if(e.target.classList&&e.target.classList.contains("grow-ta"))growEl(e.target)});
 let growT=null;
 addEventListener("resize",()=>{clearTimeout(growT);growT=setTimeout(()=>growAll(document.getElementById("app")),120)});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>growAll(document.getElementById("app")));
@@ -4621,7 +4623,7 @@ const FORMS={
   todos:{title:"To-do",fields:c=>[["text","Item","text",6],["kind","Type","select",3,{todo:"To-do",goal:"Goal"}],["due","Due","date",3],["done","Done","check",6],["notes","Notes","textarea",6]]},
   tables:{title:"Roll table",fields:c=>[["title","Table name","text",6],["desc","What it's for","text",6,null],["entries","Entries","plain-tall",6,null,"One entry per line. The die matches the number of lines."]]},
   events:{title:"Event",fields:c=>[["title","Event","text",6],["kind","Kind","select",3,EVKIND],["yearly","Repeats every year","check",3],["date","Date","igdate",6],["realDates","Played on (real dates)","dates",6,null,"The real-world game nights this in-world day covered"],["notes","Notes","textarea",6]]},
-  threads:{title:"Loose thread",fields:c=>[["text","Thread","text",6],["status","Status","select",3,{open:"Open",resolved:"Resolved"}],["notes","Notes","textarea",6,null,"Ideas for how it could come back"]]},
+  threads:{title:"Loose thread",fields:c=>[["text","Loose thread","grow",6,null,"What's left hanging, and how it could come back"],["status","Status","select",3,{open:"Open",resolved:"Resolved"}]]},
   links:{title:"Relationship",fields:c=>[["a","Character","select",3,charOpts()],["kind","Relationship","select",3,REL],["b","Other character","select",6,charOpts()],["label","Details","text",6,null,"e.g. old friends from the Great War"]]},
   loot:{title:"Item",fields:c=>[["name","Item","text",4],["qty","Quantity","number",2],["holder","Carried by","select",3,Object.fromEntries([["party","Party (shared)"],...S.characters.filter(x=>x.kind==="pc").map(x=>[x.id,x.name])])],["value","Value","text",3],["notes","Notes","textarea",6]]},
   maps:{title:"Map",fields:c=>[["title","Map name","text",6],["img","Map image","image",6],["notes","Notes","textarea",6]]},
@@ -4644,12 +4646,14 @@ function openForm(type,id,preset){
   if(type==="events"&&v.m!=null)v.date={y:v.y,m:v.m,d:v.d};
   const isNpc=type==="characters"&&v.kind!=="pc",isFac=(v.category||"")==="faction",isSess=(v.category||"")==="session",isShop=(v.category||"")==="shop",isPlace=["location","shop","lore"].includes(v.category||""),isHand=(v.category||"")==="handout";
   if(row&&isNpc)foldNpc(v);
+  if(row&&type==="threads"&&String(v.notes||"").trim()){v.text=[String(v.text||"").trim(),plain(v.notes).trim()].filter(Boolean).join("\n\n")}  // old threads kept ideas in a separate Notes box
   const fs=F.fields(c).map(([k,l,t,span,opts,hint,fl])=>{
     const val=v[k]??"",cls=`field ${span===2?"s2":span===3?"s3":span===4?"s3":""} ${fl&&fl.fac?"fac-only":""} ${fl&&fl.sess?"sess-only":""} ${fl&&fl.shop?"shop-only":""} ${fl&&fl.place?"place-only":""} ${fl&&fl.npc?"npc-only":""} ${fl&&fl.pc?"pc-only":""} ${fl&&fl.nohand?"nohand-only":""}`,hid=(fl&&fl.nohand&&isHand)||(fl&&fl.npc&&!isNpc)||(fl&&fl.pc&&isNpc)||(fl&&fl.fac&&!isFac)||(fl&&fl.sess&&!isSess)||(fl&&fl.shop&&!isShop)||(fl&&fl.place&&!isPlace)?" hidden":"";
     let input;
     if(t==="checklist")return `<div class="${cls} cl-field"${hid}><span class="label">${l}</span><div class="cl-rows" id="f-${k}">${beatList({beats:val}).map(b=>clRow(b.text,b.done)).join("")}</div><button type="button" class="btn sm cl-add" data-act="clAdd" data-k="${k}">Add a beat</button></div>`;
     if(t==="plain"||t==="plain-tall")return `<label class="${cls}"${hid}><span class="label">${l}</span><textarea id="f-${k}" class="plain-ta ${t==="plain-tall"?"tall":""}">${esc(val)}</textarea>${hint?`<span class="hint">${hint}</span>`:""}</label>`;
     if(t==="dates"){const ds=Array.isArray(val)?val:[];return `<div class="${cls}"${hid}><span class="label">${l}</span><div class="dates" id="f-${k}">${ds.map(d=>`<span class="date-row"><input type="date" value="${esc(d)}" aria-label="Real date"><button type="button" class="btn icon" data-act="dateDel" aria-label="Remove date">×</button></span>`).join("")}<button type="button" class="btn sm" data-act="dateAdd" data-k="${k}">Add a date</button></div>${hint?`<span class="hint">${hint}</span>`:""}</div>`}
+    if(t==="grow")return `<label class="${cls}"${hid}><span class="label">${l}</span><textarea id="f-${k}" class="plain-ta grow-ta grow" rows="2" placeholder="${esc(hint||"")}">${esc(val)}</textarea></label>`;
     if(t==="date")return `<label class="${cls}"${hid}><span class="label">${l}</span><input type="date" id="f-${k}" value="${esc(val)}"></label>`;
     if(t==="image")return `<div class="${cls} img-field"${hid}><span class="label">${l}</span><div class="img-prev" id="imgp-${k}">${val?`<img src="${esc(imgUrl(val))}" alt="">`:""}${assets?`<label class="btn sm">${val?"Replace":"Upload"} image<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" data-upload="${k}" hidden></label>`:""}${val?`<button type="button" class="btn sm" data-act="imgClear" data-k="${k}">Remove</button>`:""}</div><input type="hidden" id="f-${k}" value="${esc(val)}">${assets?"":`<span class="hint">Image uploads aren't available in this view.</span>`}</div>`;
     if(t==="select")input=`<select id="f-${k}">${Object.entries(opts).map(([o,ol])=>`<option value="${o}" ${String(val)===o?"selected":""}>${ol}</option>`).join("")}</select>`;
@@ -4662,6 +4666,7 @@ function openForm(type,id,preset){
   }).join("")+"";
   showSheet(`<form class="sheet" data-form="item" data-type="${type}" data-id="${id||""}"><h2>${row?"Edit":"New"} ${F.title.toLowerCase()}</h2><div class="fields">${fs}</div>
     <div class="foot"><span class="grow">${row?`<button type="button" class="btn danger" data-act="del" data-type="${type}" data-id="${id}">Delete</button>${NO_HISTORY.has(type)?"":` <button type="button" class="btn" data-act="hist" data-type="${type}" data-id="${id}">History</button>`}${ARCH_COLS.has(type)?` <button type="button" class="btn" data-act="arch" data-type="${type}" data-id="${id}" title="${isArch(row)?"Save and put it back in the Library":"Save and move it out of the Library lists"}">${isArch(row)?"Unarchive":"Archive"}</button>`:""}`:""}</span><button type="button" class="btn" data-act="close">Cancel</button><button class="btn primary" type="submit">Save</button></div></form>`);
+  const ga=document.querySelectorAll("#modal .grow-ta");ga.forEach(growEl);if(ga[0]&&!row)ga[0].focus();
 }
 function readForm(type){
   const c=cal(),o={};
@@ -4673,6 +4678,7 @@ function readForm(type){
     else if(t==="image")o[k]=document.getElementById("f-"+k).value||"";
     else if(t==="checklist")o[k]=[...document.querySelectorAll(`#f-${k} .cl-row`)].map(r=>{const x=r.querySelector(".cl-text").value.trim();return x?(r.querySelector(".cl-done").checked?"[x] ":"")+x:""}).filter(Boolean).join("\n");
     else if(t==="plain"||t==="plain-tall")o[k]=document.getElementById("f-"+k).value.replace(/\s+$/,"");
+    else if(t==="grow")o[k]=document.getElementById("f-"+k).value.trim();
     else if(t==="date")o[k]=document.getElementById("f-"+k).value||"";
     else if(t==="dates")o[k]=[...new Set([...document.querySelectorAll("#f-"+k+" input[type=date]")].map(i=>i.value).filter(Boolean))].sort();
     else if(t==="textarea"||t==="textarea-tall")o[k]=htmlToMd(document.getElementById("f-"+k));
@@ -5043,7 +5049,7 @@ document.addEventListener("submit",async e=>{
       NPC_OLD.forEach(k=>{data[k]=["level","ac","hpMax","hp","pp"].includes(k)?null:""})}  // folded into Notes
     if(type==="characters"&&data.hp==null&&data.hpMax)data.hp=data.hpMax;
     if(type==="links"){if(!data.a||!data.b||data.a===data.b){toast("Pick two different characters.");return}}
-    else if(type==="threads"){if(!data.text){toast("Describe the thread.");return}}
+    else if(type==="threads"){if(!data.text){toast("Describe the thread.");return}data.notes=""}
     else if(!data.title&&!data.name){toast(type==="characters"||type==="loot"?"Give it a name.":"Give it a title.");return}
     const old=S[type].find(x=>x.id===id)||{};const{id:_,...keep}=old;
     const arT=f.dataset.arch;delete f.dataset.arch;if(arT)data.archived=arT==="1"?Date.now():0;  // the form's Archive button saves the edits too
