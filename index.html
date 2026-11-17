@@ -1767,13 +1767,13 @@ const EVKIND={session:"Session",festival:"Festival",deadline:"Deadline",travel:"
 const TABS=[["party","Characters","Cast"],["notes","Library","Library"],["calendar","Calendar","Calendar"],["world","World","World"],["prep","Prep","Prep"]];
 
 const S={characters:[],notes:[],quests:[],events:[],threads:[],plans:[],scenes:[],preps:[],links:[],loot:[],maps:[],logs:[],encounters:[],tables:[],chats:[],meta:[],monsters:[],todos:[],settings:{},loaded:false,live:false};
-const U={tab:"party",charFilter:"pc",charQ:"",noteSel:null,noteQ:"",libGrp:"notes",noteChip:"all",questSt:"all",thrSt:"all",calY:null,calM:null,noteReading:false,calSel:null,prepTab:"board",calView:"month",tableSel:null,worldTab:"maps",sess:null};
+const U={tab:"party",charFilter:"pc",charQ:"",noteSel:null,noteQ:"",libGrp:"notes",questSt:"all",thrSt:"all",calY:null,calM:null,noteReading:false,calSel:null,prepTab:"board",calView:"month",tableSel:null,worldTab:"maps",sess:null};
 const isPhone=()=>window.matchMedia("(max-width:640px)").matches;
 // Wood & Wax turns the tabs into a side menu at 1101px and wider (matches the CSS media query)
 const SIDE_MQ=window.matchMedia("(min-width:1101px)");
 const sideMenu=()=>SIDE_MQ.matches;
-/* The DM's menu: Session, Prep Board, then The Library (Party, NPCs, Notes, Sessions, Handouts, Magic Items, Bestiary, Tables).
-   World and Calendar open from Library groups and the board; quests and threads are Notes chips.
+/* The DM's menu: Session, Prep Board, then The Library (Party, NPCs, the note sections, Sessions, Handouts, Magic Items, Bestiary, Tables).
+   World and Calendar open from Library groups and the board. "lib:notes" opens the first note section that has entries.
    Number keys 1-9 follow NAV_DM from top to bottom; players keep the tab list. Phones show NAV_PHONE: Prep Board and The Library. */
 const NAV_DM=[["board","Prep Board"],["party","Party"],["npcs","NPCs"],["lib:notes","Notes"],["lib:sessions","Sessions"],["lib:handouts","Handouts"],["lib:items","Magic Items"],["lib:bestiary","Bestiary"],["lib:tables","Tables"]];
 const NAV_PHONE=[["board","Prep Board","Prep"],["library","The Library","Library"]];
@@ -1784,13 +1784,13 @@ const visibleTabs=()=>TABS;
 function navCur(){
   if(U.tab==="prep")return "board";
   if(U.tab==="party")return U.charFilter==="npc"?"npcs":"party";
-  if(U.tab==="notes"){if(String(U.noteQ||"").trim())return "library";return U.libGrp==="party"||U.libGrp==="npcs"?U.libGrp:"lib:"+U.libGrp}
-  return {world:"lib:notes",calendar:"lib:sessions"}[U.tab]||""}
+  if(U.tab==="notes"){if(String(U.noteQ||"").trim())return "library";const g=libGrpFix(U.libGrp);return g==="party"||g==="npcs"?g:"lib:"+g}
+  return {world:"lib:locations",calendar:"lib:sessions"}[U.tab]||""}
 function navGo(v){let tab;
   if(v==="lib:party"||v==="lib:npcs")v=v.slice(4);
   if(v==="board"){tab="prep";U.prepTab="board";U.prepSess=null}
   else if(v==="party"||v==="npcs"){tab="party";U.charFilter=v==="npcs"?"npc":"pc"}
-  else{tab="notes";if(v.startsWith("lib:")){U.libGrp=v.slice(4);U.noteQ="";U.noteReading=false}}
+  else{tab="notes";if(v.startsWith("lib:")){U.libGrp=libGrpFix(v.slice(4));U.noteQ="";U.noteReading=false}}
   closeSheet();
   if(location.hash!=="#"+tab)location.hash=tab;else{render();window.scrollTo(0,0)}}
 const NAV_ICONS={search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/>',note:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',dock:'<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M9 4v16"/>',size:'<path d="M4 18 9 6l5 12M5.6 14h6.8M15 18l3-7 3 7M15.9 16h4.2"/>',keys:'<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>',
@@ -1804,6 +1804,15 @@ const NAV_ICONS={search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.
   items:'<path d="M12 2.5 15 9l-3 12.5L9 9z"/><path d="M5 9h14M7.5 4.5 9 9M16.5 4.5 15 9M7.5 4.5h9"/>',
   bestiary:'<path d="M6 4c1 5 1 11-1 16M12 3c1 6 1 12-1 18M18 4c1 5 1 11-1 16"/>',
   tables:'<path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M12 22V12M3 7l9 5 9-5"/>',
+  quests:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+  threads:'<path d="M4 6c5 0 5 6 10 6s4-6 6-6M4 18c5 0 5-6 10-6s4 6 6 6"/>',
+  hooks:'<path d="M12 3v11a4 4 0 1 1-8 0v-2l3 2"/><circle cx="12" cy="3" r="1"/>',
+  locations:'<path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+  shops:'<path d="M3 10 5 4h14l2 6M4 10v10h16V10M3 10h18M10 20v-6h4v6"/>',
+  factions:'<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="M12 8v8M8.5 11.5h7"/>',
+  lore:'<path d="M4 5c3-1.5 6-1.5 8 0v15c-2-1.5-5-1.5-8 0zM12 5c2-1.5 5-1.5 8 0v15c-3-1.5-6-1.5-8 0"/>',
+  rules:'<path d="M12 4v16M7 20h10M5 7h14M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/>',
+  other:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
   camp:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
   hide:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/><path d="M16 9l-3 3 3 3"/>',
   show:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/><path d="M13 9l3 3-3 3"/>'};
@@ -2018,7 +2027,7 @@ function navBack(){const prev=NAV.pop();if(prev&&rec(prev.type,prev.id))openEntr
 function backBtn(){const prev=NAV[NAV.length-1];if(!prev)return "";const x=rec(prev.type,prev.id);if(!x)return "";return `<button type="button" class="btn sm navback" data-act="navBack" title="Go back">‹ Back to ${esc(titleOf(prev.type,x)||"previous")}</button>`}
 function openEntry(type,id){
   closeSheet(true);
-  if(type==="notes"){U.noteSel=id;U.noteReading=true;U.noteQ="";U.arch=isArch(rec("notes",id));U.libGrp=noteGroup(rec("notes",id));chipShow(rec("notes",id));if(location.hash!=="#notes")location.hash="notes";else render();window.scrollTo({top:0})}
+  if(type==="notes"){U.noteSel=id;U.noteReading=true;U.noteQ="";U.arch=isArch(rec("notes",id));U.libGrp=noteGroup(rec("notes",id));if(location.hash!=="#notes")location.hash="notes";else render();window.scrollTo({top:0})}
   else if(type==="preps"){const x=rec("preps",id);if(!x)return;U.prepSess=num(x.session)||null;U.prepTab="board";if(location.hash!=="#prep")location.hash="prep";else render();window.scrollTo({top:0})}
   else if(type==="scenes"){const s=rec("scenes",id);if(!s)return;goBoard(num(s.session)||null,id)}
   else if(type==="threads"||type==="links"||type==="loot")openForm(type,id);
@@ -4461,16 +4470,18 @@ function facBlock(n){
   if(!f.length&&!n.goals&&!n.members)return "";
   return `<div class="facblock">${f.map(([l,v])=>`<div class="prop"><b>${l}.</b> ${linkify(esc(v),"notes:"+n.id)}</div>`).join("")}${n.goals?`<div class="prop full"><b>Goals.</b> ${linkify(esc(n.goals),"notes:"+n.id)}</div>`:""}${n.members?`<div class="full"><div class="prop"><b>Key members.</b></div><div class="prose vprose">${rich(n.members,"notes:"+n.id)}</div></div>`:""}</div>`;
 }
-/* Library: every entry sorted into groups. Notes read here; other entries open their own page. */
-const LIB_GROUPS=[["party","Party"],["npcs","NPCs"],["notes","Notes"],["sessions","Sessions"],["handouts","Handouts"],["items","Magic Items"],["bestiary","Bestiary"],["tables","Tables"]];
-/* Notes group: one list with filter chips. Session recaps stay under Sessions and monster notes under Bestiary. */
+/* Library: every entry sorted into groups. Notes read here; other entries open their own page.
+   Notes are split into their own sections (Quests, Loose threads, Plot hooks, Locations, ...), one per kind. */
+const NOTE_SECS=[["quests","Quests"],["threads","Loose threads"],["hooks","Plot hooks"],["locations","Locations"],["shops","Shops & inns"],["factions","Factions"],["lore","Lore"],["rules","Rules & rulings"],["other","Other notes"]];
+const isNoteSec=g=>NOTE_SECS.some(x=>x[0]===g);
+const LIB_GROUPS=[["party","Party"],["npcs","NPCs"],...NOTE_SECS,["sessions","Sessions"],["handouts","Handouts"],["items","Magic Items"],["bestiary","Bestiary"],["tables","Tables"]];
+/* Note sections: session recaps stay under Sessions and monster notes under Bestiary; every other note goes in the section for its category. */
 const NOTE_GROUP={monster:"bestiary",session:"sessions",handout:"handouts",item:"items"};
-const noteGroup=n=>NOTE_GROUP[n&&n.category]||"notes";
-const NOTE_CHIPS=[["all","All"],["quests","Quests"],["threads","Loose threads"],["hooks","Plot hooks"],["locations","Locations"],["shops","Shops & inns"],["factions","Factions"],["lore","Lore"],["rules","Rules & rulings"],["other","Other"]];
+const noteGroup=n=>NOTE_GROUP[n&&n.category]||chipOf({col:"notes",x:n||{}});
 const CHIP_CAT={hooks:"plot",locations:"location",shops:"shop",factions:"faction",lore:"lore",rules:"rules",other:"other"};
 const chipOf=({col,x})=>col==="quests"?"quests":col==="threads"?"threads":Object.keys(CHIP_CAT).find(k=>CHIP_CAT[k]===x.category)||"other";
 const NOTE_NEW={all:["notes",{category:"lore"},"New note"],quests:["quests",{status:"active"},"New quest"],threads:["threads",{status:"open"},"New thread"],hooks:["notes",{category:"plot"},"New plot hook"],locations:["notes",{category:"location"},"New location"],shops:["notes",{category:"shop"},"New shop or inn"],factions:["notes",{category:"faction"},"New faction"],lore:["notes",{category:"lore"},"New lore note"],rules:["notes",{category:"rules"},"New ruling"],other:["notes",{category:"other"},"New note"]};
-const LIB_NEW={notes:NOTE_NEW.all,party:["characters",{kind:"pc",status:"alive"},"New character"],npcs:["characters",{kind:"npc",status:"alive"},"New NPC"],bestiary:["monsters",{},"New stat block"],handouts:["notes",{category:"handout"},"New handout"],items:["notes",{category:"item"},"New magic item"],tables:["tables",{},"New roll table"]};
+const LIB_NEW={...Object.fromEntries(NOTE_SECS.map(([k])=>[k,NOTE_NEW[k]])),notes:NOTE_NEW.all,party:["characters",{kind:"pc",status:"alive"},"New character"],npcs:["characters",{kind:"npc",status:"alive"},"New NPC"],bestiary:["monsters",{},"New stat block"],handouts:["notes",{category:"handout"},"New handout"],items:["notes",{category:"item"},"New magic item"],tables:["tables",{},"New roll table"]};
 const LIB_COLS=["notes","characters","quests","threads","monsters","scenes","tables"];
 /* Archive: any Library entry can be archived. It leaves its group's list (and counts) but stays searchable,
    links still open it, and each list has an Archived toggle to see and restore them. */
@@ -4480,13 +4491,10 @@ const archMi=(col,x)=>ARCH_COLS.has(col)&&x?mi("arch",isArch(x)?"Unarchive":"Arc
 const archToggle=(n,lbl)=>n||U.arch?`<button type="button" class="lib-g sub-g lib-arch" data-act="libArch" aria-pressed="${!!U.arch}" title="${U.arch?"Back to the current entries":"Show archived entries"}">${U.arch?"‹ "+esc(lbl):"Archived"}<span class="n">${U.arch?"":n}</span></button>`:"";
 async function archSet(col,id,on){const x=rec(col,id);if(!x)return;const ok=await patchRec(col,id,{archived:on?Date.now():0});
   if(ok)toast(on?`Archived ${titleOf(col,x)||"entry"}. Find it under Archived in its list.`:`${titleOf(col,x)||"Entry"} is back in the Library`);render()}
-// everything in the Notes group, before any chip is applied; ar picks the archived entries instead
+// everything in the Notes group, across every note section; ar picks the archived entries instead
 const allNoteItems=(ar=false)=>[...S.notes.filter(n=>noteGroup(n)==="notes").map(x=>({col:"notes",x})),...S.quests.map(x=>({col:"quests",x})),...S.threads.map(x=>({col:"threads",x}))].filter(i=>isArch(i.x)===ar);
-const chipCounts=()=>{const o={all:0};allNoteItems().forEach(i=>{o.all++;const k=chipOf(i);o[k]=(o[k]||0)+1});return o};
-// the chip in use; falls back to All when it has gone empty
-function curChip(){const n=chipCounts();if(U.noteChip!=="all"&&!n[U.noteChip])U.noteChip="all";return U.noteChip}
-// after opening or saving a note, drop to All if the current chip would hide it
-const chipShow=n=>{if(U.noteChip!=="all"&&chipOf({col:"notes",x:n})!==U.noteChip)U.noteChip="all"};
+// "notes" (old links, the 4 key) or an unknown group opens the first note section with entries
+const libGrpFix=g=>g!=="notes"&&LIB_GROUPS.some(x=>x[0]===g)?g:NOTE_SECS.map(x=>x[0]).find(k=>libItems(k).length)||"lore";
 const questStatus=q=>q.status||"rumor";
 function libItems(g,ar=false){const T=(col,f)=>(S[col]||[]).filter(x=>isArch(x)===ar&&(!f||f(x))).map(x=>({col,x})),N=k=>T("notes",n=>noteGroup(n)===k);
   switch(g){
@@ -4498,26 +4506,26 @@ function libItems(g,ar=false){const T=(col,f)=>(S[col]||[]).filter(x=>isArch(x)=
     case"handouts":return N("handouts");
     case"items":return N("items");
     case"tables":return T("tables");
-    default:return []}}
+    default:return isNoteSec(g)?allNoteItems(ar).filter(i=>chipOf(i)===g):[]}}
 const libTag=(col,x)=>col==="notes"?(NOTE_CATS[x.category]||"Note"):col==="characters"?(x.kind==="pc"?"Player character":"NPC"):col==="quests"?"Quest · "+QSTAT[questStatus(x)]:col==="threads"?"Loose thread · "+(x.status==="resolved"?"Resolved":"Open"):(COL_LABEL[col]||"Entry");
 // only the start of a long body is needed for the one-line preview
 const libBlurb=(col,x)=>(plain(String((col==="notes"?x.body:textOf(col,x))||"").slice(0,600)).split("\n").map(s=>s.trim()).find(Boolean)||"").slice(0,90);
-const libNewFor=g=>String(U.noteQ||"").trim()?NOTE_NEW.all:(g||U.libGrp)==="notes"?NOTE_NEW[curChip()]:LIB_NEW[g||U.libGrp];
+const libNewFor=g=>String(U.noteQ||"").trim()?NOTE_NEW.all:LIB_NEW[g||U.libGrp];
 // a handout or magic item can be put on the Prep Board's session from its page in the Library
 const prepListOf=h=>h.category==="item"?"magic":"handouts";
 function hoPrepBtn(h){const n=boardN(),on=prepRec(n)[prepListOf(h)].includes(h.id);
   return `<button class="btn sm ${on?"":"primary"}" data-act="hoToPrep" data-id="${h.id}" ${on?"disabled":""}>${on?`On Session ${n} ✓`:"Add to Prep Board"}</button>`}
 function vNotes(c){
-  const q=String(U.noteQ||"").trim().toLowerCase();if(!LIB_GROUPS.some(g=>g[0]===U.libGrp))U.libGrp="notes";
+  const q=String(U.noteQ||"").trim().toLowerCase();U.libGrp=libGrpFix(U.libGrp);
   if(U.arch&&!q&&!libItems(U.libGrp,true).length)U.arch=false;  // the last archived entry came back: show the current ones
-  const g=U.libGrp,ar=!q&&!!U.arch,chip=g==="notes"&&!ar?curChip():"all",alpha=["party","npcs","bestiary","handouts","items","tables"].includes(g);
+  const g=U.libGrp,ar=!q&&!!U.arch,alpha=["party","npcs","bestiary","handouts","items","tables"].includes(g);
   const stOf=x=>x.status==="resolved"?"resolved":"open";
-  const inChip=i=>g!=="notes"||((chip==="all"||chipOf(i)===chip)&&(chip!=="quests"||U.questSt==="all"||questStatus(i.x)===U.questSt)&&(chip!=="threads"||U.thrSt==="all"||stOf(i.x)===U.thrSt));
+  const inChip=i=>ar||((g!=="quests"||U.questSt==="all"||questStatus(i.x)===U.questSt)&&(g!=="threads"||U.thrSt==="all"||stOf(i.x)===U.thrSt));
   const list=(q?LIB_COLS.flatMap(col=>(S[col]||[]).map(x=>({col,x}))).filter(({col,x})=>((titleOf(col,x)||"")+" "+textOf(col,x)).toLowerCase().includes(q)):libItems(g,ar).filter(inChip))
     .sort((a,b)=>alpha&&!q?String(titleOf(a.col,a.x)||"").localeCompare(String(titleOf(b.col,b.x)||"")):(b.x.pinned?1:0)-(a.x.pinned?1:0)||(b.x.session||0)-(a.x.session||0)||(b.x.updated||0)-(a.x.updated||0));
   const notesIn=list.filter(i=>i.col==="notes");
   if(!notesIn.find(i=>i.x.id===U.noteSel))U.noteSel=notesIn[0]?.x.id||null;
-  const cur=S.notes.find(n=>n.id===U.noteSel),gName=(LIB_GROUPS.find(x=>x[0]===g)||[])[1],chipName=g==="notes"&&chip!=="all"?(NOTE_CHIPS.find(x=>x[0]===chip)||[])[1]:"";
+  const cur=S.notes.find(n=>n.id===U.noteSel),gName=(LIB_GROUPS.find(x=>x[0]===g)||[])[1];
   // the main button follows the group (or "New note" while searching); the menu never repeats it
   const nw=libNewFor(g),mainAct=nw?"libNew":"newRecap";
   const extra=[["newRecap","New session recap"],["libNewNote","New note"]].filter(([a,l])=>a!==mainAct&&!(nw&&nw[2]===l));
@@ -4526,23 +4534,22 @@ function vNotes(c){
   let h=isDM()?pageHead(q?`Every entry matching “${esc(U.noteQ.trim())}”`:esc(gName||""),q?"Search":"The Library",{search:qBox,newLabel:nw?nw[2]:g==="sessions"?"New session plan":"",extra:extra.length?moreMenu(extra.map(([a,l])=>mi(a,l)),{label:"More ▾",title:"More ways to add",sm:false}):""}):`<div class="bar"><h2>Library</h2>${qBox}</div>`;
   // pages that used to be their own tabs open from their Library group
   const goW=(v,l)=>`<button type="button" class="btn sm" data-act="pbWorld" data-v="${v}">${l}</button>`,goP=(v,l)=>`<button type="button" class="btn sm" data-act="libPrep" data-v="${v}">${l}</button>`;
-  const more=q?"":{locations:goW("maps","Maps")+goW("rel","Relationships")+goW("places","Places")+goW("know","Party knows"),sessions:`<a class="btn sm" href="#calendar">Calendar</a>`+goP("notes","Session notes"),bestiary:goP("bestiary","Bestiary page")+goP("encounters","Encounters"),tables:goP("tables","Roll tables"),lore:goP("ideas","Saved ideas")}[g==="notes"?chip:g]||"";
+  const more=q?"":{locations:goW("maps","Maps")+goW("rel","Relationships")+goW("places","Places")+goW("know","Party knows"),sessions:`<a class="btn sm" href="#calendar">Calendar</a>`+goP("notes","Session notes"),bestiary:goP("bestiary","Bestiary page")+goP("encounters","Encounters"),tables:goP("tables","Roll tables"),lore:goP("ideas","Saved ideas")}[g]||"";
   const groups=sideMenu()&&isDM()?"":`<div class="lib-groups" role="group" aria-label="Library groups">${LIB_GROUPS.map(([k,l])=>isDM()&&(k==="party"||k==="npcs")?`<button type="button" class="lib-g" data-act="nav" data-v="${k}">${l}<span class="n">${libItems(k).length}</span></button>`:`<button type="button" class="lib-g" data-act="libGrp" data-v="${k}" aria-pressed="${!q&&g===k}">${l}<span class="n">${libItems(k).length}</span></button>`).join("")}</div>`;
-  const cnts=chipCounts(),chipBtn=(k,l,n,act,cls,on)=>`<button type="button" class="lib-g ${cls||""}" data-act="${act}" data-v="${k}" aria-pressed="${on}">${esc(l)}<span class="n">${n}</span></button>`;
+  const chipBtn=(k,l,n,act,cls,on)=>`<button type="button" class="lib-g ${cls||""}" data-act="${act}" data-v="${k}" aria-pressed="${on}">${esc(l)}<span class="n">${n}</span></button>`;
   const qs=S.quests.filter(x=>true),stCount=(arr,f)=>arr.filter(f).length;
   let chips="";
-  if(g==="notes"&&!q&&!ar){
-    chips=`<div class="lib-chips" role="group" aria-label="Filter notes">${NOTE_CHIPS.filter(([k])=>k==="all"||cnts[k]).map(([k,l])=>chipBtn(k,l,cnts[k]||0,"noteChip","",chip===k)).join("")}</div>`;
-    if(chip==="quests")chips+=`<div class="lib-chips sub" role="group" aria-label="Filter quests by status">${[["all","All"],...Object.entries(QSTAT)].map(([k,l])=>chipBtn(k,l,k==="all"?qs.length:stCount(qs,x=>questStatus(x)===k),"questSt","sub-g",U.questSt===k)).join("")}</div>`;
-    if(chip==="threads")chips+=`<div class="lib-chips sub" role="group" aria-label="Filter threads by status">${[["all","All"],["open","Open"],["resolved","Resolved"]].map(([k,l])=>chipBtn(k,l,k==="all"?S.threads.length:stCount(S.threads,x=>stOf(x)===k),"thrSt","sub-g",U.thrSt===k)).join("")}</div>`}
-  const arcHtml=g==="notes"&&!q&&!ar&&chip==="quests"?arcsBlock():"",arcs=arcHtml?`<div class="lib-arcs">${arcHtml}</div>`:"";
+  if(!q&&!ar){
+    if(g==="quests")chips+=`<div class="lib-chips sub" role="group" aria-label="Filter quests by status">${[["all","All"],...Object.entries(QSTAT)].map(([k,l])=>chipBtn(k,l,k==="all"?qs.length:stCount(qs,x=>questStatus(x)===k),"questSt","sub-g",U.questSt===k)).join("")}</div>`;
+    if(g==="threads")chips+=`<div class="lib-chips sub" role="group" aria-label="Filter threads by status">${[["all","All"],["open","Open"],["resolved","Resolved"]].map(([k,l])=>chipBtn(k,l,k==="all"?S.threads.length:stCount(S.threads,x=>stOf(x)===k),"thrSt","sub-g",U.thrSt===k)).join("")}</div>`}
+  const arcHtml=g==="quests"&&!q&&!ar?arcsBlock():"",arcs=arcHtml?`<div class="lib-arcs">${arcHtml}</div>`:"";
   const nb=(col,x)=>{const b=libBlurb(col,x);return b?`<span class="nb">${esc(b)}</span>`:""};
   const archP=x=>q&&isArch(x)?'<span class="pill">Archived</span> ':"";
   const row=({col,x})=>col==="notes"?`<button class="nitem" data-act="pick" data-id="${x.id}" aria-current="${x.id===U.noteSel}"><b>${archP(x)}${x.pinned&&!isArch(x)?'<span class="pill acc">Pinned</span> ':""}${esc(x.title||"Untitled")}</b><small>${esc(libTag(col,x))}${x.session?` · Session ${x.session}`:""}${x.ig?` · ${esc(shortDate(c,x.ig))}`:""}</small>${nb(col,x)}</button>`
     :`<button class="nitem" data-act="open" data-type="${col}" data-id="${x.id}"><b>${archP(x)}${esc(titleOf(col,x)||"Untitled")}</b><small>${esc(libTag(col,x))}</small>${nb(col,x)}</button>`;
-  h+=`<div class="notes lib ${U.noteReading?"reading":""}"><div class="nlist">${groups}${chips}${arcs}<div class="lib-lh"><h3>${q?"Search results":ar?"Archived "+esc(gName):esc(chipName||gName)}</h3><span>${list.length}</span></div>${q?"":`<div class="lib-chips sub">${archToggle(libItems(g,true).length,gName)}</div>`.replace('<div class="lib-chips sub"></div>',"")}${more&&!ar?`<div class="lib-more">${more}</div>`:""}${list.length?list.map(row).join(""):`<div class="empty">${q?"Nothing matches that search.":ar?`Nothing archived in ${esc(gName)}.`:`Nothing in ${esc(chipName||gName)} yet.`}</div>`}</div>`;
+  h+=`<div class="notes lib ${U.noteReading?"reading":""}"><div class="nlist">${groups}${chips}${arcs}<div class="lib-lh"><h3>${q?"Search results":ar?"Archived "+esc(gName):esc(gName)}</h3><span>${list.length}</span></div>${q?"":`<div class="lib-chips sub">${archToggle(libItems(g,true).length,gName)}</div>`.replace('<div class="lib-chips sub"></div>',"")}${more&&!ar?`<div class="lib-more">${more}</div>`:""}${list.length?list.map(row).join(""):`<div class="empty">${q?"Nothing matches that search.":ar?`Nothing archived in ${esc(gName)}.`:`Nothing in ${esc(gName)} yet.`}</div>`}</div>`;
   const fl=[cur&&cur.session&&["Session",cur.session],cur&&cur.ig&&["In-game date",fmtDate(c,cur.ig)],cur&&cur.played&&["Played",new Date(cur.played+"T12:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})]].filter(Boolean);
-  h+=cur?`<article class="reader lib-entry"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ Back to the list</button>${backBtn()}</div><div class="le-head"><div class="le-t"><span class="le-crumb">${esc((LIB_GROUPS.find(x=>x[0]===noteGroup(cur))||[])[1]||"")} · ${esc(NOTE_CATS[cur.category]||"Note")}${isArch(cur)?" · Archived":""}</span>
+  h+=cur?`<article class="reader lib-entry"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ Back to the list</button>${backBtn()}</div><div class="le-head"><div class="le-t"><span class="le-crumb">${esc((LIB_GROUPS.find(x=>x[0]===noteGroup(cur))||[])[1]||"")}${isNoteSec(noteGroup(cur))?"":" · "+esc(NOTE_CATS[cur.category]||"Note")}${isArch(cur)?" · Archived":""}</span>
     <h3 class="t">${esc(cur.title||"Untitled")}</h3></div><span class="dm-only acts-r">${cur.category==="handout"||cur.category==="item"?hoPrepBtn(cur):""}<button class="btn sm" data-act="edit" data-type="notes" data-id="${cur.id}">Edit</button>${moreMenu([mi("copyR20","Copy for Roll20",`data-type="notes" data-id="${cur.id}"`),mi("pin",cur.pinned?"Unpin from the top":"Pin to the top",`data-id="${cur.id}"`),mi("keepOpen",isPinned("notes",cur.id)?"Kept open ✓":"Keep open beside other pages",`data-type="notes" data-id="${cur.id}"`),archMi("notes",cur)])}</span></div>
     ${fl.length?`<dl class="le-fields">${fl.map(([l,v])=>`<div><dt>${l}</dt><dd>${esc(String(v))}</dd></div>`).join("")}</dl>`:""}
     <div class="le-cols"><div class="le-main">${placeBlock(cur)}${cur.img?`<img class="note-img" src="${esc(imgUrl(cur.img))}" alt="">`:""}${cur.category==="faction"?facBlock(cur):""}${cur.body||cur.category!=="shop"?`<section><h4 class="le-h">Notes</h4><div class="prose">${rich(cur.body,"notes:"+cur.id)}</div></section>`:""}${cur.category==="shop"||cur.stock?stockBlock(cur):""}</div>
@@ -4904,7 +4911,6 @@ document.addEventListener("click",async e=>{
     case"arch":{const f=t.closest('form[data-form="item"]'),x=rec(t.dataset.type,t.dataset.id);if(!x)break;
       if(f){f.dataset.arch=isArch(x)?"0":"1";f.requestSubmit();break}
       if(t.closest(".sheet"))closeSheet();await archSet(t.dataset.type,t.dataset.id,!isArch(x));break}
-    case"noteChip":U.noteChip=t.dataset.v;U.noteReading=false;render();break;
     case"questSt":U.questSt=t.dataset.v;render();break;
     case"thrSt":U.thrSt=t.dataset.v;render();break;
     case"libNew":{const n=libNewFor()||NOTE_NEW.all;openForm(n[0],null,{...n[1]});break}
@@ -5042,7 +5048,7 @@ document.addEventListener("submit",async e=>{
     const old=S[type].find(x=>x.id===id)||{};const{id:_,...keep}=old;
     const arT=f.dataset.arch;delete f.dataset.arch;if(arT)data.archived=arT==="1"?Date.now():0;  // the form's Archive button saves the edits too
     const saved=await save(type,id,{...keep,...data});const adopt=PREP.adding;PREP.adding=null;if(saved&&adopt&&adopt.type===type&&!f.dataset.id)prepAdopt(type,id,adopt.kind);
-    if(!arT&&type==="notes"){U.noteSel=id;if(!U.noteQ){U.arch=isArch({...keep,...data});U.libGrp=noteGroup({...keep,...data});chipShow({...keep,...data})}}    if(type==="maps"){closeSheet();toast("Saved");setTimeout(()=>openMap(id),60)}else{closeSheet();toast(arT==="1"?"Archived. Find it under Archived in its list.":arT?"Back in the Library":"Saved")}}
+    if(!arT&&type==="notes"){U.noteSel=id;if(!U.noteQ){U.arch=isArch({...keep,...data});U.libGrp=noteGroup({...keep,...data})}}    if(type==="maps"){closeSheet();toast("Saved");setTimeout(()=>openMap(id),60)}else{closeSheet();toast(arT==="1"?"Archived. Find it under Archived in its list.":arT?"Back in the Library":"Saved")}}
   if(k==="cal"){const months=document.getElementById("c-months").value.split("\n").map(l=>l.split(",").map(x=>x.trim())).filter(p=>p[0]).map(([n,d,...fl])=>{const mm=n.match(/^(.*?)\s*\((.*)\)\s*$/);const o={name:(mm?mm[1]:n).trim(),days:Math.max(1,num(d)||30)};if(mm&&mm[2])o.sub=mm[2].trim();fl.forEach(f=>{if(/^festival$/i.test(f))o.festival=true;const lp=f.match(/^leap\s+(\d+)(?:\+(\d+))?\s*(.*)$/i);if(lp){o.leapEvery=+lp[1];if(lp[2])o.leapOffset=+lp[2];if(lp[3])o.leapName=lp[3].trim()}});return o});
     const moons=document.getElementById("c-moon").value.split(";").map(x=>x.split(",").map(y=>y.trim())).filter(p=>p[0]&&parseFloat(p[1])>0).map(([n,cy,sh])=>({name:n,cycle:parseFloat(cy),shift:parseFloat(sh)||0}));
     const weekdays=document.getElementById("c-wd").value.split(",").map(s=>s.trim()).filter(Boolean);
@@ -5064,8 +5070,8 @@ document.addEventListener("submit",async e=>{
 });
 
 function route(){let h=location.hash.slice(1);
-  // the Quests page is gone: old links open Notes with the Quests chip on
-  if(h==="quests"){U.libGrp="notes";U.noteChip="quests";U.noteQ="";U.noteReading=false;h="notes";history.replaceState(null,"","#notes")}
+  // the Quests page is gone: old links open the Library's Quests section
+  if(h==="quests"){U.libGrp="quests";U.noteQ="";U.noteReading=false;h="notes";history.replaceState(null,"","#notes")}
   U.tab=TABS.some(t=>t[0]===h)?h:"party";render()}
 window.addEventListener("hashchange",route);
 document.getElementById("tabs").addEventListener("click",()=>{NAV=[]});
