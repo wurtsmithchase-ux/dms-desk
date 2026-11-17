@@ -154,6 +154,7 @@ td .clip{display:block;max-width:320px;color:var(--muted);overflow:hidden;text-o
 .lib-chips{display:flex;flex-wrap:wrap;gap:5px;padding:10px;border-bottom:1px solid var(--line);background:var(--paper)}
 .lib-chips.sub{padding:0 10px 10px;border-bottom:1px solid var(--line)}
 .lib-chips.sub .lib-g{min-height:30px;font-size:13px}
+.lib-lh + .lib-chips.sub{padding-top:8px}
 .lib-chips .lib-g.sub-g[aria-pressed="false"]{background:transparent}
 .lib-arcs{padding:12px 12px 4px;border-bottom:1px solid var(--line)}
 .lib-lh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:12px 12px 6px;border-bottom:1px solid var(--line)}
@@ -2017,7 +2018,7 @@ function navBack(){const prev=NAV.pop();if(prev&&rec(prev.type,prev.id))openEntr
 function backBtn(){const prev=NAV[NAV.length-1];if(!prev)return "";const x=rec(prev.type,prev.id);if(!x)return "";return `<button type="button" class="btn sm navback" data-act="navBack" title="Go back">‹ Back to ${esc(titleOf(prev.type,x)||"previous")}</button>`}
 function openEntry(type,id){
   closeSheet(true);
-  if(type==="notes"){U.noteSel=id;U.noteReading=true;U.noteQ="";U.libGrp=noteGroup(rec("notes",id));chipShow(rec("notes",id));if(location.hash!=="#notes")location.hash="notes";else render();window.scrollTo({top:0})}
+  if(type==="notes"){U.noteSel=id;U.noteReading=true;U.noteQ="";U.arch=isArch(rec("notes",id));U.libGrp=noteGroup(rec("notes",id));chipShow(rec("notes",id));if(location.hash!=="#notes")location.hash="notes";else render();window.scrollTo({top:0})}
   else if(type==="preps"){const x=rec("preps",id);if(!x)return;U.prepSess=num(x.session)||null;U.prepTab="board";if(location.hash!=="#prep")location.hash="prep";else render();window.scrollTo({top:0})}
   else if(type==="scenes"){const s=rec("scenes",id);if(!s)return;goBoard(num(s.session)||null,id)}
   else if(type==="threads"||type==="links"||type==="loot")openForm(type,id);
@@ -3415,9 +3416,9 @@ const GEN={cr:"1",role:"brute",type:"humanoid",dmg:"slashing"};
 
 /* NPCs: the characters whose kind is npc. Stat blocks live in the Bestiary and link from here. */
 function pplItems(){const q=String(U.pplQ||"").trim().toLowerCase();
-  return S.characters.filter(x=>x.kind!=="pc").map(x=>({col:"characters",x}))
+  return S.characters.filter(x=>x.kind!=="pc"&&isArch(x)===!!U.arch).map(x=>({col:"characters",x}))
     .filter(({col,x})=>!q||((x.name||"")+" "+textOf(col,x)+" "+(x.archetype||"")+" "+(x.hook||"")).toLowerCase().includes(q)).sort((a,b)=>(a.x.name||"").localeCompare(b.x.name||""))}
-function vPeople(){
+function vPeople(){if(U.arch&&!S.characters.some(x=>x.kind!=="pc"&&isArch(x)))U.arch=false;
   const list=pplItems();let sel=U.pplSel&&rec(U.pplSel.col,U.pplSel.id)?U.pplSel:null;
   if(!sel||!list.some(i=>i.col===sel.col&&i.x.id===sel.id))sel=list[0]?{col:list[0].col,id:list[0].x.id}:null;U.pplSel=sel;
   // stat blocks are DM-only, so players get the notes tab only
@@ -3425,7 +3426,7 @@ function vPeople(){
   const row=({col,x:r})=>`<button class="nitem" data-act="pplSel" data-col="${col}" data-id="${r.id}" aria-current="${!!sel&&sel.col===col&&sel.id===r.id}"><b>${esc(r.name||"Unnamed")}</b><small>${["NPC",r.archetype||r.cls].filter(Boolean).map(esc).join(" · ")}</small></button>`;
   const left=`<div class="nlist"><div class="ppl-tools"><input class="search" id="pplq" data-in="pplQ" type="search" placeholder="Search NPCs" aria-label="Search NPCs" value="${esc(U.pplQ||"")}">
     <form data-ppladd class="tq dm-only"><input id="ppl-add" placeholder="Add by name" aria-label="Name of a new NPC"><button class="btn sm primary" type="submit">Add</button></form></div>
-    <div class="lib-lh"><h3>NPCs</h3><span>${list.length}</span></div>${list.length?list.map(row).join(""):`<div class="empty">${U.pplQ?"Nothing matches that search.":"No one here yet. Add someone by name."}</div>`}</div>`;
+    <div class="lib-lh"><h3>${U.arch?"Archived NPCs":"NPCs"}</h3><span>${list.length}</span></div>${(n=>n||U.arch?`<div class="lib-chips sub">${archToggle(n,"NPCs")}</div>`:"")(S.characters.filter(x=>x.kind!=="pc"&&isArch(x)).length)}${list.length?list.map(row).join(""):`<div class="empty">${U.pplQ?"Nothing matches that search.":U.arch?"No archived NPCs.":"No one here yet. Add someone by name."}</div>`}</div>`;
   if(!x)return `<div class="notes lib ppl ${U.noteReading?"reading":""}">${left}<div class="empty lib-pick">Pick an NPC to see their notes and stat block.</div></div>`;
   const m=x.mon&&rec("monsters",x.mon);
   const tabs=!dm?"":`<div class="seg ppl-tabs">${[["notes","Notes"],["block","Stat block"],["gen","Quick stat block"]].map(([k,l])=>`<button type="button" data-act="pplTab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join("")}</div>`;
@@ -3445,9 +3446,9 @@ function vPeople(){
       <div class="ppl-gen">${opt("cr",CRS.map(c=>[c,"CR "+c]),"Challenge")}${opt("role",Object.entries(GEN_ROLES),"Role")}${opt("type",GEN_TYPES.map(t=>[t,CAP(t)]),"Type")}${opt("dmg",GEN_DMG.map(t=>[t,CAP(t)]),"Damage")}</div>
       <div class="ppl-acts dm-only"><button type="button" class="btn primary" data-act="genSave">${m?"Save as a new stat block and link it":"Save and link to "+esc(x.name||"this NPC")}</button></div>
       ${statBlock(g)}`}
-  const crumb=esc(["NPC",dm&&x.attitude?CAP(x.attitude):""].filter(Boolean).join(" · "));
+  const crumb=esc(["NPC",dm&&x.attitude?CAP(x.attitude):"",isArch(x)?"Archived":""].filter(Boolean).join(" · "));
   return `<div class="notes lib ppl ${U.noteReading?"reading":""}">${left}<article class="reader lib-entry"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ Back to the list</button></div>
-    <div class="le-head"><div class="le-t"><span class="le-crumb">${crumb}</span><h3 class="t">${esc(x.name||"Unnamed")}</h3></div><span class="dm-only acts-r"><button type="button" class="btn sm" data-act="view" data-type="${sel.col}" data-id="${x.id}">Full page</button><button type="button" class="btn sm" data-act="edit" data-type="${sel.col}" data-id="${x.id}">Edit</button></span></div>
+    <div class="le-head"><div class="le-t"><span class="le-crumb">${crumb}</span><h3 class="t">${esc(x.name||"Unnamed")}</h3></div><span class="dm-only acts-r"><button type="button" class="btn sm" data-act="view" data-type="${sel.col}" data-id="${x.id}">Full page</button><button type="button" class="btn sm" data-act="edit" data-type="${sel.col}" data-id="${x.id}">Edit</button>${moreMenu([archMi(sel.col,x)])}</span></div>
     ${tabs}${body}</article></div>`;
 }
 // one helper for small field changes; project() right after so a quick second tap reads the new values
@@ -3466,10 +3467,10 @@ document.addEventListener("submit",async e=>{const f=e.target.closest("[data-ppl
   const id=uid(),col="characters",ok=await save(col,id,{name:v,kind:"npc",status:"alive"});project();
   if(ok&&rec(col,id)){U.pplSel={col,id};U.pplTab="notes";U.pplQ="";U.noteReading=true}render()});
 /* Party: player characters with their sheet and story, whole-party level, and the party's languages */
-const pcList=()=>S.characters.filter(x=>x.kind==="pc");
+const pcList=()=>S.characters.filter(x=>x.kind==="pc"&&!isArch(x));  // archived heroes have left the party
 const heroLevelSet=()=>[...new Set(pcList().map(p=>num(p.level)||0))].sort((a,b)=>a-b);  // 0 means no level set
-function vHeroes(){
-  const pcs=pcList().sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+function vHeroes(){if(U.arch&&!S.characters.some(x=>x.kind==="pc"&&isArch(x)))U.arch=false;
+  const pcs=(U.arch?S.characters.filter(x=>x.kind==="pc"&&isArch(x)):pcList()).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
   if(!pcs.some(p=>p.id===U.heroSel))U.heroSel=pcs[0]?.id||null;
   const x=pcs.find(p=>p.id===U.heroSel),tab=U.heroTab||"sheet",dm=isDM(),busy=!!U.heroBusy;
   const lv=heroLevelSet(),lvTxt=!pcs.length?"":lv.length===1?(lv[0]?`Level ${lv[0]}`:"No level set"):`Levels ${lv.filter(Boolean).join(", ")}`;
@@ -3479,7 +3480,7 @@ function vHeroes(){
     <div class="hero-lv"><span><span class="label">Whole party</span><b>${lvTxt||"No heroes yet"}</b></span><span class="dm-only hero-lvb"><button type="button" class="btn ${U.lvArm?"sm danger armed":"icon"}" data-act="heroLvl" data-n="-1" aria-label="${U.lvArm?"Yes, every hero down one level":"Every hero down one level"}" ${pcs.length?"":"disabled"} ${busy?'aria-disabled="true"':""}>${U.lvArm?"Yes, all down":"−"}</button><button type="button" class="btn sm" data-act="heroLvl" data-n="1" aria-label="Every hero up one level" ${pcs.length?"":"disabled"} ${busy?'aria-disabled="true"':""}>Level up</button></span></div>
     <label class="scn-f"><span class="label">Party languages</span><input class="search" id="party-lang" value="${esc(langs)}" placeholder="e.g. Common, Elvish, Dwarvish" ${dm?'aria-describedby="party-lang-h"':"readonly"}></label>${dm?`<small id="party-lang-h" class="muted">Saves when you leave the box. The Session Table cheat sheet shows it.</small>`:""}
     <form data-heroadd class="tq dm-only"><input id="hero-add" placeholder="Add a hero by name" aria-label="Name of a new hero"><button class="btn sm primary" type="submit">Add</button></form></div>
-    <div class="lib-lh"><h3>The Party</h3><span>${pcs.length}</span></div>${pcs.length?pcs.map(row).join(""):`<div class="empty">No heroes yet. Add one by name.</div>`}</div>`;
+    <div class="lib-lh"><h3>${U.arch?"Archived heroes":"The Party"}</h3><span>${pcs.length}</span></div>${(n=>n||U.arch?`<div class="lib-chips sub">${archToggle(n,"The Party")}</div>`:"")(S.characters.filter(x=>x.kind==="pc"&&isArch(x)).length)}${pcs.length?pcs.map(row).join(""):`<div class="empty">${U.arch?"No archived heroes.":"No heroes yet. Add one by name."}</div>`}</div>`;
   if(!x)return `<div class="notes lib ppl hero ${U.noteReading?"reading":""}">${left}<div class="empty lib-pick">Pick a hero to see their sheet and story.</div></div>`;
   const max=x.hpMax||0,hp=x.hp??max;
   const stats=`<div class="hero-stats"><div aria-label="Armor class ${esc(x.ac??"not set")}"><b aria-hidden="true">${esc(x.ac??"–")}</b><span aria-hidden="true">AC</span></div><div aria-label="${max?`Hit points ${esc(hp)} of ${esc(max)}`:"Hit points not set"}"><b aria-hidden="true">${esc(max?hp:"–")}</b><span aria-hidden="true">HP${max?` / ${esc(max)}`:""}</span></div><div aria-label="Level ${esc(x.level||"not set")}"><b aria-hidden="true">${esc(x.level||"–")}</b><span aria-hidden="true">Level</span></div></div>${passiveLine(x)}`;
@@ -3493,7 +3494,7 @@ function vHeroes(){
       <section><h4 class="le-h">Personal arcs</h4>${arcs.length?arcs.map(q=>{const bs=beatList(q),d=bs.filter(b=>b.done).length;return `<button class="pb-row" data-act="open" data-type="quests" data-id="${q.id}"><b>${esc(q.title||"Untitled quest")}</b><small>${esc(QSTAT[q.status]||q.status||"")}${bs.length?` · ${d} of ${bs.length} story beats`:""}</small></button>`}).join(""):`<p class="vempty">No quests set as this hero's personal arc. Set "Personal arc of" on a quest.</p>`}</section></div>
       <div class="le-side">${backlinkBlock("characters",x.id)}</div></div>`}
   return `<div class="notes lib ppl hero ${U.noteReading?"reading":""}">${left}<article class="reader lib-entry"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ Back to the list</button></div>
-    <div class="le-head"><div class="le-t"><span class="le-crumb">${esc(["Player character",x.player?"Played by "+x.player:""].filter(Boolean).join(" · "))}</span><h3 class="t">${esc(x.name||"Unnamed")}</h3><span class="pb-sub">${esc([x.race,x.cls].filter(Boolean).join(" · "))}</span></div><span class="dm-only acts-r"><button type="button" class="btn sm" data-act="view" data-type="characters" data-id="${x.id}">Full page</button><button type="button" class="btn sm" data-act="edit" data-type="characters" data-id="${x.id}">Edit</button></span></div>
+    <div class="le-head"><div class="le-t"><span class="le-crumb">${esc(["Player character",x.player?"Played by "+x.player:"",isArch(x)?"Archived":""].filter(Boolean).join(" · "))}</span><h3 class="t">${esc(x.name||"Unnamed")}</h3><span class="pb-sub">${esc([x.race,x.cls].filter(Boolean).join(" · "))}</span></div><span class="dm-only acts-r"><button type="button" class="btn sm" data-act="view" data-type="characters" data-id="${x.id}">Full page</button><button type="button" class="btn sm" data-act="edit" data-type="characters" data-id="${x.id}">Edit</button>${moreMenu([archMi("characters",x)])}</span></div>
     ${stats}${tabs}${body}</article></div>`;
 }
 async function heroAct(a,t){if(a!=="heroLvl")U.lvArm=false;
@@ -3531,7 +3532,7 @@ function openMonster(id){
   const m=rec("monsters",id);if(!m)return;
   showSheet(`<div class="sheet wide" role="dialog" aria-label="${esc(m.name||"Monster")}">${backBtn()}${statBlock(m)}
     ${backlinkBlock("monsters",id)}
-    <div class="foot"><span class="grow">${moreMenu([PINNABLE.has("monsters")&&isDM()?mi("keepOpen",isPinned("monsters",id)?"Kept open ✓":"Keep open beside other pages",`data-type="monsters" data-id="${id}"`):"",mi("hist","Edit history",`data-type="monsters" data-id="${id}"`)],{up:true,sm:false})}</span><button type="button" class="btn" data-act="close">Close</button><button type="button" class="btn primary" data-act="edit" data-type="monsters" data-id="${id}">Edit</button></div></div>`,true);
+    <div class="foot"><span class="grow">${moreMenu([PINNABLE.has("monsters")&&isDM()?mi("keepOpen",isPinned("monsters",id)?"Kept open ✓":"Keep open beside other pages",`data-type="monsters" data-id="${id}"`):"",mi("hist","Edit history",`data-type="monsters" data-id="${id}"`),archMi("monsters",m)],{up:true,sm:false})}</span><button type="button" class="btn" data-act="close">Close</button><button type="button" class="btn primary" data-act="edit" data-type="monsters" data-id="${id}">Edit</button></div></div>`,true);
   OPEN={kind:"monster",id};
 }
 /* ---------- calendar link ---------- */
@@ -4471,17 +4472,25 @@ const chipOf=({col,x})=>col==="quests"?"quests":col==="threads"?"threads":Object
 const NOTE_NEW={all:["notes",{category:"lore"},"New note"],quests:["quests",{status:"active"},"New quest"],threads:["threads",{status:"open"},"New thread"],hooks:["notes",{category:"plot"},"New plot hook"],locations:["notes",{category:"location"},"New location"],shops:["notes",{category:"shop"},"New shop or inn"],factions:["notes",{category:"faction"},"New faction"],lore:["notes",{category:"lore"},"New lore note"],rules:["notes",{category:"rules"},"New ruling"],other:["notes",{category:"other"},"New note"]};
 const LIB_NEW={notes:NOTE_NEW.all,party:["characters",{kind:"pc",status:"alive"},"New character"],npcs:["characters",{kind:"npc",status:"alive"},"New NPC"],bestiary:["monsters",{},"New stat block"],handouts:["notes",{category:"handout"},"New handout"],items:["notes",{category:"item"},"New magic item"],tables:["tables",{},"New roll table"]};
 const LIB_COLS=["notes","characters","quests","threads","monsters","scenes","tables"];
-// everything in the Notes group, before any chip is applied
-const allNoteItems=()=>[...S.notes.filter(n=>noteGroup(n)==="notes").map(x=>({col:"notes",x})),...S.quests.map(x=>({col:"quests",x})),...S.threads.map(x=>({col:"threads",x}))];
+/* Archive: any Library entry can be archived. It leaves its group's list (and counts) but stays searchable,
+   links still open it, and each list has an Archived toggle to see and restore them. */
+const ARCH_COLS=new Set(["notes","characters","quests","threads","monsters","tables"]);
+const isArch=x=>!!(x&&x.archived);
+const archMi=(col,x)=>ARCH_COLS.has(col)&&x?mi("arch",isArch(x)?"Unarchive":"Archive",`data-type="${col}" data-id="${x.id}"`):"";
+const archToggle=(n,lbl)=>n||U.arch?`<button type="button" class="lib-g sub-g lib-arch" data-act="libArch" aria-pressed="${!!U.arch}" title="${U.arch?"Back to the current entries":"Show archived entries"}">${U.arch?"‹ "+esc(lbl):"Archived"}<span class="n">${U.arch?"":n}</span></button>`:"";
+async function archSet(col,id,on){const x=rec(col,id);if(!x)return;const ok=await patchRec(col,id,{archived:on?Date.now():0});
+  if(ok)toast(on?`Archived ${titleOf(col,x)||"entry"}. Find it under Archived in its list.`:`${titleOf(col,x)||"Entry"} is back in the Library`);render()}
+// everything in the Notes group, before any chip is applied; ar picks the archived entries instead
+const allNoteItems=(ar=false)=>[...S.notes.filter(n=>noteGroup(n)==="notes").map(x=>({col:"notes",x})),...S.quests.map(x=>({col:"quests",x})),...S.threads.map(x=>({col:"threads",x}))].filter(i=>isArch(i.x)===ar);
 const chipCounts=()=>{const o={all:0};allNoteItems().forEach(i=>{o.all++;const k=chipOf(i);o[k]=(o[k]||0)+1});return o};
 // the chip in use; falls back to All when it has gone empty
 function curChip(){const n=chipCounts();if(U.noteChip!=="all"&&!n[U.noteChip])U.noteChip="all";return U.noteChip}
 // after opening or saving a note, drop to All if the current chip would hide it
 const chipShow=n=>{if(U.noteChip!=="all"&&chipOf({col:"notes",x:n})!==U.noteChip)U.noteChip="all"};
 const questStatus=q=>q.status||"rumor";
-function libItems(g){const T=(col,f)=>(S[col]||[]).filter(f||(()=>true)).map(x=>({col,x})),N=k=>T("notes",n=>noteGroup(n)===k);
+function libItems(g,ar=false){const T=(col,f)=>(S[col]||[]).filter(x=>isArch(x)===ar&&(!f||f(x))).map(x=>({col,x})),N=k=>T("notes",n=>noteGroup(n)===k);
   switch(g){
-    case"notes":return allNoteItems();
+    case"notes":return allNoteItems(ar);
     case"party":return T("characters",x=>x.kind==="pc");
     case"npcs":return T("characters",x=>x.kind!=="pc");
     case"bestiary":return [...T("monsters"),...N("bestiary")];
@@ -4500,10 +4509,11 @@ function hoPrepBtn(h){const n=boardN(),on=prepRec(n)[prepListOf(h)].includes(h.i
   return `<button class="btn sm ${on?"":"primary"}" data-act="hoToPrep" data-id="${h.id}" ${on?"disabled":""}>${on?`On Session ${n} ✓`:"Add to Prep Board"}</button>`}
 function vNotes(c){
   const q=String(U.noteQ||"").trim().toLowerCase();if(!LIB_GROUPS.some(g=>g[0]===U.libGrp))U.libGrp="notes";
-  const g=U.libGrp,chip=g==="notes"?curChip():"all",alpha=["party","npcs","bestiary","handouts","items","tables"].includes(g);
+  if(U.arch&&!q&&!libItems(U.libGrp,true).length)U.arch=false;  // the last archived entry came back: show the current ones
+  const g=U.libGrp,ar=!q&&!!U.arch,chip=g==="notes"&&!ar?curChip():"all",alpha=["party","npcs","bestiary","handouts","items","tables"].includes(g);
   const stOf=x=>x.status==="resolved"?"resolved":"open";
   const inChip=i=>g!=="notes"||((chip==="all"||chipOf(i)===chip)&&(chip!=="quests"||U.questSt==="all"||questStatus(i.x)===U.questSt)&&(chip!=="threads"||U.thrSt==="all"||stOf(i.x)===U.thrSt));
-  const list=(q?LIB_COLS.flatMap(col=>(S[col]||[]).map(x=>({col,x}))).filter(({col,x})=>((titleOf(col,x)||"")+" "+textOf(col,x)).toLowerCase().includes(q)):libItems(g).filter(inChip))
+  const list=(q?LIB_COLS.flatMap(col=>(S[col]||[]).map(x=>({col,x}))).filter(({col,x})=>((titleOf(col,x)||"")+" "+textOf(col,x)).toLowerCase().includes(q)):libItems(g,ar).filter(inChip))
     .sort((a,b)=>alpha&&!q?String(titleOf(a.col,a.x)||"").localeCompare(String(titleOf(b.col,b.x)||"")):(b.x.pinned?1:0)-(a.x.pinned?1:0)||(b.x.session||0)-(a.x.session||0)||(b.x.updated||0)-(a.x.updated||0));
   const notesIn=list.filter(i=>i.col==="notes");
   if(!notesIn.find(i=>i.x.id===U.noteSel))U.noteSel=notesIn[0]?.x.id||null;
@@ -4521,18 +4531,19 @@ function vNotes(c){
   const cnts=chipCounts(),chipBtn=(k,l,n,act,cls,on)=>`<button type="button" class="lib-g ${cls||""}" data-act="${act}" data-v="${k}" aria-pressed="${on}">${esc(l)}<span class="n">${n}</span></button>`;
   const qs=S.quests.filter(x=>true),stCount=(arr,f)=>arr.filter(f).length;
   let chips="";
-  if(g==="notes"&&!q){
+  if(g==="notes"&&!q&&!ar){
     chips=`<div class="lib-chips" role="group" aria-label="Filter notes">${NOTE_CHIPS.filter(([k])=>k==="all"||cnts[k]).map(([k,l])=>chipBtn(k,l,cnts[k]||0,"noteChip","",chip===k)).join("")}</div>`;
     if(chip==="quests")chips+=`<div class="lib-chips sub" role="group" aria-label="Filter quests by status">${[["all","All"],...Object.entries(QSTAT)].map(([k,l])=>chipBtn(k,l,k==="all"?qs.length:stCount(qs,x=>questStatus(x)===k),"questSt","sub-g",U.questSt===k)).join("")}</div>`;
     if(chip==="threads")chips+=`<div class="lib-chips sub" role="group" aria-label="Filter threads by status">${[["all","All"],["open","Open"],["resolved","Resolved"]].map(([k,l])=>chipBtn(k,l,k==="all"?S.threads.length:stCount(S.threads,x=>stOf(x)===k),"thrSt","sub-g",U.thrSt===k)).join("")}</div>`}
-  const arcHtml=g==="notes"&&!q&&chip==="quests"?arcsBlock():"",arcs=arcHtml?`<div class="lib-arcs">${arcHtml}</div>`:"";
+  const arcHtml=g==="notes"&&!q&&!ar&&chip==="quests"?arcsBlock():"",arcs=arcHtml?`<div class="lib-arcs">${arcHtml}</div>`:"";
   const nb=(col,x)=>{const b=libBlurb(col,x);return b?`<span class="nb">${esc(b)}</span>`:""};
-  const row=({col,x})=>col==="notes"?`<button class="nitem" data-act="pick" data-id="${x.id}" aria-current="${x.id===U.noteSel}"><b>${x.pinned?'<span class="pill acc">Pinned</span> ':""}${esc(x.title||"Untitled")}</b><small>${esc(libTag(col,x))}${x.session?` · Session ${x.session}`:""}${x.ig?` · ${esc(shortDate(c,x.ig))}`:""}</small>${nb(col,x)}</button>`
-    :`<button class="nitem" data-act="open" data-type="${col}" data-id="${x.id}"><b>${esc(titleOf(col,x)||"Untitled")}</b><small>${esc(libTag(col,x))}</small>${nb(col,x)}</button>`;
-  h+=`<div class="notes lib ${U.noteReading?"reading":""}"><div class="nlist">${groups}${chips}${arcs}<div class="lib-lh"><h3>${q?"Search results":esc(chipName||gName)}</h3><span>${list.length}</span></div>${more?`<div class="lib-more">${more}</div>`:""}${list.length?list.map(row).join(""):`<div class="empty">${q?"Nothing matches that search.":`Nothing in ${esc(chipName||gName)} yet.`}</div>`}</div>`;
+  const archP=x=>q&&isArch(x)?'<span class="pill">Archived</span> ':"";
+  const row=({col,x})=>col==="notes"?`<button class="nitem" data-act="pick" data-id="${x.id}" aria-current="${x.id===U.noteSel}"><b>${archP(x)}${x.pinned&&!isArch(x)?'<span class="pill acc">Pinned</span> ':""}${esc(x.title||"Untitled")}</b><small>${esc(libTag(col,x))}${x.session?` · Session ${x.session}`:""}${x.ig?` · ${esc(shortDate(c,x.ig))}`:""}</small>${nb(col,x)}</button>`
+    :`<button class="nitem" data-act="open" data-type="${col}" data-id="${x.id}"><b>${archP(x)}${esc(titleOf(col,x)||"Untitled")}</b><small>${esc(libTag(col,x))}</small>${nb(col,x)}</button>`;
+  h+=`<div class="notes lib ${U.noteReading?"reading":""}"><div class="nlist">${groups}${chips}${arcs}<div class="lib-lh"><h3>${q?"Search results":ar?"Archived "+esc(gName):esc(chipName||gName)}</h3><span>${list.length}</span></div>${q?"":`<div class="lib-chips sub">${archToggle(libItems(g,true).length,gName)}</div>`.replace('<div class="lib-chips sub"></div>',"")}${more&&!ar?`<div class="lib-more">${more}</div>`:""}${list.length?list.map(row).join(""):`<div class="empty">${q?"Nothing matches that search.":ar?`Nothing archived in ${esc(gName)}.`:`Nothing in ${esc(chipName||gName)} yet.`}</div>`}</div>`;
   const fl=[cur&&cur.session&&["Session",cur.session],cur&&cur.ig&&["In-game date",fmtDate(c,cur.ig)],cur&&cur.played&&["Played",new Date(cur.played+"T12:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})]].filter(Boolean);
-  h+=cur?`<article class="reader lib-entry"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ Back to the list</button>${backBtn()}</div><div class="le-head"><div class="le-t"><span class="le-crumb">${esc((LIB_GROUPS.find(x=>x[0]===noteGroup(cur))||[])[1]||"")} · ${esc(NOTE_CATS[cur.category]||"Note")}</span>
-    <h3 class="t">${esc(cur.title||"Untitled")}</h3></div><span class="dm-only acts-r">${cur.category==="handout"||cur.category==="item"?hoPrepBtn(cur):""}<button class="btn sm" data-act="edit" data-type="notes" data-id="${cur.id}">Edit</button>${moreMenu([mi("copyR20","Copy for Roll20",`data-type="notes" data-id="${cur.id}"`),mi("pin",cur.pinned?"Unpin from the top":"Pin to the top",`data-id="${cur.id}"`),mi("keepOpen",isPinned("notes",cur.id)?"Kept open ✓":"Keep open beside other pages",`data-type="notes" data-id="${cur.id}"`)])}</span></div>
+  h+=cur?`<article class="reader lib-entry"><div class="reader-nav"><button class="btn sm back" data-act="noteBack">‹ Back to the list</button>${backBtn()}</div><div class="le-head"><div class="le-t"><span class="le-crumb">${esc((LIB_GROUPS.find(x=>x[0]===noteGroup(cur))||[])[1]||"")} · ${esc(NOTE_CATS[cur.category]||"Note")}${isArch(cur)?" · Archived":""}</span>
+    <h3 class="t">${esc(cur.title||"Untitled")}</h3></div><span class="dm-only acts-r">${cur.category==="handout"||cur.category==="item"?hoPrepBtn(cur):""}<button class="btn sm" data-act="edit" data-type="notes" data-id="${cur.id}">Edit</button>${moreMenu([mi("copyR20","Copy for Roll20",`data-type="notes" data-id="${cur.id}"`),mi("pin",cur.pinned?"Unpin from the top":"Pin to the top",`data-id="${cur.id}"`),mi("keepOpen",isPinned("notes",cur.id)?"Kept open ✓":"Keep open beside other pages",`data-type="notes" data-id="${cur.id}"`),archMi("notes",cur)])}</span></div>
     ${fl.length?`<dl class="le-fields">${fl.map(([l,v])=>`<div><dt>${l}</dt><dd>${esc(String(v))}</dd></div>`).join("")}</dl>`:""}
     <div class="le-cols"><div class="le-main">${placeBlock(cur)}${cur.img?`<img class="note-img" src="${esc(imgUrl(cur.img))}" alt="">`:""}${cur.category==="faction"?facBlock(cur):""}${cur.body||cur.category!=="shop"?`<section><h4 class="le-h">Notes</h4><div class="prose">${rich(cur.body,"notes:"+cur.id)}</div></section>`:""}${cur.category==="shop"||cur.stock?stockBlock(cur):""}</div>
     <div class="le-side">${backlinkBlock("notes",cur.id)}${bsEmbedHtml("notes",cur.id)}</div></div></article>`:`<div class="empty lib-pick">Notes open here. Characters, quests, stat blocks and the rest open in their own page.</div>`;
@@ -4643,7 +4654,7 @@ function openForm(type,id,preset){
     return `<${tag} class="${cls}"${hid}><span class="label"${type==="notes"&&k==="body"?' id="f-body-l"':""}>${type==="notes"&&k==="body"&&isHand?"Handout text":l}</span>${input}${hint&&tag==="label"?`<span class="hint">${hint}</span>`:""}</${tag}>`;
   }).join("")+"";
   showSheet(`<form class="sheet" data-form="item" data-type="${type}" data-id="${id||""}"><h2>${row?"Edit":"New"} ${F.title.toLowerCase()}</h2><div class="fields">${fs}</div>
-    <div class="foot"><span class="grow">${row?`<button type="button" class="btn danger" data-act="del" data-type="${type}" data-id="${id}">Delete</button>${NO_HISTORY.has(type)?"":` <button type="button" class="btn" data-act="hist" data-type="${type}" data-id="${id}">History</button>`}`:""}</span><button type="button" class="btn" data-act="close">Cancel</button><button class="btn primary" type="submit">Save</button></div></form>`);
+    <div class="foot"><span class="grow">${row?`<button type="button" class="btn danger" data-act="del" data-type="${type}" data-id="${id}">Delete</button>${NO_HISTORY.has(type)?"":` <button type="button" class="btn" data-act="hist" data-type="${type}" data-id="${id}">History</button>`}${ARCH_COLS.has(type)?` <button type="button" class="btn" data-act="arch" data-type="${type}" data-id="${id}" title="${isArch(row)?"Save and put it back in the Library":"Save and move it out of the Library lists"}">${isArch(row)?"Unarchive":"Archive"}</button>`:""}`:""}</span><button type="button" class="btn" data-act="close">Cancel</button><button class="btn primary" type="submit">Save</button></div></form>`);
 }
 function readForm(type){
   const c=cal(),o={};
@@ -4717,8 +4728,9 @@ function openView(type,id){
       <div class="taper"></div><div class="props">${propAll("Date",fmtDate(c,dt))}${propAll("Kind",EVKIND[x.kind]||"Event")}${propAll("Repeats",x.yearly?"Every year":"No")}${propAll("Played on",realDatesText(x.realDates))}</div>
       ${notesBlock(x.notes)}</div>`;
   }
+  if(isArch(x))body=body.replace(/<\/h2>/,` <span class="pill">Archived</span></h2>`);
   showSheet(`<div class="sheet" role="dialog" aria-label="Details">${backBtn()}${body}
-    <div class="foot"><span class="grow">${isDM()?moreMenu([PINNABLE.has(type)?mi("keepOpen",isPinned(type,id)?"Kept open ✓":"Keep open beside other pages",`data-type="${type}" data-id="${id}"`):"",mi("copyText","Copy as text",`data-type="${type}" data-id="${id}"`)],{up:true,sm:false}):""}</span><button type="button" class="btn" data-act="close">Close</button><button type="button" class="btn primary dm-only" data-act="edit" data-type="${type}" data-id="${id}">Edit</button></div></div>`,true);
+    <div class="foot"><span class="grow">${isDM()?moreMenu([PINNABLE.has(type)?mi("keepOpen",isPinned(type,id)?"Kept open ✓":"Keep open beside other pages",`data-type="${type}" data-id="${id}"`):"",mi("copyText","Copy as text",`data-type="${type}" data-id="${id}"`),archMi(type,x)],{up:true,sm:false}):""}</span><button type="button" class="btn" data-act="close">Close</button><button type="button" class="btn primary dm-only" data-act="edit" data-type="${type}" data-id="${id}">Edit</button></div></div>`,true);
   OPEN={kind:"view",type,id};
 }
 function applyFmt(el,f){
@@ -4884,10 +4896,14 @@ document.addEventListener("click",async e=>{
       if(t.classList.contains("day")&&isPhone()){U.calSel={y:+t.dataset.y,m:+t.dataset.m,d:+t.dataset.d};render();break}openForm("events",null,{y:+t.dataset.y,m:+t.dataset.m,d:+t.dataset.d,kind:"event"});break;
     case"del":if(!t.classList.contains("armed")){t.classList.add("armed");t.dataset.label="Delete";t.textContent="Confirm delete";return}
       await remove(t.dataset.type,t.dataset.id);closeSheet();toast("Deleted");break;
-    case"nav":navGo(t.dataset.v);break;
+    case"nav":U.arch=false;navGo(t.dataset.v);break;
     case"navToggle":navToggle();break;
     case"charFilter":U.charFilter=t.dataset.v;render();break;
-    case"libGrp":U.libGrp=t.dataset.v;U.noteQ="";U.noteReading=false;render();break;
+    case"libGrp":U.libGrp=t.dataset.v;U.noteQ="";U.noteReading=false;U.arch=false;render();break;
+    case"libArch":U.arch=!U.arch;U.noteReading=false;render();break;
+    case"arch":{const f=t.closest('form[data-form="item"]'),x=rec(t.dataset.type,t.dataset.id);if(!x)break;
+      if(f){f.dataset.arch=isArch(x)?"0":"1";f.requestSubmit();break}
+      if(t.closest(".sheet"))closeSheet();await archSet(t.dataset.type,t.dataset.id,!isArch(x));break}
     case"noteChip":U.noteChip=t.dataset.v;U.noteReading=false;render();break;
     case"questSt":U.questSt=t.dataset.v;render();break;
     case"thrSt":U.thrSt=t.dataset.v;render();break;
@@ -5024,8 +5040,9 @@ document.addEventListener("submit",async e=>{
     else if(type==="threads"){if(!data.text){toast("Describe the thread.");return}}
     else if(!data.title&&!data.name){toast(type==="characters"||type==="loot"?"Give it a name.":"Give it a title.");return}
     const old=S[type].find(x=>x.id===id)||{};const{id:_,...keep}=old;
+    const arT=f.dataset.arch;delete f.dataset.arch;if(arT)data.archived=arT==="1"?Date.now():0;  // the form's Archive button saves the edits too
     const saved=await save(type,id,{...keep,...data});const adopt=PREP.adding;PREP.adding=null;if(saved&&adopt&&adopt.type===type&&!f.dataset.id)prepAdopt(type,id,adopt.kind);
-    if(type==="notes"){U.noteSel=id;if(!U.noteQ){U.libGrp=noteGroup({...keep,...data});chipShow({...keep,...data})}}    if(type==="maps"){closeSheet();toast("Saved");setTimeout(()=>openMap(id),60)}else{closeSheet();toast("Saved")}}
+    if(!arT&&type==="notes"){U.noteSel=id;if(!U.noteQ){U.arch=isArch({...keep,...data});U.libGrp=noteGroup({...keep,...data});chipShow({...keep,...data})}}    if(type==="maps"){closeSheet();toast("Saved");setTimeout(()=>openMap(id),60)}else{closeSheet();toast(arT==="1"?"Archived. Find it under Archived in its list.":arT?"Back in the Library":"Saved")}}
   if(k==="cal"){const months=document.getElementById("c-months").value.split("\n").map(l=>l.split(",").map(x=>x.trim())).filter(p=>p[0]).map(([n,d,...fl])=>{const mm=n.match(/^(.*?)\s*\((.*)\)\s*$/);const o={name:(mm?mm[1]:n).trim(),days:Math.max(1,num(d)||30)};if(mm&&mm[2])o.sub=mm[2].trim();fl.forEach(f=>{if(/^festival$/i.test(f))o.festival=true;const lp=f.match(/^leap\s+(\d+)(?:\+(\d+))?\s*(.*)$/i);if(lp){o.leapEvery=+lp[1];if(lp[2])o.leapOffset=+lp[2];if(lp[3])o.leapName=lp[3].trim()}});return o});
     const moons=document.getElementById("c-moon").value.split(";").map(x=>x.split(",").map(y=>y.trim())).filter(p=>p[0]&&parseFloat(p[1])>0).map(([n,cy,sh])=>({name:n,cycle:parseFloat(cy),shift:parseFloat(sh)||0}));
     const weekdays=document.getElementById("c-wd").value.split(",").map(s=>s.trim()).filter(Boolean);
