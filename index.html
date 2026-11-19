@@ -379,7 +379,6 @@ textarea.scn-box-t{resize:none;overflow:hidden;min-height:96px}
 .sx-att button{flex:1 1 0;min-width:56px;min-height:36px;border:1px solid #b08e52;border-radius:3px;background:#efe0be;color:#2a1b10;font:400 13px var(--sc);cursor:pointer}
 .sx-att button[aria-pressed="true"]{background:var(--accent);border-color:#5e140b;color:#f6e8c6}
 .sx-unpin{border:1px solid #b08e52;border-radius:999px;background:#efe0be;color:#5e4630;font-size:13px;padding:2px 10px;cursor:pointer;min-height:28px}
-.sx-other{display:flex;flex-wrap:wrap;gap:6px}
 .sx-box{background:#241811;border:1px solid #5a4220;border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:8px;color:#ead9b5}
 .sx-bh{font:400 19px var(--sc);color:var(--gold)}
 .sx-bhr{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.sx-bhr small{font-size:13px;font-style:italic;color:#b5a07e}
@@ -3016,7 +3015,8 @@ const stRefreshResults=()=>{const r=document.getElementById("sx-results");if(r)r
 const stLogItems=n=>noteLines(rcNotesVal(n)).slice(-60).reverse().map(l=>{const s=l.replace(/^-\s*/,""),m=s.match(/^\[([^\]]+)\]\s*(.*)$/);return m&&/\d/.test(m[1])?{t:m[1],x:m[2]}:{t:"",x:s}});
 const stLogHtml=n=>{const it=stLogItems(n);return it.length?it.map(o=>`<li><span class="sx-lt">${esc(o.t)}</span><span>${esc(o.x)}</span></li>`).join(""):`<li class="vempty">Nothing logged yet. It goes into this session's notes for the recap.</li>`};
 function stMoon(){const c=cal(),mn=(c.moons||[]).find(x=>x&&x.cycle);if(!mn)return "";const st=moonStep(mn,toIdx(c,c.today));return `<span class="sx-moon" role="img" aria-label="${esc(mn.name)}: ${MOON_NAMES[st]}">${MOON_ICONS[st]}</span>`}
-function stHere(who){const pl=who.map(w=>w.col==="notes"&&rec("notes",w.id)).find(x=>x&&["location","shop"].includes(x.category));return pl?pl.title:""}
+// where the party is, for Travel: the first named Fantastic Location on tonight's Prep Board
+function stHere(pd){const l=pd.locations.find(l=>l.name.trim());return l?l.name.trim():""}
 function stImprov(k){const pcs=S.characters.filter(x=>x.kind==="pc"&&x.status!=="dead"),c=cal(),n=rcSession();
   if(k==="npc")return{kind:"Quick NPC",title:orPick(OR_NAMES),detail:`Species: ${orPick(OR_RACES)}\nDefining feature: ${orPick(OR_FEATURES)}\nQuirk: ${orPick(OR_QUIRKS)}\nWants: ${orPick(OR_WANTS)}`};
   if(k==="rumor")return{kind:"Rumor",title:"Overheard",detail:orPick(OR_RUMORS)};
@@ -3098,13 +3098,11 @@ function renderSession(el){
       <div class="sx-tags">${ST_TAGS.map(t=>`<button type="button" data-act="stTag" data-v="${t}" aria-pressed="${ST.tag===t}">${t}</button>`).join("")}<small>Time is stamped for you. Loot also goes to the recap.</small></div>
       <ul class="sx-log">${stLogHtml(n)}</ul></section></nav>`;
   // ---- the prep panels: Scenes, Clues, Locations and NPCs, then one column stacking Monsters, Magic Items and Handouts
-  const seen=new Set(),whoAll=[];scenes.forEach(s=>s.who.forEach(w=>{const k=w.col+":"+w.id;if(!seen.has(k)){seen.add(k);whoAll.push(w)}}));
   const pinned=(col,id)=>ST.pins.some(p=>p.col===col&&p.id===id);
   const gather=(col,ids)=>{const out=[],had=new Set();for(const id of ids){if(had.has(id))continue;had.add(id);const x=rec(col,id);if(x&&!(col==="characters"&&x.kind==="pc"))out.push({x,pin:pinned(col,id)})}return out};
-  const ppl=gather("characters",[...pd.npcs,...whoAll.filter(w=>w.col==="characters").map(w=>w.id),...ST.pins.filter(p=>p.col==="characters").map(p=>p.id)]);
-  const foes=gather("monsters",[...pd.monsters,...whoAll.filter(w=>w.col==="monsters").map(w=>w.id),...ST.pins.filter(p=>p.col==="monsters").map(p=>p.id)]);
-  const other=whoAll.filter(w=>!["characters","monsters"].includes(w.col)).map(w=>({w,x:rec(w.col,w.id)})).filter(o=>o.x);
-  const pins=ST.pins.filter(p=>!["characters","monsters"].includes(p.col)).map(p=>({p,x:rec(p.col,p.id)})).filter(o=>o.x&&!other.some(w=>w.w.col===o.p.col&&w.w.id===o.p.id));
+  const ppl=gather("characters",[...pd.npcs,...ST.pins.filter(p=>p.col==="characters").map(p=>p.id)]);
+  const foes=gather("monsters",[...pd.monsters,...ST.pins.filter(p=>p.col==="monsters").map(p=>p.id)]);
+  const pins=ST.pins.filter(p=>!["characters","monsters"].includes(p.col)).map(p=>({p,x:rec(p.col,p.id)})).filter(o=>o.x);
   const sessClues=prepClues(pn);
   const unpin=(col,x)=>`<button type="button" class="sx-unpin" data-act="stPin" data-col="${col}" data-id="${x.id}" aria-label="Unpin ${esc(titleOf(col,x)||"")}">Pinned ×</button>`;
   const clue=(k,i)=>!String(k.t||"").trim()?"":`<button type="button" class="sx-clue" data-act="stClue" data-i="${i}" aria-pressed="${!!k.found}"><span class="sx-dot" aria-hidden="true"></span><span>${esc(k.t)}</span>${k.found?`<span class="sx-rev">revealed</span>`:""}</button>`;
@@ -3128,8 +3126,7 @@ function renderSession(el){
   const col2=`<main class="sx-pgrid" aria-label="Tonight's prep" style="${stLayoutCss(L)}">
     ${pan("scenes",0,"Scenes",scenes.length?`${doneN} of ${scenes.length} done`:"",scenes.length?shown.map(scBlock).join(""):empty("No scenes for tonight yet."))}
     ${pan("clues",1,"Secrets &amp; Clues",sessClues.length?`${sessClues.filter(k=>k.found).length} of ${sessClues.length} revealed`:"",sessClues.map(clue).join("")||empty("No secrets or clues for this session."))}
-    ${pan("locations",2,"Fantastic Locations","",(locs.map(l=>`<div class="sx-card"><b class="sx-cn">${esc(l.name||"Unnamed place")}</b>${l.desc.filter(d=>d.trim()).map(d=>`<span>• ${esc(d)}</span>`).join("")}</div>`).join("")
-      +(other.length?`<div class="sx-other">${other.map(({w,x})=>`<button type="button" class="chip" data-act="stEntry" data-col="${esc(w.col)}" data-id="${esc(x.id)}">${esc(titleOf(w.col,x)||"Untitled")}</button>`).join("")}</div>`:""))||empty("No locations for this session."))}
+    ${pan("locations",2,"Fantastic Locations","",locs.map(l=>`<div class="sx-card"><b class="sx-cn">${esc(l.name||"Unnamed place")}</b>${l.desc.filter(d=>d.trim()).map(d=>`<span>• ${esc(d)}</span>`).join("")}</div>`).join("")||empty("No locations for this session."))}
     ${pan("npcs",3,"Important NPCs","",(pins.map(pinCard).join("")+ppl.map(npcCard).join(""))||empty("Nobody yet. Add NPCs on the Prep Board, or search above and pin someone."))}
     ${stack(4,"Monsters, magic items and handouts",[
       ["monsters","Relevant Monsters",foes.length||"",foes.map(foeCard).join("")||empty("No monsters for this session.")],
@@ -3138,7 +3135,7 @@ function renderSession(el){
     ${W?[0,1,2,3].map(i=>split("cols"+i,`Resize panel ${i+1} and panel ${i+2}`,`grid-row:1;grid-column:${2*i+2}`)).join(""):split("cols0","Resize the first and second columns","grid-row:1/4;grid-column:2")+split("cols1","Resize the second and third columns","grid-row:1/4;grid-column:4")+split("rows0","Resize the top and bottom rows","grid-row:2;grid-column:1/4")}</main>`;
   // ---- rules rail (left-most): rules, then the Oracle and Travel sharing one box
   const RC=ST_RCATS();if(!RC[ST.rcat])ST.rcat="Conditions";
-  const im=ST.improv,here=stHere(whoAll),pace=stPace();
+  const im=ST.improv,here=stHere(pd),pace=stPace();
   const tool=ST.tool==="travel"?"travel":"oracle";
   const col4=`<aside class="sx-col" data-keep="rules" aria-label="Rules and improv">
     <section class="sx-box" aria-label="Rules at a glance"><div class="sx-bhr"><span class="sx-bh">Rules at a Glance</span><small>stays where you leave it</small></div>
@@ -4363,6 +4360,26 @@ function planToScenes(p,n,start){
     list=[scnNew({title:p.title||`Session ${n}`,read:p.opener||"",clues,who})]}
   return list.map((s,i)=>{const{updated:_u,dmOnly:_d,secret:_s,...r}=s;
     return{...r,clues:r.clues||[],ifs:r.ifs||[],who:r.who||[],note:i===0&&extra?[r.note,extra].filter(Boolean).join("\n\n"):(r.note||""),session:n,order:start+i,played}})}
+/* One-time cleanup: scenes made from old session plans carried hidden links ("who") to the entries named in those plans.
+   Nothing edits them any more, so they're cleared. Linked NPCs and monsters are added to that session's Prep Board first, so the Session Table keeps showing them;
+   other links (quests, notes) are dropped. A scene with unsaved edits on the Prep Board waits for them to save. */
+let WHOMIG_BUSY=false;const WHOMIG_TRIED=new Set();
+const whoMigrateDue=()=>S.live&&isDM()&&!WHOMIG_BUSY&&!S.plans.length&&S.scenes.some(x=>Array.isArray(x.who)&&x.who.length&&!WHOMIG_TRIED.has(x.id));
+async function whoMigrate(){
+  if(WHOMIG_BUSY)return;WHOMIG_BUSY=true;let cleared=0;
+  try{
+    const bySess=new Map();
+    for(const x of S.scenes)if(Array.isArray(x.who)&&x.who.length&&!WHOMIG_TRIED.has(x.id)){const n=num(x.session);if(!n)continue;(bySess.get(n)||bySess.set(n,[]).get(n)).push(x)}
+    for(const [n,list] of bySess){
+      if(prepUnsaved(n)||(SCN.dirty&&SCN.d&&list.some(x=>SCN.d.some(y=>y.id===x.id))))continue;
+      const npcs=[],mons=[];list.forEach(x=>x.who.forEach(w=>{const r=rec(w.col,w.id);if(!r)return;
+        if(w.col==="characters"&&r.kind!=="pc")npcs.push(w.id);else if(w.col==="monsters")mons.push(w.id)}));
+      if(npcs.length||mons.length){const d=prepRec(n),add=npcs.some(id=>!d.npcs.includes(id))||mons.some(id=>!d.monsters.includes(id));
+        if(add&&!await prepPatch(n,d=>{npcs.forEach(id=>{if(!d.npcs.includes(id))d.npcs.push(id)});mons.forEach(id=>{if(!d.monsters.includes(id))d.monsters.push(id)})}))continue}
+      for(const x of list){WHOMIG_TRIED.add(x.id);if(await save("scenes",x.id,{...x,who:[]}))cleared++}}
+    if(cleared)project()}
+  catch(e){console.warn("scene link cleanup",e)}
+  WHOMIG_BUSY=false}
 async function planMigrate(){
   if(PLAN_BUSY||!isDM()||!S.live||!S.plans.length)return;PLAN_BUSY=true;
   try{
@@ -4437,6 +4454,7 @@ function render(){
   if(!SECMIG_DONE&&secretsDue()){SECMIG_DONE=true;setTimeout(secretMigrate,1500)}
   if(!PREPMIG_BUSY&&!window.__pmT&&prepMigrateDue())window.__pmT=setTimeout(()=>{window.__pmT=null;prepMigrate()},2500);
   if(!window.__imT&&itemMigrateDue())window.__imT=setTimeout(()=>{window.__imT=null;itemMigrate()},3000);
+  if(!window.__wmT&&whoMigrateDue())window.__wmT=setTimeout(()=>{window.__wmT=null;whoMigrate()},3500);
   if(S.plans.length&&!PLAN_BUSY&&!window.__plT&&S.plans.some(p=>!PLAN_TRIED.has(p.id)))window.__plT=setTimeout(()=>{window.__plT=null;planMigrate()},2500);
 }
 
