@@ -300,7 +300,7 @@ textarea.scn-box-t{resize:none;overflow:hidden;min-height:96px}
 .sx-grid{display:grid;grid-template-columns:330px 300px minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:18px;padding:16px max(20px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));height:100%;box-sizing:border-box}
 .sx-col{min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;scrollbar-width:none}
 .sx-col::-webkit-scrollbar{display:none}
-/* the six prep panels: a grid whose two column and one row dividers drag (sizes saved on this device, see stLayout) */
+/* the prep panels: a grid whose two column and one row dividers drag (sizes saved on this device, see stLayout) */
 .sx-pgrid{display:grid;min-height:0;min-width:0;padding:5px}
 .sx-pan{background:#efe0be;color:#2a1b10;border-radius:4px;box-shadow:0 0 0 1px #8a6a32,0 0 0 4px #241811,0 0 0 5px #5a4220;padding:12px 16px;display:flex;flex-direction:column;gap:8px;min-height:0;min-width:0;overflow:hidden;box-sizing:border-box}
 .sx-pan .vempty{color:#5e4630}
@@ -310,6 +310,12 @@ textarea.scn-box-t{resize:none;overflow:hidden;min-height:96px}
 .sx-sedit{border:0;background:none;font:400 14px var(--sc);color:var(--accent);cursor:pointer;padding:0 0 0 10px;min-height:32px}
 .sx-sedit:hover{text-decoration:underline}
 .sx-sb{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin}.sx-sb>*{flex-shrink:0}
+/* Monsters, Magic Items and Handouts share one panel, stacked: each list takes the height it needs and they shrink together when the panel is full */
+.sx-stack{gap:0;padding-top:10px;padding-bottom:10px}
+.sx-sub{display:flex;flex-direction:column;gap:6px;flex:0 1 auto;min-height:76px}
+.sx-sub+.sx-sub{margin-top:8px;padding-top:8px;border-top:2px solid #b08e52}
+.sx-sub .sx-sb{flex:0 1 auto}
+.sx-sub .sx-sb .vempty{margin:0}
 .sx-card{display:flex;flex-direction:column;gap:3px;padding:8px 10px;border:1px solid var(--gilt-rule);border-radius:3px;background:#f6ebd0;font-size:15px;line-height:1.35}
 .sx-card b.sx-cn{font:600 16px var(--body)}
 .sx-split{position:relative;touch-action:none;outline:none}
@@ -326,7 +332,7 @@ textarea.scn-box-t{resize:none;overflow:hidden;min-height:96px}
 .sx-wide[aria-pressed="true"]{background:var(--accent);color:#f6e8c6}
 /* narrower wide screens: same row of controls, music on a second row under it */
 @media (min-width:901px) and (max-width:1799px){.sx-top{display:grid;grid-template-columns:auto minmax(160px,300px) minmax(0,1fr) repeat(4,auto);column-gap:12px}.sx-time{flex:none}.sx-music{grid-row:2;grid-column:1/-1}}
-/* narrower than the six panels can share: one scrolling column, prep first, panels at their natural height */
+/* narrower than the prep panels can share: one scrolling column, prep first, panels at their natural height */
 @media (max-width:1499px){.sx-grid{grid-template-columns:minmax(0,1fr);height:auto;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}.sx-col{overflow:visible}
   .sx-pgrid{order:-1;display:flex;flex-direction:column;gap:14px}.sx-split,.sx-top .sx-eq,.sx-top .sx-wide{display:none}.sx-pan{max-height:70vh}}
 @media (max-width:900px){.tablemode.sx-mode{overflow-y:auto}.sx-mode .sx-body{flex:none;overflow:visible}.sx-pan{padding:12px}.sx-search{max-width:none}}
@@ -373,7 +379,6 @@ textarea.scn-box-t{resize:none;overflow:hidden;min-height:96px}
 .sx-att button{flex:1 1 0;min-width:56px;min-height:36px;border:1px solid #b08e52;border-radius:3px;background:#efe0be;color:#2a1b10;font:400 13px var(--sc);cursor:pointer}
 .sx-att button[aria-pressed="true"]{background:var(--accent);border-color:#5e140b;color:#f6e8c6}
 .sx-unpin{border:1px solid #b08e52;border-radius:999px;background:#efe0be;color:#5e4630;font-size:13px;padding:2px 10px;cursor:pointer;min-height:28px}
-.sx-other{display:flex;flex-wrap:wrap;gap:6px}
 .sx-box{background:#241811;border:1px solid #5a4220;border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:8px;color:#ead9b5}
 .sx-bh{font:400 19px var(--sc);color:var(--gold)}
 .sx-bhr{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.sx-bhr small{font-size:13px;font-style:italic;color:#b5a07e}
@@ -3010,7 +3015,8 @@ const stRefreshResults=()=>{const r=document.getElementById("sx-results");if(r)r
 const stLogItems=n=>noteLines(rcNotesVal(n)).slice(-60).reverse().map(l=>{const s=l.replace(/^-\s*/,""),m=s.match(/^\[([^\]]+)\]\s*(.*)$/);return m&&/\d/.test(m[1])?{t:m[1],x:m[2]}:{t:"",x:s}});
 const stLogHtml=n=>{const it=stLogItems(n);return it.length?it.map(o=>`<li><span class="sx-lt">${esc(o.t)}</span><span>${esc(o.x)}</span></li>`).join(""):`<li class="vempty">Nothing logged yet. It goes into this session's notes for the recap.</li>`};
 function stMoon(){const c=cal(),mn=(c.moons||[]).find(x=>x&&x.cycle);if(!mn)return "";const st=moonStep(mn,toIdx(c,c.today));return `<span class="sx-moon" role="img" aria-label="${esc(mn.name)}: ${MOON_NAMES[st]}">${MOON_ICONS[st]}</span>`}
-function stHere(who){const pl=who.map(w=>w.col==="notes"&&rec("notes",w.id)).find(x=>x&&["location","shop"].includes(x.category));return pl?pl.title:""}
+// where the party is, for Travel: the first named Fantastic Location on tonight's Prep Board
+function stHere(pd){const l=pd.locations.find(l=>l.name.trim());return l?l.name.trim():""}
 function stImprov(k){const pcs=S.characters.filter(x=>x.kind==="pc"&&x.status!=="dead"),c=cal(),n=rcSession();
   if(k==="npc")return{kind:"Quick NPC",title:orPick(OR_NAMES),detail:`Species: ${orPick(OR_RACES)}\nDefining feature: ${orPick(OR_FEATURES)}\nQuirk: ${orPick(OR_QUIRKS)}\nWants: ${orPick(OR_WANTS)}`};
   if(k==="rumor")return{kind:"Rumor",title:"Overheard",detail:orPick(OR_RUMORS)};
@@ -3026,14 +3032,14 @@ function stImprov(k){const pcs=S.characters.filter(x=>x.kind==="pc"&&x.status!==
 function stFoeInfo(x){const ls=String(x.notes||"").split("\n").map(l=>plain(l).trim()).filter(Boolean);const f=re=>{const l=ls.find(l=>re.test(l));return l?l.replace(re,"").trim():""};
   return{fight:f(/^tactics?\s*[:.]\s*/i)||(ls[0]&&!/^(breaks?|flees?|morale|says?)\b/i.test(ls[0])?ls[0]:""),flee:f(/^(breaks? when|flees? when|flees?|morale)\s*[:.]\s*/i),say:f(/^says?\s*[:.]\s*/i)}}
 
-/* The six prep panels' sizes: two column and one row divider that drag. Saved on this device only ({cols:[3 fr], rows:[2 fr]}); none saved = all equal. */
-const ST_LAYOUT_KEY="desk.st.layout",ST_LAYOUT6_KEY="desk.st.layout6",ST_WIDE_KEY="desk.st.wide",ST_GAP=14;
-// "wide" = the rules rail and party column are hidden and the six panels sit in one row (needs a screen 1500px or wider)
+/* The prep panels' sizes (Scenes, Clues, Locations and NPCs in a 2x2, the stacked Monsters / Magic Items / Handouts column beside them): two column and one row divider that drag. Saved on this device only ({cols:[3 fr], rows:[2 fr]}); none saved = all equal. */
+const ST_LAYOUT_KEY="desk.st.layout",ST_LAYOUT5_KEY="desk.st.layout5",ST_WIDE_KEY="desk.st.wide",ST_GAP=14;
+// "wide" = the rules rail and party column are hidden and the five panels (the last one stacking Monsters, Magic Items and Handouts) sit in one row (needs a screen 1500px or wider)
 function stWide(){try{return localStorage.getItem(ST_WIDE_KEY)==="1"&&innerWidth>=1500}catch(_){return false}}
 function stWideSave(on){try{on?localStorage.setItem(ST_WIDE_KEY,"1"):localStorage.removeItem(ST_WIDE_KEY)}catch(_){}}
-function stLayout(wide){const nc=wide?6:3,nr=wide?1:2;try{const L=JSON.parse(localStorage.getItem(wide?ST_LAYOUT6_KEY:ST_LAYOUT_KEY)||"null"),ok=(a,n)=>Array.isArray(a)&&a.length===n&&a.every(v=>typeof v==="number"&&isFinite(v)&&v>0);
+function stLayout(wide){const nc=wide?5:3,nr=wide?1:2;try{const L=JSON.parse(localStorage.getItem(wide?ST_LAYOUT5_KEY:ST_LAYOUT_KEY)||"null"),ok=(a,n)=>Array.isArray(a)&&a.length===n&&a.every(v=>typeof v==="number"&&isFinite(v)&&v>0);
   if(L&&ok(L.cols,nc)&&ok(L.rows,nr))return{cols:L.cols,rows:L.rows}}catch(_){}return{cols:Array(nc).fill(1),rows:Array(nr).fill(1)}}
-function stLayoutSave(L,wide){try{const k=wide?ST_LAYOUT6_KEY:ST_LAYOUT_KEY;L?localStorage.setItem(k,JSON.stringify(L)):localStorage.removeItem(k)}catch(_){}}
+function stLayoutSave(L,wide){try{const k=wide?ST_LAYOUT5_KEY:ST_LAYOUT_KEY;L?localStorage.setItem(k,JSON.stringify(L)):localStorage.removeItem(k)}catch(_){}}
 const stLayoutEqual=wide=>{const L=stLayout(wide),eq=a=>a.every(v=>Math.abs(v/a[0]-1)<.01);return eq(L.cols)&&eq(L.rows)};
 const stTracks=a=>a.map(f=>`minmax(0,${+f.toFixed(4)}fr)`).join(` ${ST_GAP}px `);
 const stLayoutCss=L=>`grid-template-columns:${stTracks(L.cols)};grid-template-rows:${stTracks(L.rows)}`;
@@ -3075,7 +3081,7 @@ function renderSession(el){
     <div class="sx-time">${stMoon()}<span class="sx-dt"><b>${esc(fmtDate(c,c.today))}</b><span>${fmtMin(stMin??igMin())}</span></span>
       <button type="button" class="btn sm" data-act="stTime" data-n="10">+10 min</button><button type="button" class="btn sm" data-act="stTime" data-n="60">+1 hour</button><button type="button" class="btn sm" data-act="stShort" title="An hour passes and the rest goes in this session's notes">Short rest</button><button type="button" class="btn sm" data-act="stLong" title="Next day at 8 am, logged in this session's notes">Long rest</button><button type="button" class="btn sm" data-act="stUndo" ${ST.undo.length?"":"disabled"} title="Undo the last time change" aria-label="Undo the last time change">↶ Undo</button></div>
     ${music?`<div class="sx-music">${music}</div>`:""}
-    <button type="button" class="btn sx-wide" data-act="stWide" aria-pressed="${W}" title="${W?"Show":"Hide"} the rules and party columns" aria-label="${W?"Show":"Hide"} the rules and party columns"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="16"/><path d="M8 4v16"/></svg></button><button type="button" class="btn sx-eq" data-act="stEqual" ${stLayoutEqual(W)?"disabled":""} title="Make all six prep cards the same size" aria-label="Make all six prep cards the same size"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="7" height="7"/><rect x="14" y="4" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></button><button type="button" class="btn sx-startb" data-act="stStart" aria-expanded="${!!ST.start}" aria-controls="sx-start">Start</button><button type="button" class="btn sx-prep" data-act="stPrepLib">Prep &amp; Library</button><button type="button" class="btn primary sx-end" data-act="stRecap">End session</button>
+    <button type="button" class="btn sx-wide" data-act="stWide" aria-pressed="${W}" title="${W?"Show":"Hide"} the rules and party columns" aria-label="${W?"Show":"Hide"} the rules and party columns"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="16"/><path d="M8 4v16"/></svg></button><button type="button" class="btn sx-eq" data-act="stEqual" ${stLayoutEqual(W)?"disabled":""} title="Make all the prep cards the same size" aria-label="Make all the prep cards the same size"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="7" height="7"/><rect x="14" y="4" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></button><button type="button" class="btn sx-startb" data-act="stStart" aria-expanded="${!!ST.start}" aria-controls="sx-start">Start</button><button type="button" class="btn sx-prep" data-act="stPrepLib">Prep &amp; Library</button><button type="button" class="btn primary sx-end" data-act="stRecap">End session</button>
     ${ST.start?`<section id="sx-start" class="sx-start" role="dialog" aria-labelledby="sx-start-h"><div class="sx-sh2"><h2 id="sx-start-h">Start</h2><button type="button" class="sx-x" data-act="stStart" aria-label="Close Start">×</button></div>
       ${String(pd.opening||"").trim()?`<p>${esc(pd.opening.trim())}</p>`:`<p class="vempty">No opening written for this session yet.</p>`}
       <div class="sx-sacts"><button type="button" class="btn" data-act="stEdit" data-id="${sessId(pn)}" data-sec="opening">Edit on the Prep Board</button><button type="button" class="btn primary" data-act="stStart">Done</button></div></section>`:""}</header>`;
@@ -3091,14 +3097,12 @@ function renderSession(el){
     <section class="sx-box" aria-label="Session log"><span class="sx-bh">Log a Moment</span><form data-stlog class="sx-logf"><input id="sx-log" placeholder="What happened? Press Enter" aria-label="What happened?" enterkeyhint="done"><button class="btn sm primary" type="submit">Log</button></form>
       <div class="sx-tags">${ST_TAGS.map(t=>`<button type="button" data-act="stTag" data-v="${t}" aria-pressed="${ST.tag===t}">${t}</button>`).join("")}<small>Time is stamped for you. Loot also goes to the recap.</small></div>
       <ul class="sx-log">${stLogHtml(n)}</ul></section></nav>`;
-  // ---- the six prep panels
-  const seen=new Set(),whoAll=[];scenes.forEach(s=>s.who.forEach(w=>{const k=w.col+":"+w.id;if(!seen.has(k)){seen.add(k);whoAll.push(w)}}));
+  // ---- the prep panels: Scenes, Clues, Locations and NPCs, then one column stacking Monsters, Magic Items and Handouts
   const pinned=(col,id)=>ST.pins.some(p=>p.col===col&&p.id===id);
   const gather=(col,ids)=>{const out=[],had=new Set();for(const id of ids){if(had.has(id))continue;had.add(id);const x=rec(col,id);if(x&&!(col==="characters"&&x.kind==="pc"))out.push({x,pin:pinned(col,id)})}return out};
-  const ppl=gather("characters",[...pd.npcs,...whoAll.filter(w=>w.col==="characters").map(w=>w.id),...ST.pins.filter(p=>p.col==="characters").map(p=>p.id)]);
-  const foes=gather("monsters",[...pd.monsters,...whoAll.filter(w=>w.col==="monsters").map(w=>w.id),...ST.pins.filter(p=>p.col==="monsters").map(p=>p.id)]);
-  const other=whoAll.filter(w=>!["characters","monsters"].includes(w.col)).map(w=>({w,x:rec(w.col,w.id)})).filter(o=>o.x);
-  const pins=ST.pins.filter(p=>!["characters","monsters"].includes(p.col)).map(p=>({p,x:rec(p.col,p.id)})).filter(o=>o.x&&!other.some(w=>w.w.col===o.p.col&&w.w.id===o.p.id));
+  const ppl=gather("characters",[...pd.npcs,...ST.pins.filter(p=>p.col==="characters").map(p=>p.id)]);
+  const foes=gather("monsters",[...pd.monsters,...ST.pins.filter(p=>p.col==="monsters").map(p=>p.id)]);
+  const pins=ST.pins.filter(p=>!["characters","monsters"].includes(p.col)).map(p=>({p,x:rec(p.col,p.id)})).filter(o=>o.x);
   const sessClues=prepClues(pn);
   const unpin=(col,x)=>`<button type="button" class="sx-unpin" data-act="stPin" data-col="${col}" data-id="${x.id}" aria-label="Unpin ${esc(titleOf(col,x)||"")}">Pinned ×</button>`;
   const clue=(k,i)=>!String(k.t||"").trim()?"":`<button type="button" class="sx-clue" data-act="stClue" data-i="${i}" aria-pressed="${!!k.found}"><span class="sx-dot" aria-hidden="true"></span><span>${esc(k.t)}</span>${k.found?`<span class="sx-rev">revealed</span>`:""}</button>`;
@@ -3108,23 +3112,30 @@ function renderSession(el){
   const pinCard=({p,x})=>`<div class="sx-npc sx-pin"><div class="sx-nh"><button type="button" class="sx-nn" data-act="stEntry" data-col="${p.col}" data-type="${p.col}" data-id="${x.id}">${esc(titleOf(p.col,x)||"Untitled")} <span>more ›</span></button><button type="button" class="sx-unpin" data-act="stPin" data-col="${p.col}" data-id="${x.id}" aria-label="Unpin ${esc(titleOf(p.col,x)||"")}">Pinned · ${esc(libTag(p.col,x))} ×</button></div><span>${esc(libBlurb(p.col,x))}</span>${x.secret?`<span class="sx-sec"><b>Secret:</b> ${esc(plain(String(x.secret)).slice(0,200))}</span>`:""}</div>`;
   const tick=x=>`<button type="button" class="sx-tick" data-act="stDone" data-id="${esc(x.id)}" aria-pressed="${!!x.done}" aria-label="${esc(scnTitle(x.note)||x.title||"Scene")}: ${x.done?"done, mark not done":"mark done"}">${x.done?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>':""}</button>`;
   const scBlock=x=>{const t=String(x.note||"").trim()||String(x.title||"").trim();return `<div class="sx-sc ${x.done?"done":""}">${tick(x)}<div class="sx-sc-body">${t?esc(t):`<i>Empty scene</i>`}</div></div>`};
-  const L=stLayout(W),RP=[1,3],CP=[1,3,5];
-  const pan=(k,i,title,count,body)=>`<section class="sx-pan" style="${W?`grid-row:1;grid-column:${2*i+1}`:`grid-row:${RP[Math.floor(i/3)]};grid-column:${CP[i%3]}`}" aria-labelledby="sx-h-${k}"><div class="sx-sh2"><h2 id="sx-h-${k}">${title}</h2><span>${count?`<small>${count}</small>`:""}<button type="button" class="sx-sedit" data-act="stEdit" data-id="${sessId(pn)}" data-sec="${k}" aria-label="Edit ${title} on the Prep Board">Edit</button></span></div><div class="sx-sb" data-keep="p-${k}">${body}</div></section>`;
+  // slots 0-3 fill a 2x2 in the first two columns; slot 4 (the stack) takes the third column top to bottom. Wide: all five in one row.
+  const L=stLayout(W),POS=["grid-row:1;grid-column:1","grid-row:1;grid-column:3","grid-row:3;grid-column:1","grid-row:3;grid-column:3","grid-row:1/4;grid-column:5"];
+  const place=i=>W?`grid-row:1;grid-column:${2*i+1}`:POS[i];
+  const head=(k,title,count,tag)=>`<div class="sx-sh2"><${tag} id="sx-h-${k}">${title}</${tag}><span>${count?`<small>${count}</small>`:""}<button type="button" class="sx-sedit" data-act="stEdit" data-id="${sessId(pn)}" data-sec="${k}" aria-label="Edit ${title} on the Prep Board">Edit</button></span></div>`;
+  const pan=(k,i,title,count,body)=>`<section class="sx-pan" style="${place(i)}" aria-labelledby="sx-h-${k}">${head(k,title,count,"h2")}<div class="sx-sb" data-keep="p-${k}">${body}</div></section>`;
+  // one panel holding several short lists on top of one another; each list is only as tall as it needs and scrolls once the panel is full
+  const stack=(i,label,subs)=>`<section class="sx-pan sx-stack" style="${place(i)}" aria-label="${label}">${subs.map(([k,title,count,body])=>`<section class="sx-sub" aria-labelledby="sx-h-${k}">${head(k,title,count,"h2")}<div class="sx-sb" data-keep="p-${k}">${body}</div></section>`).join("")}</section>`;
+  const noteRow=(x,word)=>{const b=libBlurb("notes",x);return `<div class="sx-npc"><div class="sx-nh"><button type="button" class="sx-nn" data-act="stEntry" data-col="notes" data-id="${x.id}" aria-label="Open ${esc(x.title||word)}">${esc(x.title||"Unnamed "+word)} <span>more ›</span></button></div>${b?`<span>${esc(b)}</span>`:""}</div>`};
   const empty=t=>`<p class="vempty">${t}</p>`;
-  const locs=pd.locations.filter(l=>l.name.trim()||l.desc.some(d=>d.trim())),items=pd.magic.map(id=>rec("notes",id)).filter(Boolean);
+  const locs=pd.locations.filter(l=>l.name.trim()||l.desc.some(d=>d.trim())),items=pd.magic.map(id=>rec("notes",id)).filter(Boolean),hos=pd.handouts.map(id=>rec("notes",id)).filter(Boolean);
   const split=(k,label,style)=>`<div class="sx-split ${k==="rows0"?"h":"v"}" style="${style}" data-split="${k}" role="separator" aria-orientation="${k==="rows0"?"horizontal":"vertical"}" aria-label="${label}" title="Drag to resize · double-click to make every card the same size" tabindex="0"></div>`;
   const col2=`<main class="sx-pgrid" aria-label="Tonight's prep" style="${stLayoutCss(L)}">
     ${pan("scenes",0,"Scenes",scenes.length?`${doneN} of ${scenes.length} done`:"",scenes.length?shown.map(scBlock).join(""):empty("No scenes for tonight yet."))}
     ${pan("clues",1,"Secrets &amp; Clues",sessClues.length?`${sessClues.filter(k=>k.found).length} of ${sessClues.length} revealed`:"",sessClues.map(clue).join("")||empty("No secrets or clues for this session."))}
-    ${pan("locations",2,"Fantastic Locations","",(locs.map(l=>`<div class="sx-card"><b class="sx-cn">${esc(l.name||"Unnamed place")}</b>${l.desc.filter(d=>d.trim()).map(d=>`<span>• ${esc(d)}</span>`).join("")}</div>`).join("")
-      +(other.length?`<div class="sx-other">${other.map(({w,x})=>`<button type="button" class="chip" data-act="stEntry" data-col="${esc(w.col)}" data-id="${esc(x.id)}">${esc(titleOf(w.col,x)||"Untitled")}</button>`).join("")}</div>`:""))||empty("No locations for this session."))}
+    ${pan("locations",2,"Fantastic Locations","",locs.map(l=>`<div class="sx-card"><b class="sx-cn">${esc(l.name||"Unnamed place")}</b>${l.desc.filter(d=>d.trim()).map(d=>`<span>• ${esc(d)}</span>`).join("")}</div>`).join("")||empty("No locations for this session."))}
     ${pan("npcs",3,"Important NPCs","",(pins.map(pinCard).join("")+ppl.map(npcCard).join(""))||empty("Nobody yet. Add NPCs on the Prep Board, or search above and pin someone."))}
-    ${pan("monsters",4,"Relevant Monsters","",foes.map(foeCard).join("")||empty("No monsters for this session."))}
-    ${pan("items",5,"Magic Items","",items.map(x=>{const b=libBlurb("notes",x);return `<div class="sx-npc"><div class="sx-nh"><button type="button" class="sx-nn" data-act="stEntry" data-col="notes" data-id="${x.id}" aria-label="Open ${esc(x.title||"magic item")}">${esc(x.title||"Unnamed item")} <span>more ›</span></button></div>${b?`<span>${esc(b)}</span>`:""}</div>`}).join("")||empty("No magic items for this session. Add them on the Prep Board."))}
-    ${W?[0,1,2,3,4].map(i=>split("cols"+i,`Resize panel ${i+1} and panel ${i+2}`,`grid-row:1;grid-column:${2*i+2}`)).join(""):split("cols0","Resize the first and second columns","grid-row:1/4;grid-column:2")+split("cols1","Resize the second and third columns","grid-row:1/4;grid-column:4")+split("rows0","Resize the top and bottom rows","grid-row:2;grid-column:1/6")}</main>`;
+    ${stack(4,"Monsters, magic items and handouts",[
+      ["monsters","Relevant Monsters",foes.length||"",foes.map(foeCard).join("")||empty("No monsters for this session.")],
+      ["items","Magic Items",items.length||"",items.map(x=>noteRow(x,"magic item")).join("")||empty("No magic items for this session. Add them on the Prep Board.")],
+      ["handouts","Handouts",hos.length||"",hos.map(x=>noteRow(x,"handout")).join("")||empty("No handouts for this session. Add them on the Prep Board.")]])}
+    ${W?[0,1,2,3].map(i=>split("cols"+i,`Resize panel ${i+1} and panel ${i+2}`,`grid-row:1;grid-column:${2*i+2}`)).join(""):split("cols0","Resize the first and second columns","grid-row:1/4;grid-column:2")+split("cols1","Resize the second and third columns","grid-row:1/4;grid-column:4")+split("rows0","Resize the top and bottom rows","grid-row:2;grid-column:1/4")}</main>`;
   // ---- rules rail (left-most): rules, then the Oracle and Travel sharing one box
   const RC=ST_RCATS();if(!RC[ST.rcat])ST.rcat="Conditions";
-  const im=ST.improv,here=stHere(whoAll),pace=stPace();
+  const im=ST.improv,here=stHere(pd),pace=stPace();
   const tool=ST.tool==="travel"?"travel":"oracle";
   const col4=`<aside class="sx-col" data-keep="rules" aria-label="Rules and improv">
     <section class="sx-box" aria-label="Rules at a glance"><div class="sx-bhr"><span class="sx-bh">Rules at a Glance</span><small>stays where you leave it</small></div>
@@ -4349,6 +4360,26 @@ function planToScenes(p,n,start){
     list=[scnNew({title:p.title||`Session ${n}`,read:p.opener||"",clues,who})]}
   return list.map((s,i)=>{const{updated:_u,dmOnly:_d,secret:_s,...r}=s;
     return{...r,clues:r.clues||[],ifs:r.ifs||[],who:r.who||[],note:i===0&&extra?[r.note,extra].filter(Boolean).join("\n\n"):(r.note||""),session:n,order:start+i,played}})}
+/* One-time cleanup: scenes made from old session plans carried hidden links ("who") to the entries named in those plans.
+   Nothing edits them any more, so they're cleared. Linked NPCs and monsters are added to that session's Prep Board first, so the Session Table keeps showing them;
+   other links (quests, notes) are dropped. A scene with unsaved edits on the Prep Board waits for them to save. */
+let WHOMIG_BUSY=false;const WHOMIG_TRIED=new Set();
+const whoMigrateDue=()=>S.live&&isDM()&&!WHOMIG_BUSY&&!S.plans.length&&S.scenes.some(x=>Array.isArray(x.who)&&x.who.length&&!WHOMIG_TRIED.has(x.id));
+async function whoMigrate(){
+  if(WHOMIG_BUSY)return;WHOMIG_BUSY=true;let cleared=0;
+  try{
+    const bySess=new Map();
+    for(const x of S.scenes)if(Array.isArray(x.who)&&x.who.length&&!WHOMIG_TRIED.has(x.id)){const n=num(x.session);if(!n)continue;(bySess.get(n)||bySess.set(n,[]).get(n)).push(x)}
+    for(const [n,list] of bySess){
+      if(prepUnsaved(n)||(SCN.dirty&&SCN.d&&list.some(x=>SCN.d.some(y=>y.id===x.id))))continue;
+      const npcs=[],mons=[];list.forEach(x=>x.who.forEach(w=>{const r=rec(w.col,w.id);if(!r)return;
+        if(w.col==="characters"&&r.kind!=="pc")npcs.push(w.id);else if(w.col==="monsters")mons.push(w.id)}));
+      if(npcs.length||mons.length){const d=prepRec(n),add=npcs.some(id=>!d.npcs.includes(id))||mons.some(id=>!d.monsters.includes(id));
+        if(add&&!await prepPatch(n,d=>{npcs.forEach(id=>{if(!d.npcs.includes(id))d.npcs.push(id)});mons.forEach(id=>{if(!d.monsters.includes(id))d.monsters.push(id)})}))continue}
+      for(const x of list){WHOMIG_TRIED.add(x.id);if(await save("scenes",x.id,{...x,who:[]}))cleared++}}
+    if(cleared)project()}
+  catch(e){console.warn("scene link cleanup",e)}
+  WHOMIG_BUSY=false}
 async function planMigrate(){
   if(PLAN_BUSY||!isDM()||!S.live||!S.plans.length)return;PLAN_BUSY=true;
   try{
@@ -4423,6 +4454,7 @@ function render(){
   if(!SECMIG_DONE&&secretsDue()){SECMIG_DONE=true;setTimeout(secretMigrate,1500)}
   if(!PREPMIG_BUSY&&!window.__pmT&&prepMigrateDue())window.__pmT=setTimeout(()=>{window.__pmT=null;prepMigrate()},2500);
   if(!window.__imT&&itemMigrateDue())window.__imT=setTimeout(()=>{window.__imT=null;itemMigrate()},3000);
+  if(!window.__wmT&&whoMigrateDue())window.__wmT=setTimeout(()=>{window.__wmT=null;whoMigrate()},3500);
   if(S.plans.length&&!PLAN_BUSY&&!window.__plT&&S.plans.some(p=>!PLAN_TRIED.has(p.id)))window.__plT=setTimeout(()=>{window.__plT=null;planMigrate()},2500);
 }
 
