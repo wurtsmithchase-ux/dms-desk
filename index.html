@@ -2183,8 +2183,8 @@ function vPrep(c){
 // the session the board is showing: the one picked in the header, else the next one to run
 const boardN=()=>{if(U.prepSess)return U.prepSess;const p=thNext();return p?p.session:nextSession()};
 function sessPicker(n){
-  const list=[...new Set([...sessList(),n])].sort((a,b)=>b-a),cnt=k=>S.scenes.filter(x=>num(x.session)===k).length;
-  return `<select class="scn-in ph-sess" id="scn-plan" aria-label="Session">${list.map(k=>`<option value="${k}" ${k===n?"selected":""}>Session ${k} · ${cnt(k)} scene${cnt(k)===1?"":"s"}${sessPlan(k).status==="played"?" (played)":""}</option>`).join("")}<option value="new">+ Plan session ${nextSession()}</option></select>`}
+  const list=[...new Set([...sessList(),n])].sort((a,b)=>b-a);
+  return `<select class="scn-in ph-sess" id="scn-plan" aria-label="Session">${list.map(k=>`<option value="${k}" ${k===n?"selected":""}>Session ${k}${sessPlan(k).status==="played"?" (played)":""}</option>`).join("")}<option value="new">+ Plan session ${nextSession()}</option></select>`}
 // the old Scenes page, notes and plan links all land on the board: show session n and focus a scene (or the Scenes section)
 function goBoard(n,sel,sec){
   U.prepSess=n||null;U.prepTab="board";if(sel)SCN.sel=sel;
@@ -2661,12 +2661,10 @@ async function carryOver(from,to){
 const scnUnsaved=pid=>(SCN.pid===pid&&SCN.dirty)||!!SCN.pending[pid];
 document.addEventListener("visibilitychange",()=>{if(document.hidden)scnFlush()});
 window.addEventListener("pagehide",()=>{scnFlush()});
-// the scene boxes: one growing text box per scene, with delete and a way to push it to the next session
+// the scene boxes: one growing text box per scene, with delete
 function scnCards(){
-  const nx=sessNum(SCN.pid)+1;
   const row=(x,i)=>`<div class="pp-row" data-scsel="${x.id}"><span class="pp-i" aria-hidden="true">${i+1}</span>
     <textarea class="pp-in grow" data-scf="note" data-id="${x.id}" rows="1" placeholder="Scene" aria-label="Scene ${i+1}">${esc(x.note)}</textarea>
-    <button type="button" class="pp-mv" data-act="scnMoveNext" data-id="${x.id}" title="Move to Session ${nx}" aria-label="Move scene ${i+1} to Session ${nx}">→ ${nx}</button>
     ${ppGrip("scenes",i,SCN.d.length,scnTitle(x.note)||"scene "+(i+1))}
     <button type="button" class="pp-x ${SCN.arm===x.id?"armed":""}" data-act="scnDel" data-id="${x.id}" aria-label="${SCN.arm===x.id?`Yes, delete scene ${i+1}`:`Delete scene ${i+1}`}" title="Delete">${SCN.arm===x.id?"Delete?":"×"}</button></div>`;
   return `<div data-pplist="scenes">${SCN.d.map(row).join("")}</div>${ppAdd("scnAdd","Add scene")}`}
@@ -2678,7 +2676,6 @@ document.addEventListener("input",e=>{const t=e.target;if(!t.dataset||t.dataset.
 document.addEventListener("change",e=>{
   if(e.target.id!=="scn-plan")return;scnFlush();prepFlush();U.prepSess=e.target.value==="new"?nextSession():num(e.target.value);render()});
 function scnAct(a,t){
-  if(a==="scnMoveNext"){const n=SCN.pid?sessNum(SCN.pid):0;if(!n)return;return sessMoveScenes([t.dataset.id],n+1)}
   if(a==="scnAdd"){if(!SCN.d)return;const s=scnNew();SCN.d.push(s);SCN.sel=s.id;SCN.arm=null;FOCUS_NEXT=`[data-scsel="${CSS.escape(s.id)}"] textarea`;return scnTouch(true)}
   if(a==="scnDel"){if(SCN.arm!==t.dataset.id){SCN.arm=t.dataset.id;render();return}SCN.d=SCN.d.filter(x=>x.id!==t.dataset.id);SCN.arm=null;SCN.sel=null;return scnTouch(true)}}
 function backlinksFrom(text){
@@ -5084,7 +5081,7 @@ document.addEventListener("click",async e=>{
     case"ppCarry":carryOver(num(t.dataset.from),num(t.dataset.to));break;
     case"scnMoveOpen":{const p=sessPlan(sessNum(t.dataset.id));sessMoveScenes(p.scenes.filter(x=>!x.done&&!x.played).map(x=>x.id),p.session+1);break}
     case"ppJump":case"ppReady":case"ppFold":case"ppClueAdd":case"ppClueDel":case"ppLocAdd":case"ppLocDel":case"ppDescAdd":case"ppDescDel":case"ppPick":case"ppPickDel":case"ppPickNew":case"ppSort":prepAct(a,t);break;
-    case"scnAdd":case"scnDel":case"scnMoveNext":scnAct(a,t);break;
+    case"scnAdd":case"scnDel":scnAct(a,t);break;
     case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stStart":case"stEqual":case"stWide":case"stTool":case"stDone":case"stSpot":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
     case"stTime":case"stShort":case"stLong":case"stUndo":case"stRoll":case"stAtt":case"stEdit":case"stClue":stAct(a,t);break;
     case"heroSel":case"heroTab":case"heroLvl":heroAct(a,t);break;
