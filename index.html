@@ -2170,7 +2170,7 @@ function vPrep(c){
   const back=`<button type="button" class="btn ph-back" data-act="prepTab" data-v="board">‹ Prep Board</button>`;
   if(t==="board"){const n=boardN(),ng=nextGameText();
     const board=vPrepBoard(c);  // loads the session's drafts first, so the status line is current
-    return pageHead(esc(ng||"No game date set"),`Prep for Session ${n}`,{extra:sessPicker(n)+`<span id="pp-state" class="scn-state" role="status" aria-live="polite">${esc(boardState())}</span>`,cls:"ph-c"})+board}
+    return pageHead(esc(ng||"No game date set"),`Prep for Session ${n}`,{extra:sessPicker(n)+carryMenu(n)+`<span id="pp-state" class="scn-state" role="status" aria-live="polite">${esc(boardState())}</span>`,cls:"ph-c"})+board}
   const PREP_PAGES={notes:"Session notes",todos:"Prep to-dos",bestiary:"Bestiary",encounters:"Encounters",tables:"Roll tables",spotlight:"Spotlight",ideas:"Saved ideas"};
   return pageHead("Prep",PREP_PAGES[t]||"Prep",{extra:back})+`<div class="ph-page">`+(t==="notes"?toolsPanel():t==="todos"?vTodos():t==="bestiary"?vBestiary():t==="encounters"?vEncounters():t==="tables"?vTables():t==="ideas"?vBrainstorm():vSpotlight())+`</div>`;
 }
@@ -2608,6 +2608,39 @@ async function sessMoveScenes(ids,m){
   project();SCN.ver=null;SCN.sel=null;
   if(k)toast(`Moved ${k} scene${k===1?"":"s"} to Session ${m}.`+(bad?` ${bad} didn't save.`:""));
   render()}
+/* Carry over: move everything still open on an earlier session's board to session `to`.
+   Unfinished scenes (not done, not played) change session; unrevealed clues leave the old board and join the new one (a clue already there by the same text isn't added twice).
+   The rest of the board (NPCs, monsters, locations, items, handouts) has no done state, so it stays put. */
+const carryScenes=k=>S.scenes.filter(x=>num(x.session)===k&&!x.done&&!x.played);
+const carryClues=k=>prepClues(k).filter(c=>!c.found&&c.t.trim());
+const carryCount=k=>({sc:carryScenes(k).length,cl:carryClues(k).length});
+const carryFrom=n=>[...new Set([...sessList(),...S.preps.map(r=>num(r.session)||num(String(r.id).slice(4)))])].filter(k=>k>0&&k<n).sort((a,b)=>b-a).filter(k=>{const c=carryCount(k);return c.sc||c.cl});
+function carryMenu(n){
+  const L=carryFrom(n).slice(0,6);if(!L.length)return "";
+  const what=c=>[c.sc?`${c.sc} scene${c.sc===1?"":"s"}`:"",c.cl?`${c.cl} clue${c.cl===1?"":"s"}`:""].filter(Boolean).join(", ");
+  return moreMenu(L.map(k=>mi("ppCarry",`From Session ${k} · ${what(carryCount(k))}`,`data-from="${k}" data-to="${n}"`)),{label:"⇠ Carry over",title:"Move unfinished scenes and unrevealed clues from an earlier session to this one",cls:"pp-carry"})}
+let CARRY_BUSY=false;
+async function carryOver(from,to){
+  if(CARRY_BUSY||!from||!to||from===to)return;CARRY_BUSY=true;
+  try{
+    // nothing moves while either board has edits that haven't saved
+    for(const k of [from,to]){const pid=sessId(k);if(SCN.pid===pid&&SCN.dirty)await scnFlush();if(scnUnsaved(pid)){toast(`Your scene edits for Session ${k} haven't saved yet, so nothing was moved.`);render();return}}
+    for(const k of [from,to]){if(PREP.n===k&&PREP.dirty)await prepFlush();if(prepUnsaved(k)){toast(`Your prep edits for Session ${k} haven't saved yet, so nothing was moved.`);render();return}}
+    // clues: add to the new board first, then take them off the old one, so a failed save never loses one
+    const open=carryClues(from);let cl=0,clBad=false;
+    if(open.length){
+      const have=new Set(prepRec(to).clues.map(c=>c.t.trim().toLowerCase()));
+      const add=open.filter(c=>!have.has(c.t.trim().toLowerCase())).map(c=>({t:c.t,found:false}));
+      const ok=!add.length||await prepPatch(to,d=>{d.clues.push(...add)});
+      if(ok&&await prepPatch(from,d=>{d.clues=d.clues.filter(c=>c.found||!c.t.trim())}))cl=open.length;else clBad=true}
+    // scenes: each one changes session, after what the new session already has
+    const base=S.scenes.filter(x=>num(x.session)===to).length;let sc=0,scBad=0;
+    for(const cur of carryScenes(from)){const{id,updated:_u,dmOnly:_d,secret:_s,...r}=JSON.parse(JSON.stringify(cur));
+      if(await save("scenes",id,{...r,session:to,order:base+sc,done:false,played:false}))sc++;else scBad++}
+    project();SCN.ver=null;PREP.ver=null;
+    const got=[sc?`${sc} scene${sc===1?"":"s"}`:"",cl?`${cl} clue${cl===1?"":"s"}`:""].filter(Boolean).join(" and ");
+    toast((got?`Moved ${got} from Session ${from} to Session ${to}.`:"Nothing was moved.")+(scBad?` ${scBad} scene${scBad===1?"":"s"} didn't save.`:"")+(clBad?" The clues didn't save.":""));
+  }finally{CARRY_BUSY=false;render()}}
 // true when this session has scene edits that aren't saved yet (open in the editor or held from a failed save)
 const scnUnsaved=pid=>(SCN.pid===pid&&SCN.dirty)||!!SCN.pending[pid];
 document.addEventListener("visibilitychange",()=>{if(document.hidden)scnFlush()});
@@ -5032,6 +5065,7 @@ document.addEventListener("click",async e=>{
     case"newRel":openForm("links",null,{a:t.dataset.id,kind:"ally",dmOnly:true});break;
     case"newPlan":goBoard(nextSession());break;
     case"planPlayed":{const pid=t.dataset.id,on=sessPlan(sessNum(pid)).status!=="played";stScenePatch(pid,sc=>sc.forEach(s=>{s.played=on}));break}
+    case"ppCarry":carryOver(num(t.dataset.from),num(t.dataset.to));break;
     case"scnMoveOpen":{const p=sessPlan(sessNum(t.dataset.id));sessMoveScenes(p.scenes.filter(x=>!x.done&&!x.played).map(x=>x.id),p.session+1);break}
     case"ppJump":case"ppReady":case"ppFold":case"ppClueAdd":case"ppClueDel":case"ppLocAdd":case"ppLocDel":case"ppDescAdd":case"ppDescDel":case"ppPick":case"ppPickDel":case"ppPickNew":case"ppSort":prepAct(a,t);break;
     case"scnAdd":case"scnDel":case"scnMoveNext":scnAct(a,t);break;
