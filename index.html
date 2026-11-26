@@ -2379,8 +2379,8 @@ function vPrepBoard(c){
     return `<section class="pp-sec${closed?" closed":""}" id="pp-sec-${k}" aria-labelledby="pp-h-${k}"><div class="pp-sh"><h3 id="pp-h-${k}" tabindex="-1"><button type="button" class="pp-fold" data-act="ppFold" data-k="${k}" aria-expanded="${!closed}" aria-controls="pp-b-${k}">${PP_ICO.chev}<span class="pp-t">${esc(title)}</span>${o.count!=null?`<span class="pp-n" id="pp-n-${k}">${o.count}</span>`:""}</button></h3>${o.act||""}<button type="button" class="pp-ready" data-act="ppReady" data-k="${k}" aria-pressed="${on}" aria-label="${esc(title)} ready" title="Ready">${PP_ICO.check("",13)}</button></div><div class="pp-bd" id="pp-b-${k}" ${closed?"hidden":""}>${body}</div></section>`};
   const T=Object.fromEntries(PREP_SECS);
   // Scenes: one compact growing row per scene, edited right here
-  const pl=sessPlan(n),nx=n+1;
-  const scenesAct=moreMenu([mi("planPlayed",pl.status==="played"?"Mark as planned":"Mark as played",`data-id="${pl.id}" ${pl.scenes.length?"":"disabled"}`),mi("scnMoveOpen",`Move unfinished scenes to Session ${nx}`,`data-id="${pl.id}" ${pl.scenes.some(x=>!x.done&&!x.played)?"":"disabled"}`),mi("copyR20","Copy for Roll20",`data-type="scenes" data-id="${pl.id}"`),...ppSortItems("scenes",SCN.d.length,[["az","Sort scenes A–Z"],["open","Unfinished scenes first"]])]);
+  const pl=sessPlan(n);
+  const scenesAct=moreMenu([mi("planPlayed",pl.status==="played"?"Mark as planned":"Mark as played",`data-id="${pl.id}" ${pl.scenes.length?"":"disabled"}`),mi("copyR20","Copy for Roll20",`data-type="scenes" data-id="${pl.id}"`),...ppSortItems("scenes",SCN.d.length,[["az","Sort scenes A–Z"],["open","Unfinished scenes first"]])]);
   const scenesBody=scnCards();
   const clues=d.clues.map((k,i)=>`<div class="pp-row"><input type="checkbox" data-pp="found" data-i="${i}" ${k.found?"checked":""} aria-label="Clue ${i+1} revealed" title="Revealed to the players">${ppArea("pp-clue-"+i,`data-pp="clue" data-i="${i}"`,k.t,"Clue","Secret or clue "+(i+1))}${ppGrip("clues",i,d.clues.length,k.t||"clue "+(i+1))}${ppX("ppClueDel",`data-i="${i}"`,"Remove clue "+(i+1))}</div>`).join("");
   const locs=d.locations.map((l,i)=>`<div class="pp-loc"><div class="pp-lh"><input id="pp-ln-${i}" class="pp-in pp-lname" data-pp="ln" data-i="${i}" value="${esc(l.name)}" placeholder="Location" aria-label="Location ${i+1} name" autocomplete="off">${ppGrip("locations",i,d.locations.length,l.name||"location "+(i+1))}${ppX("ppLocDel",`data-i="${i}"`,"Remove "+(l.name||"location "+(i+1)))}</div>
@@ -2596,18 +2596,6 @@ async function sessAddScene(n,o){
   if(SCN.pid===sessId(n)&&SCN.dirty)await scnFlush();
   const{id:_,...s}=scnNew(o),id=uid();
   return await save("scenes",id,{...s,session:n,order:S.scenes.filter(x=>num(x.session)===n).length})?id:null}
-/* Moves scenes to the end of another session. A moved scene starts fresh there (not done, not played).
-   Edits in the editor are saved first, and nothing moves while this session still has unsaved edits. */
-async function sessMoveScenes(ids,m){
-  const pid=SCN.pid;if(pid&&SCN.dirty)await scnFlush();
-  if(pid&&scnUnsaved(pid)){toast("Your scene edits haven't saved yet, so nothing was moved.");render();return}
-  const base=S.scenes.filter(x=>num(x.session)===m).length;let k=0,bad=0;
-  for(const id of ids){const cur=S.scenes.find(x=>x.id===id);if(!cur)continue;
-    const{id:_i,updated:_u,dmOnly:_d,secret:_s,...r}=JSON.parse(JSON.stringify(cur));
-    if(await save("scenes",id,{...r,session:m,order:base+k,done:false,played:false}))k++;else bad++}
-  project();SCN.ver=null;SCN.sel=null;
-  if(k)toast(`Moved ${k} scene${k===1?"":"s"} to Session ${m}.`+(bad?` ${bad} didn't save.`:""));
-  render()}
 /* Carry over: bring everything still open on an earlier session's board to session `to`.
    Moved: unfinished scenes (not done, not played) change session; unrevealed clues leave the old board and join the new one.
    Copied: NPCs, monsters, magic items, handouts and locations have no done state, so they're added to the new board and also stay on the old one.
@@ -5079,7 +5067,6 @@ document.addEventListener("click",async e=>{
     case"newPlan":goBoard(nextSession());break;
     case"planPlayed":{const pid=t.dataset.id,on=sessPlan(sessNum(pid)).status!=="played";stScenePatch(pid,sc=>sc.forEach(s=>{s.played=on}));break}
     case"ppCarry":carryOver(num(t.dataset.from),num(t.dataset.to));break;
-    case"scnMoveOpen":{const p=sessPlan(sessNum(t.dataset.id));sessMoveScenes(p.scenes.filter(x=>!x.done&&!x.played).map(x=>x.id),p.session+1);break}
     case"ppJump":case"ppReady":case"ppFold":case"ppClueAdd":case"ppClueDel":case"ppLocAdd":case"ppLocDel":case"ppDescAdd":case"ppDescDel":case"ppPick":case"ppPickDel":case"ppPickNew":case"ppSort":prepAct(a,t);break;
     case"scnAdd":case"scnDel":scnAct(a,t);break;
     case"stClose":case"stSheet":case"stEntry":case"stEntryTab":case"stFull":case"stRecap":case"stHooks":case"stRecapNote":case"stPrepLib":case"stQClear":case"stPin":case"stStart":case"stEqual":case"stWide":case"stTool":case"stDone":case"stSpot":case"stTag":case"stRcat":case"stPace":case"stOracle":case"stTable":case"stLogIt":case"stGenSave":stAct2(a,t);break;
